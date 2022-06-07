@@ -6,7 +6,7 @@ import skimage.morphology
 
 from habitat.sims.habitat_simulator.actions import HabitatSimActions
 
-import utils.pose_utils as pu
+import submission.utils.pose_utils as pu
 from .fmm_planner import FMMPlanner
 
 
@@ -46,10 +46,12 @@ class Planner:
         self.turn_angle = config.ENVIRONMENT.turn_angle
         self.collision_threshold = config.AGENT.PLANNER.collision_threshold
         if config.AGENT.PLANNER.denoise_selem_radius > 0:
-            self.denoise_selem = skimage.morphology.disk(config.AGENT.PLANNER.denoise_selem_radius)
+            self.denoise_selem = skimage.morphology.disk(
+                config.AGENT.PLANNER.denoise_selem_radius)
         else:
             self.denoise_selem = None
-        self.dilation_selem = skimage.morphology.disk(config.AGENT.PLANNER.dilation_selem_radius)
+        self.dilation_selem = skimage.morphology.disk(
+            config.AGENT.PLANNER.dilation_selem_radius)
 
         self.collision_map = None
         self.visited_map = None
@@ -159,15 +161,28 @@ class Planner:
 
         obstacles = obstacle_map[x1:x2, y1:y2]
 
-        # Remove noise with standard morphological transformation (closing -> opening)
+        # Remove noise with standard morphological transformation
+        # (closing -> opening)
         if self.denoise_selem is not None:
-            denoised_obstacles = cv2.morphologyEx(obstacles, cv2.MORPH_CLOSE, self.denoise_selem)
-            denoised_obstacles = cv2.morphologyEx(denoised_obstacles, cv2.MORPH_OPEN, self.denoise_selem)
+            denoised_obstacles = cv2.morphologyEx(
+                obstacles,
+                cv2.MORPH_CLOSE,
+                self.denoise_selem
+            )
+            denoised_obstacles = cv2.morphologyEx(
+                denoised_obstacles,
+                cv2.MORPH_OPEN,
+                self.denoise_selem
+            )
         else:
             denoised_obstacles = obstacles
 
         # Increase the size of obstacles
-        dilated_obstacles = cv2.dilate(denoised_obstacles, self.dilation_selem, iterations=1)
+        dilated_obstacles = cv2.dilate(
+            denoised_obstacles,
+            self.dilation_selem,
+            iterations=1
+        )
 
         if self.visualize:
             r, c = obstacles.shape
@@ -216,8 +231,12 @@ class Planner:
             self.col_width = 1
 
         dist = pu.get_l2_distance(x1, x2, y1, y2)
-        if dist < self.collision_threshold:  # Collision
+
+        if dist < self.collision_threshold:
+            # We have a collision
             width = self.col_width
+
+            # Add obstacles to the collision map
             for i in range(length):
                 for j in range(width):
                     wx = x1 + 0.05 * \

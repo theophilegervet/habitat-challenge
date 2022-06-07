@@ -1,0 +1,5 @@
+scikit-image==0.15.0
+scikit-fmm
+torch
+torchvision
+# Add python -m pip install 'git+https://github.com/facebookresearch/detectron2.git' to Docker

@@ -3,25 +3,21 @@ from torch import Tensor
 import torch.nn as nn
 
 from .semantic_map.semantic_map_module import SemanticMapModule
-
-
-policies = {
-    "frontier": FrontierExplorationPolicy,
-    "semantic": SemanticExplorationPolicy
-}
+from .policy.policy import Policy
 
 
 class AgentModule(nn.Module):
 
-    def __init__(self, config):
-        super(AgentModule, self).__init__()
+    def __init__(self, config, policy: Policy):
+        super().__init__()
 
         self.semantic_map_module = SemanticMapModule(config)
-        self.policy = policies[config.AGENT.type](config)
+        self.policy = policy
 
     def forward(self,
                 seq_obs: Optional[Tensor],
                 seq_pose_delta: Optional[Tensor],
+                seq_goal_category: Optional[Tensor],
                 seq_dones: Optional[Tensor],
                 seq_update_global: Optional[Tensor],
                 init_local_map: Optional[Tensor],
@@ -44,6 +40,8 @@ class AgentModule(nn.Module):
              or (3 + 1 + num_sem_categories + vision_features_dim)
             seq_pose_delta: sequence of delta in pose since last frame of shape
              (batch_size, sequence_length, 3)
+            seq_goal_category: sequence of goal categories of shape
+             (batch_size, sequence_length, 1)
             seq_dones: sequence of (batch_size, sequence_length) done flags that
              indicate episode restarts
             seq_update_global: sequence of (batch_size, sequence_length) binary
@@ -115,7 +113,8 @@ class AgentModule(nn.Module):
         # Predict high-level goals from map features
         # batched across sequence length x num environments
         map_features = seq_map_features.flatten(0, 1)
-        goal_actions, regression_logits = self.policy(map_features)
+        goal_category = seq_goal_category.flatten(0, 1)
+        goal_actions, regression_logits = self.policy(map_features, goal_category)
         seq_goal_actions = goal_actions.view(batch_size, sequence_length, -1)
         seq_regression_logits = (regression_logits.view(batch_size, sequence_length, -1)
                                  if regression_logits is not None else None)

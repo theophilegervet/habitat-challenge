@@ -1,6 +1,8 @@
+import torch
 from habitat.core.env import Env
 
 from submission.utils.config_utils import get_config
+from submission.utils.constants import hm3d_categories_mapping
 from submission.agent import Agent
 
 
@@ -12,6 +14,16 @@ def main():
 
     obs = env.reset()
     agent.reset()
+
+    # Set mapping to convert instance segmentation to semantic segmentation
+    # when using ground-truth semantics
+    agent.obs_preprocessor.set_instance_id_to_category_id(torch.tensor([
+        hm3d_categories_mapping.get(
+            obj.category.index(),
+            config.ENVIRONMENT.num_sem_categories - 1
+        )
+        for obj in env.sim.semantic_annotations().objects
+    ]))
 
     while not env.episode_over:
         action = agent.act(obs)

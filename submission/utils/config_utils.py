@@ -16,14 +16,13 @@ def get_config(path: str, opts: Optional[list] = None) -> Tuple[Config, str]:
     """
     config = Config()
 
-    # Start with Habitat's default config
-    config.merge_from_file(habitat.config.default._C)
-
-    # Add our code's config
+    # Start with our code's config
     config.merge_from_file(path)
 
-    # Add the base task config specified in our code's config
+    # Add Habitat's default config and the base task config path specified
+    # in our code's config under TASK_CONFIG
     task_config = Config()
+    task_config.merge_from_other_cfg(habitat.config.default._C)
     task_config.merge_from_file(config.BASE_TASK_CONFIG_PATH)
     config.TASK_CONFIG = task_config
 
@@ -78,6 +77,6 @@ def get_config(path: str, opts: Optional[list] = None) -> Tuple[Config, str]:
     assert config.ENVIRONMENT.min_depth == depth_sensor.MIN_DEPTH
     assert config.ENVIRONMENT.max_depth == depth_sensor.MAX_DEPTH
     assert config.ENVIRONMENT.turn_angle == config.TASK_CONFIG.SIMULATOR.TURN_ANGLE
-    assert config.ENVIRONMENT.success_distance == config.TASK_CONFIG.TASK.SUCCESS_DISTANCE
+    assert config.ENVIRONMENT.success_distance == config.TASK_CONFIG.TASK.SUCCESS.SUCCESS_DISTANCE
 
     return config, config_str

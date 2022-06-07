@@ -47,7 +47,7 @@ class SemanticMapModule(nn.Module):
             map_pred_threshold (float): number of depth points to be in bin to
              consider it as obstacle
         """
-        super(SemanticMapModule, self).__init__()
+        super().__init__()
 
         self.screen_h = config.ENVIRONMENT.frame_height
         self.screen_w = config.ENVIRONMENT.frame_width

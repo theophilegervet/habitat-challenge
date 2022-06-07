@@ -9,14 +9,16 @@ class Policy(nn.Module, ABC):
     Policy to select high-level goals.
     """
 
-    def __init__(self):
-        super(Policy, self).__init__()
-
     @abstractmethod
-    def forward(self, map_features: Tensor) -> Tuple[Tensor, Optional[Tensor]]:
+    def forward(self,
+                map_features: Tensor,
+                goal_category: Tensor
+                ) -> Tuple[Tensor, Optional[Tensor]]:
         """
         Arguments:
-            map_features: semantic map features of shape (batch_size, channels, M, M)
+            map_features: semantic map features of shape
+             (batch_size, channels, M, M)
+            goal_category: semantic goal category
 
         Returns:
             goal_actions: (y, x) goals in [0, 1] x [0, 1] of
