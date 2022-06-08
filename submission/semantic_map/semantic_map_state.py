@@ -52,8 +52,8 @@ class SemanticMapState:
         # Local map boundaries
         self.lmb = torch.zeros(self.num_environments, 4, dtype=torch.int32, device=self.device)
 
-        # Agent high-level goal
-        self.global_goals = [None] * self.num_environments
+        # Binary map encoding agent high-level goal
+        self.goal_map = np.zeros((self.num_environments, self.local_h, self.local_w))
 
     def init_map_and_pose(self):
         """Initialize global and local map and sensor pose variables."""
@@ -68,16 +68,14 @@ class SemanticMapState:
             e, self.local_map, self.global_map, self.local_pose, self.global_pose,
             self.lmb, self.origins, self.map_size_parameters)
 
-    def update_global_goal_for_env(self, e: int, goal_action: np.ndarray):
+    def update_global_goal_for_env(self, e: int, goal_map: np.ndarray):
         """Update global goal for a specific environment with the goal action chosen
         by the policy.
 
         Arguments:
-            goal_action: (y, x) goal in [0, 1] x [0, 1]
+            goal_map: binary map encoding goal(s) of shape (batch_size, M, M)
         """
-        y, x = goal_action
-        self.global_goals[e] = [min(int(y * self.local_h), int(self.local_h - 1)),
-                                min(int(x * self.local_w), int(self.local_w - 1))]
+        self.goal_map[e] = goal_map
 
     # ------------------------------------------------------------------
     # Getters
@@ -111,9 +109,7 @@ class SemanticMapState:
             self.lmb[e]
         ]).cpu().float().numpy()
 
-    def get_goal_map(self, e):
+    def get_goal_map(self, e) -> np.ndarray:
         """Get binary goal map encoding current global goal for an
         environment."""
-        goal_map = np.zeros((self.local_h, self.local_w))
-        goal_map[self.global_goals[e][0], self.global_goals[e][1]] = 1
-        return goal_map
+        return self.goal_map[e]

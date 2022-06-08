@@ -21,8 +21,7 @@ class Policy(nn.Module, ABC):
             goal_category: semantic goal category
 
         Returns:
-            goal_actions: (y, x) goals in [0, 1] x [0, 1] of
-             shape (batch_size, 2)
+            goal_map: binary map encoding goal(s) of shape (batch_size, M, M)
             regression_logits: if we're using a regression policy, tensor
              of pre-sigmoid (y, x) locations to use in MSE loss of shape
               (batch_size, 2)

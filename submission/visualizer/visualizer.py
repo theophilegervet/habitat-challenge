@@ -21,12 +21,12 @@ class Visualizer:
         self.show_images = config.VISUALIZE
         self.print_images = config.PRINT_IMAGES
 
+        self.default_vis_dir = f"{config.DUMP_LOCATION}/images/{config.EXP_NAME}"
+        shutil.rmtree(self.default_vis_dir, ignore_errors=True)
+        os.makedirs(self.default_vis_dir, exist_ok=True)
+
         self.color_palette = [int(x * 255.) for x in map_color_palette]
         self.legend = cv2.imread("submission/visualizer/legend.png")
-
-        self.images_dir = f"{config.DUMP_LOCATION}/images/{config.EXP_NAME}"
-        shutil.rmtree(self.images_dir, ignore_errors=True)
-        os.makedirs(self.images_dir, exist_ok=True)
 
         self.num_sem_categories = config.ENVIRONMENT.num_sem_categories
         self.map_resolution = config.AGENT.SEMANTIC_MAP.map_resolution
@@ -35,14 +35,22 @@ class Visualizer:
             config.AGENT.SEMANTIC_MAP.map_size_cm // self.map_resolution
         )
 
+        self.vis_dir = None
         self.image_vis = None
         self.visited_map_vis = None
         self.last_xy = None
 
     def reset(self):
+        self.vis_dir = self.default_vis_dir
         self.image_vis = None
         self.visited_map_vis = np.zeros(self.map_shape)
         self.last_xy = None
+
+    def set_vis_dir(self, scene_id: str, episode_id: str):
+        self.vis_dir = os.path.join(
+            self.default_vis_dir, f"{scene_id}_{episode_id}")
+        shutil.rmtree(self.vis_dir, ignore_errors=True)
+        os.makedirs(self.vis_dir, exist_ok=True)
 
     def visualize(self,
                   sensor_pose: np.ndarray,
@@ -85,23 +93,23 @@ class Visualizer:
                 last_pose, curr_pose, self.visited_map_vis[gy1:gy2, gx1:gx2])
         self.last_xy = (curr_x, curr_y)
 
-        semantic_map += 5
+        semantic_map += 4
 
         # Obstacles, explored, and visited areas
-        no_category_mask = semantic_map == 5 + self.num_sem_categories - 1
+        no_category_mask = semantic_map == 4 + self.num_sem_categories - 1
         obstacle_mask = np.rint(obstacle_map) == 1
         explored_mask = np.rint(explored_map) == 1
         visited_mask = self.visited_map_vis[gy1:gy2, gx1:gx2] == 1
         semantic_map[no_category_mask] = 0
-        semantic_map[np.logical_and(no_category_mask, obstacle_mask)] = 1
         semantic_map[np.logical_and(no_category_mask, explored_mask)] = 2
+        semantic_map[np.logical_and(no_category_mask, obstacle_mask)] = 1
         semantic_map[visited_mask] = 3
 
         # Goal
         selem = skimage.morphology.disk(4)
         goal_mat = 1 - skimage.morphology.binary_dilation(goal_map, selem) != True
         goal_mask = goal_mat == 1
-        semantic_map[goal_mask] = 4
+        semantic_map[goal_mask] = 3
 
         # Semantic categories
         semantic_map_vis = Image.new("P", (semantic_map.shape[1], semantic_map.shape[0]))
@@ -130,8 +138,11 @@ class Visualizer:
         cv2.drawContours(self.image_vis, [agent_arrow], 0, color, -1)
 
         if self.show_images:
-            raise NotImplementedError
+            cv2.imshow("Visualization", self.image_vis)
+            cv2.waitKey(1)
 
         if self.print_images:
-            cv2.imwrite(os.path.join(self.images_dir, f"{timestep}.png"),
-                        self.image_vis)
+            cv2.imwrite(
+                os.path.join(self.vis_dir, f"snapshot_{timestep}.png"),
+                self.image_vis
+            )

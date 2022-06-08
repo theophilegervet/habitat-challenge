@@ -3,6 +3,7 @@ import cv2
 import skfmm
 import numpy as np
 from numpy import ma
+import os
 
 
 class FMMPlanner:
@@ -14,7 +15,10 @@ class FMMPlanner:
                  traversible: np.ndarray,
                  stop_distance: float,
                  scale: int = 1,
-                 step_size: int = 5):
+                 step_size: int = 5,
+                 vis_dir: str = "data/images/planner",
+                 visualize=False,
+                 print_images=False):
         """
         Arguments:
             traversible: (M + 1, M + 1) binary map encoding traversible regions
@@ -22,7 +26,13 @@ class FMMPlanner:
             scale: map scale
             step_size: maximum distance of the short-term goal selected by the
              planner
+            vis_dir: folder where to dump visualization
         """
+        self.visualize = visualize
+        self.print_images = print_images
+        self.vis_dir = vis_dir
+        os.makedirs(self.vis_dir, exist_ok=True)
+
         self.stop_distance = stop_distance
         self.scale = scale
         self.step_size = step_size
@@ -38,7 +48,7 @@ class FMMPlanner:
         self.du = int(self.step_size / (self.scale * 1.))
         self.fmm_dist = None
 
-    def set_multi_goal(self, goal_map: np.ndarray, visualize=False):
+    def set_multi_goal(self, goal_map: np.ndarray, timestep: int):
         """Set long-term goal(s) used to compute distance from a binary
         goal map.
         """
@@ -48,14 +58,21 @@ class FMMPlanner:
         dd = ma.filled(dd, np.max(dd) + 1)
         self.fmm_dist = dd
 
-        if visualize:
-            r, c = self.traversible.shape
-            dist_vis = np.zeros((r, c * 3))
-            dist_vis[:, :c] = self.traversible
-            dist_vis[:, c:2 * c] = goal_map
-            dist_vis[:, 2 * c:] = self.fmm_dist / self.fmm_dist.max()
+        r, c = self.traversible.shape
+        dist_vis = np.zeros((r, c * 3))
+        dist_vis[:, :c] = np.flipud(self.traversible)
+        dist_vis[:, c:2 * c] = np.flipud(goal_map)
+        dist_vis[:, 2 * c:] = np.flipud(self.fmm_dist / self.fmm_dist.max())
+
+        if self.visualize:
             cv2.imshow("Planner Distance", dist_vis)
             cv2.waitKey(1)
+
+        if self.print_images:
+            cv2.imwrite(
+                os.path.join(self.vis_dir, f"planner_snapshot_{timestep}.png"),
+                (dist_vis * 255).astype(int)
+            )
 
     def get_short_term_goal(self, state: List[int]):
         """Compute the short-term goal closest to the current state.

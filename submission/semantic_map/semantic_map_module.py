@@ -4,6 +4,7 @@ from torch import Tensor, IntTensor
 import torch.nn as nn
 from torch.nn import functional as F
 import numpy as np
+import skimage.morphology
 
 import submission.utils.depth_utils as du
 import submission.utils.rotation_utils as ru
@@ -228,9 +229,6 @@ class SemanticMapModule(nn.Module):
 
         voxel_channels = 1 + self.num_sem_categories
 
-        # init_grid and feat could safely be fp16 but because of a PyTorch bug
-        # https://github.com/pytorch/pytorch/issues/74487
-        # binning voxels with fp32 inputs is much faster than with fp16 inputs
         init_grid = torch.zeros(
             batch_size,
             voxel_channels,
@@ -325,6 +323,18 @@ class SemanticMapModule(nn.Module):
         for e in range(batch_size):
             x, y = curr_loc[e]
             current_map[e, 2:4, y - 2:y + 3, x - 2:x + 3].fill_(1.)
+
+            # Set a disk around the agent to explored
+            # TODO Move this to GPU
+            # TODO Check that the explored disk fits in the map
+            radius = 10
+            explored_disk = torch.from_numpy(skimage.morphology.disk(radius))
+            current_map[
+                e,
+                1,
+                y - radius: y + radius + 1,
+                x - radius: x + radius + 1
+            ][explored_disk == 1] = 1
 
         return current_map, current_pose
 

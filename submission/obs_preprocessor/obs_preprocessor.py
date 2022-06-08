@@ -9,7 +9,11 @@ from habitat import Config
 from habitat.core.simulator import Observations
 
 import submission.utils.pose_utils as pu
-from submission.utils.constants import frame_color_palette
+from submission.utils.constants import (
+    frame_color_palette,
+    goal_categories,
+    goal_categories_mapping
+)
 from .mask_rcnn import MaskRCNN
 
 
@@ -65,8 +69,9 @@ class ObsPreprocessor:
         )
 
     def preprocess_goal(self, obs: List[Observations]) -> Tuple[Tensor, List[str]]:
-        goal = torch.from_numpy(np.stack([ob["objectgoal"] for ob in obs]))
-        goal_name = ["chair"] * self.num_environments  # TODO
+        goal = torch.tensor([
+            goal_categories_mapping[ob["objectgoal"][0]] for ob in obs])
+        goal_name = [goal_categories[ob["objectgoal"][0]] for ob in obs]
         return goal, goal_name
 
     def preprocess_frame(self,
@@ -104,6 +109,7 @@ class ObsPreprocessor:
 
         depth = preprocess_depth(depth)
 
+        # TODO Handle more than a single frame
         if "semantic" in obs[0] and self.instance_id_to_category_id is not None:
             # Ground-truth semantic segmentation
             assert "semantic" in obs[0]
@@ -118,7 +124,7 @@ class ObsPreprocessor:
 
         else:
             # Predicted semantic segmentation
-            # TODO Handle more than a single frame and avoid conversion to numpy
+            # TODO Avoid conversion to numpy
             # TODO Make sure we're sending data in the right format (BGR vs RGB)
             semantic, semantic_vis = self.segmentation.get_prediction(
                 rgb[0].numpy(), depth[0].squeeze(-1).numpy())
@@ -147,6 +153,7 @@ class ObsPreprocessor:
         vis = vis.convert("RGB")
         vis = np.array(vis)
         vis = np.where(vis != 255, vis, rgb)
+        vis = vis[:, :, ::-1]
         return vis
 
     def preprocess_pose(self,
@@ -158,7 +165,11 @@ class ObsPreprocessor:
         pose_deltas = []
 
         for e in range(self.num_environments):
-            curr_pose = np.concatenate([obs[e]["gps"], obs[e]["compass"]])
+            curr_pose = np.array([
+                obs[e]["gps"][0],
+                -obs[e]["gps"][1],
+                obs[e]["compass"][0]
+            ])
             pose_delta = pu.get_rel_pose_change(curr_pose, last_poses[e])
             curr_poses.append(curr_pose)
             pose_deltas.append(pose_delta)

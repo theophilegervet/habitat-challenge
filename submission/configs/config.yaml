@@ -22,7 +22,8 @@ ENVIRONMENT:
   max_depth: 5.0          # maximum depth for depth sensor (in metres)
 
 AGENT:
-  goal_update_steps: 5    # frequency at which to update the high-level goal during inference
+  goal_update_steps: 1    # frequency at which to update the high-level goal during inference
+  max_steps: 250          # maximum number of steps before stopping an episode
 
   SEMANTIC_MAP:
     map_size_cm: 9600        # global map size (in centimetres)

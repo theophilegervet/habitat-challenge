@@ -1,3 +1,21 @@
+goal_categories = {
+    0: "chair",
+    1: "bed",
+    2: "potted plant",
+    3: "toilet",
+    4: "tv",
+    5: "couch",
+}
+
+goal_categories_mapping = {
+    0: 0,  # chair
+    1: 3,  # bed
+    2: 2,  # potted plant
+    3: 4,  # toilet
+    4: 5,  # tv
+    5: 1,  # couch
+}
+
 coco_categories = {
     "chair": 0,
     "couch": 1,
@@ -5,7 +23,7 @@ coco_categories = {
     "bed": 3,
     "toilet": 4,
     "tv": 5,
-    "dining-table": 6,
+    "dining table": 6,
     "oven": 7,
     "sink": 8,
     "refrigerator": 9,
@@ -24,7 +42,7 @@ coco_categories_mapping = {
     59: 3,  # bed
     61: 4,  # toilet
     62: 5,  # tv
-    60: 6,  # dining-table
+    60: 6,  # dining table
     69: 7,  # oven
     71: 8,  # sink
     72: 9,  # refrigerator
@@ -52,7 +70,7 @@ hm3d_categories_mapping = {
     47: 4,   # toilet bin
     # tv
     74: 5,   # tv
-    # dining-table
+    # dining table
     23: 6,   # table
     # oven
     103: 7,  # microwave

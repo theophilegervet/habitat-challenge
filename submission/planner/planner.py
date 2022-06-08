@@ -1,9 +1,12 @@
+import os
+import shutil
 import cv2
 import math
 import numpy as np
 from typing import Tuple, List
 import skimage.morphology
 
+from habitat import Config
 from habitat.sims.habitat_simulator.actions import HabitatSimActions
 
 import submission.utils.pose_utils as pu
@@ -17,7 +20,7 @@ class Planner:
     in the environment when training with vectorized environments.
     """
 
-    def __init__(self, config):
+    def __init__(self, config: Config):
         """
         Arguments decided by the environment:
             frame_height (int): first-person frame height
@@ -33,6 +36,10 @@ class Planner:
              there's a collision
         """
         self.visualize = config.VISUALIZE
+        self.print_images = config.PRINT_IMAGES
+        self.default_vis_dir = f"{config.DUMP_LOCATION}/images/{config.EXP_NAME}"
+        os.makedirs(self.default_vis_dir, exist_ok=True)
+
         self.map_size_cm = config.AGENT.SEMANTIC_MAP.map_size_cm
         self.map_resolution = config.AGENT.SEMANTIC_MAP.map_resolution
         self.map_shape = (self.map_size_cm // self.map_resolution,
@@ -53,14 +60,17 @@ class Planner:
         self.dilation_selem = skimage.morphology.disk(
             config.AGENT.PLANNER.dilation_selem_radius)
 
+        self.vis_dir = None
         self.collision_map = None
         self.visited_map = None
         self.col_width = None
         self.last_pose = None
         self.curr_pose = None
         self.last_action = None
+        self.timestep = None
 
     def reset(self):
+        self.vis_dir = self.default_vis_dir
         self.collision_map = np.zeros(self.map_shape)
         self.visited_map = np.zeros(self.map_shape)
         self.col_width = 1
@@ -68,6 +78,13 @@ class Planner:
         self.curr_pose = [self.map_size_cm / 100. / 2.,
                           self.map_size_cm / 100. / 2., 0.]
         self.last_action = None
+        self.timestep = 1
+
+    def set_vis_dir(self, scene_id: str, episode_id: str):
+        self.vis_dir = os.path.join(
+            self.default_vis_dir, f"{scene_id}_{episode_id}")
+        shutil.rmtree(self.vis_dir, ignore_errors=True)
+        os.makedirs(self.vis_dir, exist_ok=True)
 
     def plan(self,
              obstacle_map: np.ndarray,
@@ -94,6 +111,13 @@ class Planner:
         start = [int(start_y * 100. / self.map_resolution - gx1),
                  int(start_x * 100. / self.map_resolution - gy1)]
         start = pu.threshold_poses(start, obstacle_map.shape)
+
+        # If we're close enough to the closest goal, stop
+        # TODO Compute distance in meters instead of map cells
+        goal_locations = np.argwhere(goal_map == 1)
+        distances = np.linalg.norm(goal_locations - start, axis=1)
+        if distances.min() < 12.:
+            return HabitatSimActions.STOP
 
         self.curr_pose = [start_x, start_y, start_o]
         self.visited_map[gx1:gx2, gy1:gy2][start[0] - 0:start[0] + 1,
@@ -184,14 +208,14 @@ class Planner:
             iterations=1
         )
 
-        if self.visualize:
-            r, c = obstacles.shape
-            morphological_vis = np.zeros((r, c * 3))
-            morphological_vis[:, :c] = obstacles
-            morphological_vis[:, c:2 * c] = denoised_obstacles
-            morphological_vis[:, 2 * c:] = dilated_obstacles
-            cv2.imshow("Planner Morphological Transformations", morphological_vis)
-            cv2.waitKey(1)
+        # if self.visualize:
+        #     r, c = obstacles.shape
+        #     morphological_vis = np.zeros((r, c * 3))
+        #     morphological_vis[:, :c] = obstacles
+        #     morphological_vis[:, c:2 * c] = denoised_obstacles
+        #     morphological_vis[:, 2 * c:] = dilated_obstacles
+        #     cv2.imshow("Planner Morphological Transformations", morphological_vis)
+        #     cv2.waitKey(1)
 
         traversible = 1 - dilated_obstacles
         traversible[self.collision_map[gx1:gx2, gy1:gy2][x1:x2, y1:y2] == 1] = 0
@@ -201,12 +225,19 @@ class Planner:
         traversible = add_boundary(traversible)
         goal_map = add_boundary(goal_map, value=0)
 
-        planner = FMMPlanner(traversible, self.stop_distance)
+        planner = FMMPlanner(
+            traversible,
+            self.stop_distance,
+            vis_dir=self.vis_dir,
+            visualize=self.visualize,
+            print_images=self.print_images
+        )
 
         selem = skimage.morphology.disk(10)
         goal_map = skimage.morphology.binary_dilation(goal_map, selem) != True
         goal_map = 1 - goal_map * 1.
-        planner.set_multi_goal(goal_map, visualize=self.visualize)
+        planner.set_multi_goal(goal_map, self.timestep)
+        self.timestep += 1
 
         state = [start[0] - x1 + 1, start[1] - y1 + 1]
         stg_x, stg_y, _, stop = planner.get_short_term_goal(state)

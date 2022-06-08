@@ -7,6 +7,7 @@ import numpy as np
 import habitat
 from habitat import Config
 from habitat.core.simulator import Observations
+from habitat.sims.habitat_simulator.actions import HabitatSimActions
 
 from .agent_module import AgentModule
 from .semantic_map.semantic_map_state import SemanticMapState
@@ -29,6 +30,7 @@ class Agent(habitat.Agent):
     """
 
     def __init__(self, config: Config, rank: int, ddp: bool = False):
+        self.max_steps = config.AGENT.max_steps
         self.goal_update_steps = config.AGENT.goal_update_steps
         self.precision = torch.float16 if config.MIXED_PRECISION_AGENT else torch.float32
         self.num_environments = config.NUM_ENVIRONMENTS
@@ -100,11 +102,11 @@ class Agent(habitat.Agent):
                           for e in range(self.num_environments)]
         dones = torch.tensor([False] * self.num_environments)
         update_global = torch.tensor(
-            [self.timesteps[e] % self.goal_update_steps == 1
+            [self.timesteps[e] % self.goal_update_steps == 0
              for e in range(self.num_environments)])
 
         (
-            predicted_goal_actions,
+            goal_map,
             _,
             self.semantic_map.local_map,
             self.semantic_map.global_map,
@@ -131,11 +133,11 @@ class Agent(habitat.Agent):
         self.semantic_map.lmb = seq_lmb[:, -1]
         self.semantic_map.origins = seq_origins[:, -1]
 
-        goal_actions = predicted_goal_actions.squeeze(1).cpu()
+        goal_map = goal_map.squeeze(1).cpu().numpy()
 
         for e in range(self.num_environments):
             if update_global[e]:
-                self.semantic_map.update_global_goal_for_env(e, goal_actions[e])
+                self.semantic_map.update_global_goal_for_env(e, goal_map[e])
 
         planner_inputs = [
             {
@@ -167,9 +169,20 @@ class Agent(habitat.Agent):
         self.planner.reset()
         self.visualizer.reset()
 
+    def set_vis_dir(self, scene_id: str, episode_id: str):
+        """
+        Reset visualization directory - if we have access to
+        environment object and scene_id and episode_id.
+        """
+        self.planner.set_vis_dir(scene_id, episode_id)
+        self.visualizer.set_vis_dir(scene_id, episode_id)
+
     @torch.no_grad()
     def act(self, obs: Observations):
         """Act end-to-end."""
+        if self.timesteps[0] > self.max_steps:
+            return HabitatSimActions.STOP
+
         (
             obs_preprocessed,
             semantic_frame,
@@ -181,6 +194,7 @@ class Agent(habitat.Agent):
 
         planner_inputs, vis_infos = self.prepare_planner_inputs(
             obs_preprocessed, pose_delta, goal_category)
+
         action = self.planner.plan(**planner_inputs[0])
 
         self.visualizer.visualize(

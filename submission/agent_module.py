@@ -60,8 +60,8 @@ class AgentModule(nn.Module):
              goal from these map features instead
 
         Returns:
-            seq_goal_actions: sequence of (y, x) goals in [0, 1] x [0, 1] of
-             shape (batch_size, sequence_length, 2)
+            seq_goal_map: sequence of binary maps encoding goal(s) of shape
+             (batch_size, sequence_length, M, M)
             seq_regression_logits: if we're using a regression policy, pre-sigmoid
              (y, x) locations to use in MSE loss of shape
              (batch_size, sequence_length, 2)
@@ -114,13 +114,13 @@ class AgentModule(nn.Module):
         # batched across sequence length x num environments
         map_features = seq_map_features.flatten(0, 1)
         goal_category = seq_goal_category.flatten(0, 1)
-        goal_actions, regression_logits = self.policy(map_features, goal_category)
-        seq_goal_actions = goal_actions.view(batch_size, sequence_length, -1)
+        goal_map, regression_logits = self.policy(map_features, goal_category)
+        seq_goal_map = goal_map.view(batch_size, sequence_length, *goal_map.shape[-2:])
         seq_regression_logits = (regression_logits.view(batch_size, sequence_length, -1)
                                  if regression_logits is not None else None)
 
         return (
-            seq_goal_actions,
+            seq_goal_map,
             seq_regression_logits,
             final_local_map,
             final_global_map,
