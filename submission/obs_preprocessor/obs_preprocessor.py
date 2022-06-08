@@ -82,6 +82,7 @@ class ObsPreprocessor:
             zero_mask = depth == 0.
             col_max = depth.max(axis=1, keepdims=True).values
             depth += zero_mask * col_max
+            depth = self.min_depth * 100. + depth * self.max_depth * 100.
             return depth
 
         def downscale(rgb, depth, semantic):
@@ -135,7 +136,6 @@ class ObsPreprocessor:
         depth = depth.permute(0, 3, 1, 2)
         semantic = semantic.permute(0, 3, 1, 2)
 
-        depth = self.min_depth * 100. + depth * self.max_depth * 100.
         rgb, depth, semantic = downscale(rgb, depth, semantic)
         obs_preprocessed = torch.cat([rgb, depth, semantic], dim=1)
 
