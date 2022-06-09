@@ -111,6 +111,8 @@ class VectorizedEvaluator:
 
         # TODO Write vectorized evaluation loop here
 
+        envs.close()
+
 
 if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
