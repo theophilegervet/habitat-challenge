@@ -3,6 +3,7 @@ import torch
 from torch.nn.parallel import DistributedDataParallel
 from torch.nn import DataParallel
 import numpy as np
+import time
 
 import habitat
 from habitat import Config
@@ -61,6 +62,7 @@ class Agent(habitat.Agent):
 
         self.timesteps = None
         self.last_poses = None
+        self.last_action = None
 
     # ------------------------------------------------------------------
     # Inference methods to interact with vectorized environments
@@ -180,6 +182,7 @@ class Agent(habitat.Agent):
     @torch.no_grad()
     def act(self, obs: Observations):
         """Act end-to-end."""
+        #st = time.time()
         if self.timesteps[0] > self.max_steps:
             return HabitatSimActions.STOP
 
@@ -190,12 +193,13 @@ class Agent(habitat.Agent):
             pose_delta,
             goal_category,
             goal_name
-        ) = self.obs_preprocessor.preprocess([obs], self.last_poses)
+        ) = self.obs_preprocessor.preprocess([obs], self.last_poses, self.last_action)
 
         planner_inputs, vis_infos = self.prepare_planner_inputs(
             obs_preprocessed, pose_delta, goal_category)
 
         action = self.planner.plan(**planner_inputs[0])
+        self.last_action = action
 
         self.visualizer.visualize(
             **planner_inputs[0],
@@ -204,4 +208,5 @@ class Agent(habitat.Agent):
             goal_name=goal_name[0],
             timestep=self.timesteps[0]
         )
+        #print("Action time: {}".format(time.time()-st))
         return {"action": action}
