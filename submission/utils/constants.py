@@ -53,6 +53,7 @@ coco_categories_mapping = {
     39: 14,  # bottle
 }
 
+# TODO This mapping seems only valid for scene wcojb4TFT35
 hm3d_categories_mapping = {
     # chair
     196: 0,  # folding chair

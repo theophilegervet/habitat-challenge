@@ -22,7 +22,6 @@ class Visualizer:
         self.print_images = config.PRINT_IMAGES
 
         self.default_vis_dir = f"{config.DUMP_LOCATION}/images/{config.EXP_NAME}"
-        shutil.rmtree(self.default_vis_dir, ignore_errors=True)
         os.makedirs(self.default_vis_dir, exist_ok=True)
 
         self.color_palette = [int(x * 255.) for x in map_color_palette]

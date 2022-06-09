@@ -15,6 +15,7 @@ def main():
     for ep in range(len(env.episodes)):
         obs = env.reset()
         agent.reset()
+
         agent.set_vis_dir(
             scene_id=env.current_episode.scene_id.split("/")[-1].split(".")[0],
             episode_id=env.current_episode.episode_id
@@ -22,13 +23,13 @@ def main():
 
         # Set mapping to convert instance segmentation to semantic segmentation
         # when using ground-truth semantics
-        agent.obs_preprocessor.set_instance_id_to_category_id(torch.tensor([
-            hm3d_categories_mapping.get(
-                obj.category.index(),
-                config.ENVIRONMENT.num_sem_categories - 1
-            )
-            for obj in env.sim.semantic_annotations().objects
-        ]))
+        # agent.obs_preprocessor.set_instance_id_to_category_id(torch.tensor([
+        #     hm3d_categories_mapping.get(
+        #         obj.category.index(),
+        #         config.ENVIRONMENT.num_sem_categories - 1
+        #     )
+        #     for obj in env.sim.semantic_annotations().objects
+        # ]))
 
         while not env.episode_over:
             action = agent.act(obs)

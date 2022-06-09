@@ -38,17 +38,17 @@ class MaskRCNN:
                 obj_mask = seg_predictions[0]["instances"].pred_masks[j] * 1.0
                 obj_mask = obj_mask.cpu().numpy()
 
-                # if depth is not None:
-                #     md = np.median(depth[obj_mask == 1])
-                #     if md == 0:
-                #         filter_mask = np.ones_like(obj_mask, dtype=bool)
-                #     else:
-                #         # Restrict objects to 2m depth
-                #         filter_mask = (depth >= md + 1.0) | (depth <= md - 1.0)
-                #     print(
-                #         f"Median object depth: {md.item()}, filtering out {np.count_nonzero(filter_mask)} pixels"
-                #     )
-                #     obj_mask[filter_mask] = 0.0
+                if depth is not None:
+                    md = np.median(depth[obj_mask == 1])
+                    if md == 0:
+                        filter_mask = np.ones_like(obj_mask, dtype=bool)
+                    else:
+                        # Restrict objects to 2m depth
+                        filter_mask = (depth >= md + 100) | (depth <= md - 100)
+                    # print(
+                    #     f"Median object depth: {md.item()}, filtering out {np.count_nonzero(filter_mask)} pixels"
+                    # )
+                    obj_mask[filter_mask] = 0.0
 
                 semantic_pred[:, :, idx] += obj_mask
 

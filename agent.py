@@ -1,10 +1,10 @@
 import argparse
-import os
-import random
-
 import numpy
 
 import habitat
+
+from submission.utils.config_utils import get_config
+from submission.agent import Agent
 
 
 class RandomAgent(habitat.Agent):
@@ -25,9 +25,8 @@ def main():
     )
     args = parser.parse_args()
 
-    config_paths = os.environ["CHALLENGE_CONFIG_FILE"]
-    config = habitat.get_config(config_paths)
-    agent = RandomAgent(task_config=config)
+    config, config_str = get_config("submission/configs/config.yaml")
+    agent = Agent(config=config, rank=0, ddp=False)
 
     if args.evaluation == "local":
         challenge = habitat.Challenge(eval_remote=False)
