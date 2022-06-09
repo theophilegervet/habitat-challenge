@@ -117,3 +117,4 @@ class VectorizedEvaluator:
 if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
     evaluator = VectorizedEvaluator(config, config_str)
+    evaluator.eval()
