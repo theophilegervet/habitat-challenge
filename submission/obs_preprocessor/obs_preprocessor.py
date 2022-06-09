@@ -38,7 +38,7 @@ class ObsPreprocessor:
 
         self.segmentation = MaskRCNN(
             sem_pred_prob_thr=0.9,
-            sem_gpu_id=(-1 if device == torch.device("cpu") else torch.device.index),
+            sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
             visualize=True
         )
 
