@@ -44,7 +44,7 @@ class MaskRCNN:
                         filter_mask = np.ones_like(obj_mask, dtype=bool)
                     else:
                         # Restrict objects to 2m depth
-                        filter_mask = (depth >= md + 100) | (depth <= md - 100)
+                        filter_mask = (depth >= md + 50) | (depth <= md - 50)
                     # print(
                     #     f"Median object depth: {md.item()}, filtering out {np.count_nonzero(filter_mask)} pixels"
                     # )

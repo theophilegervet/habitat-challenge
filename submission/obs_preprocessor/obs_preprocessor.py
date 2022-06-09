@@ -7,6 +7,7 @@ from PIL import Image
 
 from habitat import Config
 from habitat.core.simulator import Observations
+from habitat.sims.habitat_simulator.actions import HabitatSimActions
 
 import submission.utils.pose_utils as pu
 from submission.utils.constants import (
@@ -46,17 +47,19 @@ class ObsPreprocessor:
         self.one_hot_encoding = torch.eye(
             self.num_sem_categories, device=self.device, dtype=self.precision)
         self.color_palette = [int(x * 255.) for x in frame_color_palette]
+        self.forward_count = 0
 
     def set_instance_id_to_category_id(self, instance_id_to_category_id):
         self.instance_id_to_category_id = instance_id_to_category_id.to(self.device)
 
     def preprocess(self,
                    obs: List[Observations],
-                   last_poses: List[np.ndarray]
+                   last_poses: List[np.ndarray],
+                   last_action: int
                    ) -> Tuple[Tensor, np.ndarray, List[np.ndarray],
                               Tensor, Tensor, List[str]]:
         """Preprocess observation."""
-        obs_preprocessed, semantic_frame = self.preprocess_frame(obs)
+        obs_preprocessed, semantic_frame = self.preprocess_frame(obs, last_action)
         pose_delta, curr_poses = self.preprocess_pose(obs, last_poses)
         goal, goal_name = self.preprocess_goal(obs)
         return (
@@ -75,7 +78,8 @@ class ObsPreprocessor:
         return goal, goal_name
 
     def preprocess_frame(self,
-                         obs: List[Observations]
+                         obs: List[Observations],
+                         last_action: int,
                          ) -> Tuple[Tensor, np.ndarray]:
         """Preprocess frame information in the observation."""
         def preprocess_depth(depth):
@@ -120,17 +124,23 @@ class ObsPreprocessor:
             semantic = self.instance_id_to_category_id[semantic]
             semantic = self.one_hot_encoding[semantic]
             semantic_vis = self._get_semantic_frame_vis(
-                rgb[0].numpy(), semantic[0].numpy())
+                rgb[0].cpu().numpy(), semantic[0].cpu().numpy())
             semantic_vis = np.expand_dims(semantic_vis, 0)
 
         else:
             # Predicted semantic segmentation
             # TODO Avoid conversion to numpy
             # TODO Make sure we're sending data in the right format (BGR vs RGB)
-            semantic, semantic_vis = self.segmentation.get_prediction(
-                rgb[0].numpy(), depth[0].squeeze(-1).numpy())
-            semantic = torch.from_numpy(semantic).unsqueeze(0).long()
-            semantic_vis = np.expand_dims(semantic_vis, 0)
+            if last_action == HabitatSimActions.MOVE_FORWARD and self.forward_count < 4:
+                self.forward_count += 1
+                semantic = torch.zeros((1, self.frame_height, self.frame_width, self.num_sem_categories)).to(self.device)
+                semantic_vis = np.zeros((1, self.frame_height, self.frame_width, 3))
+            else:
+                self.forward_count = 0
+                semantic, semantic_vis = self.segmentation.get_prediction(
+                rgb[0].cpu().numpy(),   depth[0].cpu().squeeze(-1).numpy())
+                semantic = torch.from_numpy(semantic).unsqueeze(0).long().to(self.device)
+                semantic_vis = np.expand_dims(semantic_vis, 0)
 
         rgb = rgb.permute(0, 3, 1, 2)
         depth = depth.permute(0, 3, 1, 2)
