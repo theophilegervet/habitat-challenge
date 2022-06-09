@@ -182,7 +182,6 @@ class Agent(habitat.Agent):
     @torch.no_grad()
     def act(self, obs: Observations):
         """Act end-to-end."""
-        # st = time.time()
         if self.timesteps[0] > self.max_steps:
             return HabitatSimActions.STOP
         t0 = time.time()
@@ -195,15 +194,15 @@ class Agent(habitat.Agent):
             goal_name
         ) = self.obs_preprocessor.preprocess([obs], self.last_poses, self.last_action)
         t1 = time.time()
-        print("t1 - t0", t1 - t0)
+        print(f"Obs preprocessing time: {t1 - t0}")
         planner_inputs, vis_infos = self.prepare_planner_inputs(
             obs_preprocessed, pose_delta, goal_category)
         t2 = time.time()
-        print("t2 - t1", t2 - t1)
+        print(f"Semantic mapping and policy time: {t2 - t1}")
         action = self.planner.plan(**planner_inputs[0])
         self.last_action = action
         t3 = time.time()
-        print("t3 - t2", t3 - t2)
+        print(f"Planning time: {t3 - t2}")
         self.visualizer.visualize(
             **planner_inputs[0],
             **vis_infos[0],
@@ -212,6 +211,7 @@ class Agent(habitat.Agent):
             timestep=self.timesteps[0]
         )
         t4 = time.time()
-        print("t4 - t3", t4 - t3)
-        #print("Action time: {}".format(time.time()-st))
+        print(f"Visualization time: {t4 - t3}")
+        print(f"Total time: {t4 - t0}")
+        print()
         return {"action": action}

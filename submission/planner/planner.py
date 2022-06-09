@@ -5,6 +5,7 @@ import math
 import numpy as np
 from typing import Tuple, List
 import skimage.morphology
+import time
 
 from habitat import Config
 from habitat.sims.habitat_simulator.actions import HabitatSimActions
@@ -101,6 +102,7 @@ class Planner:
         Returns:
             action: low-level action
         """
+        t0 = time.time()
         self.last_pose = self.curr_pose
         obstacle_map = np.rint(obstacle_map)
 
@@ -112,12 +114,16 @@ class Planner:
                  int(start_x * 100. / self.map_resolution - gy1)]
         start = pu.threshold_poses(start, obstacle_map.shape)
 
+        t1 = time.time()
+        print(f"Planner t1 - t0: {t1 - t0}")
         # If we're close enough to the closest goal, stop
         # TODO Compute distance in meters instead of map cells
         goal_locations = np.argwhere(goal_map == 1)
         distances = np.linalg.norm(goal_locations - start, axis=1)
         if distances.min() < 12.:
             return HabitatSimActions.STOP
+        t2 = time.time()
+        print(f"Planner t2 - t1: {t2 - t1}")
 
         self.curr_pose = [start_x, start_y, start_o]
         self.visited_map[gx1:gx2, gy1:gy2][start[0] - 0:start[0] + 1,
@@ -153,6 +159,8 @@ class Planner:
                 action = HabitatSimActions.MOVE_FORWARD
 
         self.last_action = action
+        t3 = time.time()
+        print(f"Planner t3 - t2: {t3 - t2}")
         return action
 
     def _get_short_term_goal(self,

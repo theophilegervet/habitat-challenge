@@ -138,7 +138,7 @@ class ObsPreprocessor:
             else:
                 self.forward_count = 0
                 semantic, semantic_vis = self.segmentation.get_prediction(
-                rgb[0].cpu().numpy(),   depth[0].cpu().squeeze(-1).numpy())
+                    rgb[0].cpu().numpy(),   depth[0].cpu().squeeze(-1).numpy())
                 semantic = torch.from_numpy(semantic).unsqueeze(0).long().to(self.device)
                 semantic_vis = np.expand_dims(semantic_vis, 0)
 
