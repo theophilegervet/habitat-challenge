@@ -128,13 +128,19 @@ class Planner:
         self.curr_pose = [start_x, start_y, start_o]
         self.visited_map[gx1:gx2, gy1:gy2][start[0] - 0:start[0] + 1,
                                            start[1] - 0:start[1] + 1] = 1
+        t3 = time.time()
+        print(f"Planner t3 - t2: {t3 - t2}")
 
         if self.last_action == HabitatSimActions.MOVE_FORWARD:
             self._check_collision()
+        t4 = time.time()
+        print(f"Planner t4 - t3: {t4 - t3}")
 
         # High-level goal -> short-term goal
         short_term_goal, stop = self._get_short_term_goal(
             obstacle_map, np.copy(goal_map), start, planning_window)
+        t5 = time.time()
+        print(f"Planner t5 - t4: {t5 - t4}")
 
         # Short-term goal -> deterministic local policy
         if stop:
@@ -157,10 +163,10 @@ class Planner:
                 action = HabitatSimActions.TURN_LEFT
             else:
                 action = HabitatSimActions.MOVE_FORWARD
+        t6 = time.time()
+        print(f"Planner t6 - t5: {t6 - t5}")
 
         self.last_action = action
-        t3 = time.time()
-        print(f"Planner t3 - t2: {t3 - t2}")
         return action
 
     def _get_short_term_goal(self,
