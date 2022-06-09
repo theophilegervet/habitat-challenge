@@ -38,7 +38,7 @@ class ObsPreprocessor:
 
         self.segmentation = MaskRCNN(
             sem_pred_prob_thr=0.9,
-            sem_gpu_id=(-1 if device == torch.device("cpu") else torch.device.index),
+            sem_gpu_id=(-1 if device == torch.device("cpu") else 0),
             visualize=True
         )
 
@@ -119,7 +119,7 @@ class ObsPreprocessor:
             semantic = self.instance_id_to_category_id[semantic]
             semantic = self.one_hot_encoding[semantic]
             semantic_vis = self._get_semantic_frame_vis(
-                rgb[0].numpy(), semantic[0].numpy())
+                rgb[0].cpu().numpy(), semantic[0].cpu().numpy())
             semantic_vis = np.expand_dims(semantic_vis, 0)
 
         else:
