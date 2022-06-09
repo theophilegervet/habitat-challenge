@@ -128,8 +128,8 @@ class ObsPreprocessor:
             # TODO Avoid conversion to numpy
             # TODO Make sure we're sending data in the right format (BGR vs RGB)
             semantic, semantic_vis = self.segmentation.get_prediction(
-                rgb[0].numpy(), depth[0].squeeze(-1).numpy())
-            semantic = torch.from_numpy(semantic).unsqueeze(0).long()
+                rgb[0].cpu().numpy(), depth[0].cpu().squeeze(-1).numpy())
+            semantic = torch.from_numpy(semantic).unsqueeze(0).long().to(self.device)
             semantic_vis = np.expand_dims(semantic_vis, 0)
 
         rgb = rgb.permute(0, 3, 1, 2)
