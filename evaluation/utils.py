@@ -4,11 +4,9 @@ import random
 from habitat import Config
 from habitat import make_dataset
 from habitat.core.dataset import ALL_SCENES_MASK
-from habitat.core.env import Env
 from habitat.core.vector_env import VectorEnv
 
-from submission.utils.config_utils import get_config
-from submission.agent import Agent
+from .env_wrapper import EnvWrapper
 
 
 def _get_env_gpus(config: Config, rank: int) -> List[int]:
@@ -28,17 +26,13 @@ def _get_env_gpus(config: Config, rank: int) -> List[int]:
     return gpus
 
 
-def make_vector_envs(
-        config: Config,
-        auto_reset_done: bool = True,
-        max_scene_repeat_episodes: int = -1
-    ) -> VectorEnv:
+def make_vector_envs(config: Config,
+                     max_scene_repeat_episodes: int = -1
+                     ) -> VectorEnv:
     """Create vectorized online acting environments and split scenes
     across environments.
 
     Arguments:
-        auto_reset_done: if True, automatically reset the environment when
-         an episode is over
         max_scene_repeat_episodes: if > 0, this is the maximum number of
          consecutive episodes in the same scene — set to 1 to get some
          scene diversity in visualization but keep to -1 default for
@@ -88,7 +82,6 @@ def make_vector_envs(
 
     envs = VectorEnv(
         make_env_fn=make_env_fn,
-        auto_reset_done=auto_reset_done,
         env_fn_args=tuple([(configs[rank],)
                            for rank in range(len(configs))])
     )
@@ -96,25 +89,4 @@ def make_vector_envs(
 
 
 def make_env_fn(config):
-    return Env(config.TASK_CONFIG)
-
-
-class VectorizedEvaluator:
-
-    def __init__(self, config: Config, config_str: str):
-        self.config = config
-        self.config_str = config_str
-        self.agent = Agent(config=config, rank=0, ddp=False)
-
-    def eval(self):
-        envs = make_vector_envs(self.config, auto_reset_done=True)
-
-        # TODO Write vectorized evaluation loop here
-
-        envs.close()
-
-
-if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/config.yaml")
-    evaluator = VectorizedEvaluator(config, config_str)
-    evaluator.eval()
+    return EnvWrapper(config)

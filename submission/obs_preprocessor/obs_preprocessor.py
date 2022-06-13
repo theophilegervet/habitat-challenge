@@ -47,7 +47,7 @@ class ObsPreprocessor:
         self.one_hot_encoding = torch.eye(
             self.num_sem_categories, device=self.device, dtype=self.precision)
         self.color_palette = [int(x * 255.) for x in frame_color_palette]
-        self.forward_count = 0
+        self.forward_count = [0]
 
     def set_instance_id_to_category_id(self, instance_id_to_category_id):
         self.instance_id_to_category_id = instance_id_to_category_id.to(self.device)
@@ -55,11 +55,10 @@ class ObsPreprocessor:
     def preprocess(self,
                    obs: List[Observations],
                    last_poses: List[np.ndarray],
-                   last_action: int
                    ) -> Tuple[Tensor, np.ndarray, List[np.ndarray],
                               Tensor, Tensor, List[str]]:
         """Preprocess observation."""
-        obs_preprocessed, semantic_frame = self.preprocess_frame(obs, last_action)
+        obs_preprocessed, semantic_frame = self.preprocess_frame(obs)
         pose_delta, curr_poses = self.preprocess_pose(obs, last_poses)
         goal, goal_name = self.preprocess_goal(obs)
         return (
@@ -77,10 +76,7 @@ class ObsPreprocessor:
         goal_name = [goal_categories[ob["objectgoal"][0]] for ob in obs]
         return goal, goal_name
 
-    def preprocess_frame(self,
-                         obs: List[Observations],
-                         last_action: int,
-                         ) -> Tuple[Tensor, np.ndarray]:
+    def preprocess_frame(self, obs: List[Observations]) -> Tuple[Tensor, np.ndarray]:
         """Preprocess frame information in the observation."""
         def preprocess_depth(depth):
             zero_mask = depth == 0.
@@ -114,9 +110,9 @@ class ObsPreprocessor:
 
         depth = preprocess_depth(depth)
 
-        # TODO Handle more than a single frame
         if "semantic" in obs[0] and self.instance_id_to_category_id is not None:
             # Ground-truth semantic segmentation
+            # TODO Handle multiple environments with ground-truth segmentation
             assert "semantic" in obs[0]
             semantic = torch.from_numpy(
                 np.stack([ob["semantic"] for ob in obs]
@@ -129,18 +125,17 @@ class ObsPreprocessor:
 
         else:
             # Predicted semantic segmentation
-            # TODO Avoid conversion to numpy
-            # TODO Make sure we're sending data in the right format (BGR vs RGB)
-            if last_action == HabitatSimActions.MOVE_FORWARD and self.forward_count < 4:
-                self.forward_count += 1
-                semantic = torch.zeros((1, self.frame_height, self.frame_width, self.num_sem_categories)).to(self.device)
-                semantic_vis = np.zeros((1, self.frame_height, self.frame_width, 3))
-            else:
-                self.forward_count = 0
+            # TODO Parallelize segmentation prediction
+            rgb_numpy = rgb.cpu().numpy()
+            depth_numpy = depth.cpu().squeeze(-1).numpy()
+            semantic_list, semantic_vis_list = [], []
+            for e in range(len(obs)):
                 semantic, semantic_vis = self.segmentation.get_prediction(
-                    rgb[0].cpu().numpy(),   depth[0].cpu().squeeze(-1).numpy())
-                semantic = torch.from_numpy(semantic).unsqueeze(0).long().to(self.device)
-                semantic_vis = np.expand_dims(semantic_vis, 0)
+                    rgb_numpy[e], depth_numpy[e])
+                semantic_list.append(semantic)
+                semantic_vis_list.append(semantic_vis)
+            semantic = torch.from_numpy(np.stack(semantic_list, 0)).long().to(self.device)
+            semantic_vis = np.stack(semantic_vis_list, 0)
 
         rgb = rgb.permute(0, 3, 1, 2)
         depth = depth.permute(0, 3, 1, 2)

@@ -9,6 +9,7 @@ from submission.agent import Agent
 
 def main():
     config, config_str = get_config("submission/configs/config.yaml")
+    assert config.NUM_ENVIRONMENTS == 1
 
     agent = Agent(config=config, rank=0, ddp=False)
     env = Env(config=config.TASK_CONFIG)

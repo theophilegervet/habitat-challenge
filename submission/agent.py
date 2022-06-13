@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Tuple, Dict
 import torch
 from torch.nn.parallel import DistributedDataParallel
 from torch.nn import DataParallel
@@ -62,7 +62,7 @@ class Agent(habitat.Agent):
 
         self.timesteps = None
         self.last_poses = None
-        self.last_action = None
+        self.last_actions = None
 
     # ------------------------------------------------------------------
     # Inference methods to interact with vectorized environments
@@ -94,7 +94,7 @@ class Agent(habitat.Agent):
                 sensor_pose: (7,) np.ndarray denoting global pose (x, y, o)
                  and local map boundaries planning window (gx1, gx2, gy1, gy2)
                 goal_map: (M, M) binary np.ndarray denoting goal location
-            vis_infos: list of num_environments visualization info dicts containing
+            vis_inputs: list of num_environments visualization info dicts containing
                 explored_map: (M, M) binary np.ndarray local explored map
                  prediction
                 semantic_map: (M, M) np.ndarray containing local semantic map
@@ -149,7 +149,7 @@ class Agent(habitat.Agent):
             }
             for e in range(self.num_environments)
         ]
-        vis_infos = [
+        vis_inputs = [
             {
                 "explored_map": self.semantic_map.get_explored_map(e),
                 "semantic_map": self.semantic_map.get_semantic_map(e),
@@ -157,33 +157,31 @@ class Agent(habitat.Agent):
             for e in range(self.num_environments)
         ]
 
-        return planner_inputs, vis_infos
+        return planner_inputs, vis_inputs
 
-    # ------------------------------------------------------------------
-    # Inference methods to interact with a single un-vectorized environment
-    # ------------------------------------------------------------------
-
-    def reset(self):
+    def reset_vectorized(self):
         """Initialize agent state."""
         self.timesteps = [0] * self.num_environments
         self.last_poses = [np.zeros(3)] * self.num_environments
+        self.last_actions = [None] * self.num_environments
         self.semantic_map.init_map_and_pose()
-        self.planner.reset()
-        self.visualizer.reset()
 
-    def set_vis_dir(self, scene_id: str, episode_id: str):
-        """
-        Reset visualization directory - if we have access to
-        environment object and scene_id and episode_id.
-        """
-        self.planner.set_vis_dir(scene_id, episode_id)
-        self.visualizer.set_vis_dir(scene_id, episode_id)
+    def reset_vectorized_for_env(self, e: int):
+        """Initialize agent state for a specific environment."""
+        self.timesteps[e] = 0
+        self.last_poses[e] = np.zeros(3)
+        self.last_actions[e] = None
+        self.semantic_map.init_map_and_pose_for_env(e)
 
     @torch.no_grad()
-    def act(self, obs: Observations):
+    def act_vectorized(self,
+                       obs: Tuple[Observations],
+                       infos: Tuple[dict]
+                       ) -> Tuple[List[dict], List[dict]]:
         """Act end-to-end."""
-        if self.timesteps[0] > self.max_steps:
-            return HabitatSimActions.STOP
+        self.last_actions = [info["last_action"] for info in infos]
+
+        # 1 - Obs preprocessing
         t0 = time.time()
         (
             obs_preprocessed,
@@ -192,26 +190,79 @@ class Agent(habitat.Agent):
             pose_delta,
             goal_category,
             goal_name
-        ) = self.obs_preprocessor.preprocess([obs], self.last_poses, self.last_action)
+        ) = self.obs_preprocessor.preprocess(obs, self.last_poses)
         t1 = time.time()
-        print(f"Obs preprocessing time: {t1 - t0}")
-        planner_inputs, vis_infos = self.prepare_planner_inputs(
+        print(f"[Agent] Obs preprocessing time: {t1 - t0:.2f}")
+
+        # 2 - Semantic mapping + policy
+        planner_inputs, vis_inputs = self.prepare_planner_inputs(
             obs_preprocessed, pose_delta, goal_category)
         t2 = time.time()
-        print(f"Semantic mapping and policy time: {t2 - t1}")
+        print(f"[Agent] Semantic mapping and policy time: {t2 - t1:.2f}")
+
+        for e in range(self.num_environments):
+            vis_inputs[e]["semantic_frame"] = semantic_frame[e]
+            vis_inputs[e]["goal_name"] = goal_name[e]
+            vis_inputs[e]["timestep"] = self.timesteps[e]
+
+        return planner_inputs, vis_inputs
+
+    # ------------------------------------------------------------------
+    # Inference methods to interact with a single un-vectorized environment
+    # ------------------------------------------------------------------
+
+    def reset(self):
+        """Initialize agent state."""
+        self.reset_vectorized()
+        self.planner.reset()
+        self.visualizer.reset()
+
+    @torch.no_grad()
+    def act(self, obs: Observations) -> Dict[str, int]:
+        """Act end-to-end."""
+        if self.timesteps[0] > self.max_steps:
+            return HabitatSimActions.STOP
+
+        # 1 - Obs preprocessing
+        t0 = time.time()
+        (
+            obs_preprocessed,
+            semantic_frame,
+            self.last_poses,
+            pose_delta,
+            goal_category,
+            goal_name
+        ) = self.obs_preprocessor.preprocess([obs], self.last_poses)
+        t1 = time.time()
+        print(f"[Agent] Obs preprocessing time: {t1 - t0:.2f}")
+
+        # 2 - Semantic mapping + policy
+        planner_inputs, vis_inputs = self.prepare_planner_inputs(
+            obs_preprocessed, pose_delta, goal_category)
+        t2 = time.time()
+        print(f"[Agent] Semantic mapping and policy time: {t2 - t1:.2f}")
+
+        # 3 - Planning
         action = self.planner.plan(**planner_inputs[0])
-        self.last_action = action
+        self.last_actions[0] = action
         t3 = time.time()
-        print(f"Planning time: {t3 - t2}")
-        self.visualizer.visualize(
-            **planner_inputs[0],
-            **vis_infos[0],
-            semantic_frame=semantic_frame[0],
-            goal_name=goal_name[0],
-            timestep=self.timesteps[0]
-        )
+        print(f"[Agent] Planning time: {t3 - t2:.2f}")
+
+        # 4 - Visualization
+        vis_inputs[0]["semantic_frame"] = semantic_frame[0]
+        vis_inputs[0]["goal_name"] = goal_name[0]
+        vis_inputs[0]["timestep"] = self.timesteps[0]
+        self.visualizer.visualize(**planner_inputs[0], **vis_inputs[0])
         t4 = time.time()
-        print(f"Visualization time: {t4 - t3}")
-        print(f"Total time: {t4 - t0}")
+        print(f"[Agent] Visualization time: {t4 - t3:.2f}")
+        print(f"[Agent] Total time: {t4 - t0:.2f}")
         print()
         return {"action": action}
+
+    def set_vis_dir(self, scene_id: str, episode_id: str):
+        """
+        Reset visualization directory - if we have access to
+        environment object and scene_id and episode_id.
+        """
+        self.planner.set_vis_dir(scene_id, episode_id)
+        self.visualizer.set_vis_dir(scene_id, episode_id)
