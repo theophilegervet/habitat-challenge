@@ -102,14 +102,14 @@ class FMMPlanner:
 
         # TODO Should we compute this as a function of the environment
         #  success distance (self.stop_distance)?
-        if subset[self.du, self.du] < 1.0:
+        if subset[self.du, self.du] < self.step_size:
             stop = True
         else:
             stop = False
 
         subset -= subset[self.du, self.du]
         ratio1 = subset / dist_mask
-        subset[ratio1 < -1.5] = 1
+        subset[ratio1 < -1.1] = 1
 
         (stg_x, stg_y) = np.unravel_index(np.argmin(subset), subset.shape)
 

@@ -120,15 +120,23 @@ class Planner:
             return HabitatSimActions.STOP
 
         self.curr_pose = [start_x, start_y, start_o]
-        self.visited_map[gx1:gx2, gy1:gy2][start[0] - 0:start[0] + 1,
-                                           start[1] - 0:start[1] + 1] = 1
+        self.visited_map[gx1:gx2, gy1:gy2][start[0] - 1:start[0] + 2,
+                                           start[1] - 1:start[1] + 2] = 1
 
         if self.last_action == HabitatSimActions.MOVE_FORWARD:
             self._check_collision()
 
         # High-level goal -> short-term goal
-        short_term_goal, stop = self._get_short_term_goal(
-            obstacle_map, np.copy(goal_map), start, planning_window)
+        short_term_goal, stop, replan = self._get_short_term_goal(
+            obstacle_map, np.copy(goal_map), start, planning_window,
+            use_collision_map = True)
+        
+        if replan:
+            self.collision_map *= 0
+            #short_term_goal, stop, replan = self._get_short_term_goal(
+                #obstacle_map, np.copy(goal_map), start, planning_window,
+                #use_collision_map = False)
+        
 
         # Short-term goal -> deterministic local policy
         if stop:
@@ -160,7 +168,8 @@ class Planner:
                              goal_map: np.ndarray,
                              start: List[int],
                              planning_window: List[int],
-                             ) -> Tuple[Tuple[int, int], bool]:
+                             use_collision_map: bool
+                             ) -> Tuple[Tuple[int, int], bool, bool]:
         """Get short-term goal.
 
         Args:
@@ -218,7 +227,8 @@ class Planner:
         #     cv2.waitKey(1)
 
         traversible = 1 - dilated_obstacles
-        traversible[self.collision_map[gx1:gx2, gy1:gy2][x1:x2, y1:y2] == 1] = 0
+        if use_collision_map:
+            traversible[self.collision_map[gx1:gx2, gy1:gy2][x1:x2, y1:y2] == 1] = 0
         traversible[self.visited_map[gx1:gx2, gy1:gy2][x1:x2, y1:y2] == 1] = 1
         traversible[int(start[0] - x1) - 1:int(start[0] - x1) + 2,
                     int(start[1] - y1) - 1:int(start[1] - y1) + 2] = 1
@@ -240,24 +250,27 @@ class Planner:
         self.timestep += 1
 
         state = [start[0] - x1 + 1, start[1] - y1 + 1]
-        stg_x, stg_y, _, stop = planner.get_short_term_goal(state)
+        stg_x, stg_y, replan, stop = planner.get_short_term_goal(state)
         stg_x, stg_y = stg_x + x1 - 1, stg_y + y1 - 1
         short_term_goal = int(stg_x), int(stg_y)
-        return short_term_goal, stop
+        return short_term_goal, stop, replan
 
     def _check_collision(self):
         """Check whether we had a collision and update the collision map."""
         x1, y1, t1 = self.last_pose
-        x2, y2, _ = self.curr_pose
-        buf = 4
+        x2, y2, t2 = self.curr_pose
+        buf = 2#4
         length = 2
 
         if abs(x1 - x2) < 0.05 and abs(y1 - y2) < 0.05:
             self.col_width += 2
             if self.col_width == 7:
                 length = 4
-                buf = 3
-            self.col_width = min(self.col_width, 5)
+                buf = 2
+            elif self.col_width == 9:
+                length = 6
+                buf = 2
+            self.col_width = min(self.col_width, 7)
         else:
             self.col_width = 1
 
@@ -270,12 +283,12 @@ class Planner:
             # Add obstacles to the collision map
             for i in range(length):
                 for j in range(width):
-                    wx = x1 + 0.05 * \
-                         ((i + buf) * np.cos(np.deg2rad(t1))
-                          + (j - width // 2) * np.sin(np.deg2rad(t1)))
-                    wy = y1 + 0.05 * \
-                         ((i + buf) * np.sin(np.deg2rad(t1))
-                          - (j - width // 2) * np.cos(np.deg2rad(t1)))
+                    wx = x2 + 0.05 * \
+                         ((i + buf) * np.cos(np.deg2rad(t2))
+                          + (j - width // 2) * np.sin(np.deg2rad(t2)))
+                    wy = y2 + 0.05 * \
+                         ((i + buf) * np.sin(np.deg2rad(t2))
+                          - (j - width // 2) * np.cos(np.deg2rad(t2)))
                     r, c = wy, wx
                     r, c = int(r * 100 / self.map_resolution), \
                            int(c * 100 / self.map_resolution)

@@ -37,7 +37,22 @@ def main():
             action = agent.act(obs)
             obs = env.step(action)
 
+        print(env.get_metrics())
         episode_metrics[f"{scene_id}_{episode_id}"] = env.get_metrics()
+
+        if ep%50 == 49:
+            aggregated_metrics = {}
+            for k in episode_metrics[f"{scene_id}_{episode_id}"].keys():
+                aggregated_metrics[f"{k}/mean"] = sum(
+                    v[k] for v in episode_metrics.values()) / len(episode_metrics)
+                aggregated_metrics[f"{k}/min"] = min(
+                    v[k] for v in episode_metrics.values())
+                aggregated_metrics[f"{k}/max"] = max(
+                    v[k] for v in episode_metrics.values())
+
+            print("After {} episodes:".format(ep))
+            print("Aggregate:")
+            pprint.pprint(aggregated_metrics)
 
     aggregated_metrics = {}
     for k in episode_metrics[f"{scene_id}_{episode_id}"].keys():

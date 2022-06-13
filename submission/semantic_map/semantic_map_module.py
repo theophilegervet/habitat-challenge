@@ -267,8 +267,8 @@ class SemanticMapModule(nn.Module):
 
         voxels = du.splat_feat_nd(init_grid, feat, XYZ_cm_std).transpose(2, 3)
 
-        # TODO What is this 25?
-        min_z = int(25 / self.z_resolution - self.min_height)
+        # TODO What is this 25? height in cm that agent can climb
+        min_z = int(30 / self.z_resolution - self.min_height)
         max_z = int((self.agent_height + 1) / self.z_resolution - self.min_height)
 
         agent_height_proj = voxels[..., min_z:max_z].sum(4)
@@ -295,7 +295,7 @@ class SemanticMapModule(nn.Module):
         agent_view[:, 0:1, y1:y2, x1:x2] = torch.clamp(fp_map_pred, min=0., max=1.)
         agent_view[:, 1:2, y1:y2, x1:x2] = torch.clamp(fp_exp_pred, min=0., max=1.)
         agent_view[:, 4:4 + self.num_sem_categories, y1:y2, x1:x2] = torch.clamp(
-            agent_height_proj[:, 1:1 + self.num_sem_categories] / self.cat_pred_threshold,
+            all_height_proj[:, 1:1 + self.num_sem_categories] / self.cat_pred_threshold,
             min=0., max=1
         )
 
