@@ -23,6 +23,11 @@ def _get_env_gpus(config: Config, rank: int) -> List[int]:
         return [lst[i:i + n] for i in range(0, len(lst), n)]
 
     gpus = chunks(config.SIMULATOR_GPU_IDS, num_env_gpus_per_agent_process)[rank]
+    print("XXX")
+    print(num_agent_processes)
+    print(num_env_gpus)
+    print(num_env_gpus_per_agent_process)
+    print(gpus)
     return gpus
 
 
