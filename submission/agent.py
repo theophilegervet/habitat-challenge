@@ -2,7 +2,6 @@ from typing import List, Tuple, Dict
 import torch
 from torch.nn.parallel import DistributedDataParallel
 from torch.nn import DataParallel
-import numpy as np
 import time
 
 import habitat
@@ -185,8 +184,9 @@ class Agent(habitat.Agent):
         if self.timesteps[0] > self.max_steps:
             return HabitatSimActions.STOP
 
+        # t0 = time.time()
+
         # 1 - Obs preprocessing
-        t0 = time.time()
         (
             obs_preprocessed,
             semantic_frame,
@@ -194,30 +194,34 @@ class Agent(habitat.Agent):
             goal_category,
             goal_name
         ) = self.obs_preprocessor.preprocess([obs])
-        t1 = time.time()
-        print(f"[Agent] Obs preprocessing time: {t1 - t0:.2f}")
+
+        # t1 = time.time()
+        # print(f"[Agent] Obs preprocessing time: {t1 - t0:.2f}")
 
         # 2 - Semantic mapping + policy
         planner_inputs, vis_inputs = self.prepare_planner_inputs(
             obs_preprocessed, pose_delta, goal_category)
-        t2 = time.time()
-        print(f"[Agent] Semantic mapping and policy time: {t2 - t1:.2f}")
+
+        # t2 = time.time()
+        # print(f"[Agent] Semantic mapping and policy time: {t2 - t1:.2f}")
 
         # 3 - Planning
         action = self.planner.plan(**planner_inputs[0])
         self.obs_preprocessor.last_actions[0] = action
-        t3 = time.time()
-        print(f"[Agent] Planning time: {t3 - t2:.2f}")
+
+        # t3 = time.time()
+        # print(f"[Agent] Planning time: {t3 - t2:.2f}")
 
         # 4 - Visualization
         vis_inputs[0]["semantic_frame"] = semantic_frame[0]
         vis_inputs[0]["goal_name"] = goal_name[0]
         self.visualizer.visualize(**planner_inputs[0], **vis_inputs[0])
-        t4 = time.time()
-        print(f"[Agent] Visualization time: {t4 - t3:.2f}")
 
-        print(f"[Agent] Total time: {t4 - t0:.2f}")
-        print()
+        # t4 = time.time()
+        # print(f"[Agent] Visualization time: {t4 - t3:.2f}")
+        # print(f"[Agent] Total time: {t4 - t0:.2f}")
+        # print()
+
         return {"action": action}
 
     def set_vis_dir(self, scene_id: str, episode_id: str):

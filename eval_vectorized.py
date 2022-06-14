@@ -16,7 +16,7 @@ class VectorizedEvaluator:
         self.config_str = config_str
         self.agent = Agent(config=config, rank=0, ddp=False)
 
-    def eval(self, num_episodes=30):
+    def eval(self, num_episodes=20):
         start_time = time.time()
         episode_metrics = {}
         episode_idx = 0
@@ -27,7 +27,7 @@ class VectorizedEvaluator:
         self.agent.reset_vectorized()
 
         while episode_idx < num_episodes:
-            t0 = time.time()
+            # t0 = time.time()
 
             obs = torch.cat([ob.to(self.agent.device) for ob in obs])
             pose_delta = torch.cat([info["pose_delta"] for info in infos])
@@ -36,8 +36,8 @@ class VectorizedEvaluator:
             planner_inputs, vis_inputs = self.agent.prepare_planner_inputs(
                 obs, pose_delta, goal_category)
 
-            t1 = time.time()
-            print(f"[Agent] Semantic mapping and policy time: {t1 - t0:.2f}")
+            # t1 = time.time()
+            # print(f"[Agent] Semantic mapping and policy time: {t1 - t0:.2f}")
 
             obs, dones, infos = zip(*envs.call(
                 ["plan_and_step"] * envs.num_envs,
@@ -45,15 +45,15 @@ class VectorizedEvaluator:
                  for p_in, v_in in zip(planner_inputs, vis_inputs)]
             ))
 
-            t2 = time.time()
-            print(f"[Vectorized Env] Obs preprocessing, planning, "
-                  f"and step time: {t2 - t1:.2f}")
-            print(f"Total time: {t2 - t0:.2f}")
-            print()
+            # t2 = time.time()
+            # print(f"[Vectorized Env] Obs preprocessing, planning, "
+            #       f"and step time: {t2 - t1:.2f}")
+            # print(f"Total time: {t2 - t0:.2f}")
+            # print()
 
             # For done episodes, gather statistics and reset agent —
-            # the environment itself is automatically reset by the
-            # vectorized environment
+            # the environment itself is automatically reset by its
+            # wrapper
             for e, (done, info) in enumerate(zip(dones, infos)):
                 if done:
                     episode_key = (f"{info['last_episode_scene_id']}_"
