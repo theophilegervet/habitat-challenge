@@ -42,6 +42,15 @@ class ObsPreprocessor:
             visualize=True
         )
 
+        other_models = [
+            MaskRCNN(
+                sem_pred_prob_thr=0.9,
+                sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
+                visualize=True
+            )
+            for _ in range(5)
+        ]
+
         self.instance_id_to_category_id = None
         self.one_hot_encoding = torch.eye(
             self.num_sem_categories, device=self.device, dtype=self.precision)
