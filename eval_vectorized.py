@@ -29,8 +29,7 @@ class VectorizedEvaluator:
         while episode_idx < num_episodes:
             t0 = time.time()
 
-            print([ob.device for ob in obs])
-            obs = torch.cat(obs)
+            obs = torch.cat([ob.to(self.agent.device) for ob in obs])
             pose_delta = torch.cat([info["pose_delta"] for info in infos])
             goal_category = torch.cat([info["goal_category"] for info in infos])
 
