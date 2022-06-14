@@ -23,6 +23,16 @@ class UnvectorizedEvaluator:
 
         env = Env(config=config.TASK_CONFIG)
 
+        from collections import defaultdict
+        episodes = defaultdict(list)
+        for ep in env.episodes:
+            episodes[ep.scene_id].append(ep.episode_id)
+        print("config.TASK_CONFIG.DATASET.SPLIT", config.TASK_CONFIG.DATASET.SPLIT)
+        print("Scenes", len(episodes))
+        print("Episodes per scene", [len(v) for v in episodes.values()])
+
+        return
+
         for episode_idx in range(len(env.episodes)):
             obs = env.reset()
             self.agent.reset()
