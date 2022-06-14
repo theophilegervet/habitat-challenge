@@ -48,7 +48,7 @@ class ObsPreprocessor:
                 sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
                 visualize=True
             )
-            for _ in range(5)
+            for _ in range(20)
         ]
 
         self.instance_id_to_category_id = None
