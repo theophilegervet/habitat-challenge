@@ -132,7 +132,7 @@ class Planner:
         short_term_goal, stop = self._get_short_term_goal(
             obstacle_map, np.copy(goal_map), start, planning_window)
         # t1 = time.time()
-        # print(f"Planning get_short_term_goal() time: {t1 - t0}")
+        # print(f"[Planning] get_short_term_goal() time: {t1 - t0}")
 
         # Short-term goal -> deterministic local policy
         if stop:

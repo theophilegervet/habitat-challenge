@@ -14,7 +14,8 @@ from submission.utils.constants import map_color_palette
 
 class Visualizer:
     """
-    This class is intended to visualize a single object goal navigation task.
+    This class is intended to visualize a single object goal navigation task -
+    it can either be integrated in the agent or an environment.
     """
 
     def __init__(self, config: Config):
