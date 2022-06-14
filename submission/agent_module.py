@@ -79,7 +79,7 @@ class AgentModule(nn.Module):
             seq_origins: sequence of local map origins of shape
              (batch_size, sequence_length, 3)
         """
-        t0 = time.time()
+        # t0 = time.time()
 
         if seq_map_features is None:
             # Update map with observations and generate map features
@@ -113,8 +113,8 @@ class AgentModule(nn.Module):
             seq_lmb = None
             seq_origins = None
 
-        t1 = time.time()
-        print(f"[Semantic mapping] Total time: {t1 - t0:.2f}")
+        # t1 = time.time()
+        # print(f"[Semantic mapping] Total time: {t1 - t0:.2f}")
 
         # Predict high-level goals from map features
         # batched across sequence length x num environments
@@ -125,8 +125,8 @@ class AgentModule(nn.Module):
         seq_regression_logits = (regression_logits.view(batch_size, sequence_length, -1)
                                  if regression_logits is not None else None)
 
-        t2 = time.time()
-        print(f"[Policy] Total time: {t2 - t1:.2f}")
+        # t2 = time.time()
+        # print(f"[Policy] Total time: {t2 - t1:.2f}")
 
         return (
             seq_goal_map,
