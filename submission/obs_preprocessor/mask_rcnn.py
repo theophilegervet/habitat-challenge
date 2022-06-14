@@ -54,7 +54,7 @@ class MaskRCNN:
         one_hot_predictions = np.zeros(
             (batch_size, height, width, self.num_sem_categories))
 
-        t0 = time.time()
+        # t0 = time.time()
 
         for i in range(batch_size):
             for j, class_idx in enumerate(predictions[i]["instances"].pred_classes.cpu().numpy()):
@@ -79,8 +79,8 @@ class MaskRCNN:
 
                     one_hot_predictions[i, :, :, idx] += obj_mask
 
-        t1 = time.time()
-        print(f"[Obs preprocessing] Segmentation depth filtering time: {t1 - t0:.2f}")
+        # t1 = time.time()
+        # print(f"[Obs preprocessing] Segmentation depth filtering time: {t1 - t0:.2f}")
 
         if self.visualize:
             visualizations = np.stack(
@@ -187,14 +187,14 @@ class VisualizationDemo:
             predictions: a list of predictions for all images
             visualizations: a list of prediction visualizations for all images
         """
-        t0 = time.time()
+        # t0 = time.time()
 
         predictions = self.predictor(images)
         batch_size = len(predictions)
         visualizations = []
 
-        t1 = time.time()
-        print(f"[Obs preprocessing] Segmentation prediction time: {t1 - t0:.2f}")
+        # t1 = time.time()
+        # print(f"[Obs preprocessing] Segmentation prediction time: {t1 - t0:.2f}")
 
         if visualize:
             for i in range(batch_size):
@@ -218,8 +218,8 @@ class VisualizationDemo:
                             predictions=instances)
                 visualizations.append(vis)
 
-        t2 = time.time()
-        print(f"[Obs preprocessing] Segmentation visualization time: {t2 - t1:.2f}")
+        # t2 = time.time()
+        # print(f"[Obs preprocessing] Segmentation visualization time: {t2 - t1:.2f}")
 
         return predictions, visualizations
 
