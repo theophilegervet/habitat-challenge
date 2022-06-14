@@ -198,14 +198,14 @@ class VisualizationDemo(object):
             images (np.ndarray): image of shape (batch_size, H, W, C)
              (in BGR order). This is the format used by OpenCV.
         Returns:
-            all_predictions (dict): the output of the model
-            all_vis_output (VisImage): the visualized image output
+            all_predictions (List[dict]): the output of the model
+            all_vis_output (List[VisImage]): the visualized image output
         """
         all_predictions = self.predictor(images)
         all_vis_outputs = []
 
         if visualize:
-            for i in range(all_predictions.shape[0]):
+            for i in range(len(all_predictions)):
                 predictions = all_predictions[i]
                 image = images[i]
                 visualizer = Visualizer(image, self.metadata, instance_mode=self.instance_mode)
@@ -224,6 +224,9 @@ class VisualizationDemo(object):
                         vis_output = visualizer.draw_instance_predictions(predictions=instances)
                 all_vis_outputs.append(vis_output)
 
+        print("run_on_image()")
+        print(len(all_predictions))
+        print(len(all_vis_outputs))
         return all_predictions, all_vis_outputs
 
 
