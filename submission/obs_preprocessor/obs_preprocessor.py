@@ -127,15 +127,19 @@ class ObsPreprocessor:
             # TODO Parallelize segmentation prediction
             rgb_numpy = rgb.cpu().numpy()
             depth_numpy = depth.cpu().squeeze(-1).numpy()
-            semantic_list, semantic_vis_list = [], []
-            for e in range(len(obs)):
-                semantic, semantic_vis = self.segmentation.get_prediction(
-                    rgb_numpy[e], depth_numpy[e])
-                semantic_list.append(semantic)
-                semantic_vis_list.append(semantic_vis)
-            semantic = torch.from_numpy(np.stack(semantic_list, 0)).long().to(
-                self.device)
-            semantic_vis = np.stack(semantic_vis_list, 0)
+
+            # semantic_list, semantic_vis_list = [], []
+            # for e in range(len(obs)):
+            #     semantic, semantic_vis = self.segmentation.get_prediction(
+            #         rgb_numpy[e], depth_numpy[e])
+            #     semantic_list.append(semantic)
+            #     semantic_vis_list.append(semantic_vis)
+            # semantic = torch.from_numpy(np.stack(semantic_list, 0)).long().to(self.device)
+            # semantic_vis = np.stack(semantic_vis_list, 0)
+
+            semantic, semantic_vis = self.segmentation.get_prediction(
+                rgb_numpy, depth_numpy)
+            semantic = torch.from_numpy(semantic).long().to(self.device)
 
         rgb = rgb.permute(0, 3, 1, 2)
         depth = depth.permute(0, 3, 1, 2)
