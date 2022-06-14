@@ -2,6 +2,7 @@
 # https://github.com/facebookresearch/detectron2/blob/master/demo/demo.py and
 # https://github.com/facebookresearch/detectron2/blob/master/demo/predictor.py
 
+from typing import Optional
 import argparse
 import torch
 import numpy as np
@@ -58,49 +59,50 @@ class MaskRCNN:
     #
     #     return semantic_pred, img
 
-    def get_prediction(self, img, depth=None):
-        t0 = time.time()
-        image_list = []
-        img = img[:, :, ::-1]
-        image_list.append(img)
-        t1 = time.time()
-        print("t1 - t0", t1 - t0)
+    def get_prediction(self,
+                       images: np.ndarray,
+                       depths: Optional[np.ndarray] = None):
+        """
+        Arguments:
+            images: image frames of shape (batch_size, H, W, 3)
+            depths: depth frames of shape (batch_size, H, W)
+        """
+        batch_size, height, width, _ = images.shape
+        images = images[:, :, :, ::-1]
 
-        seg_predictions, vis_output = self.segmentation_model.get_predictions(
-            image_list, visualize=self.visualize
+        predictions, vis_outputs = self.segmentation_model.get_predictions(
+            images, visualize=self.visualize
         )
-        t2 = time.time()
-        print("t2 - t1", t2 - t1)
+        one_hot_predictions = np.zeros((batch_size, height, width, self.num_sem_categories))
 
-        semantic_pred = np.zeros((img.shape[0], img.shape[1], self.num_sem_categories))
+        for i in range(batch_size):
+            for j, class_idx in enumerate(predictions[i]["instances"].pred_classes.cpu().numpy()):
+                if class_idx in list(coco_categories_mapping.keys()):
+                    idx = coco_categories_mapping[class_idx]
+                    obj_mask = predictions[i]["instances"].pred_masks[j] * 1.0
+                    obj_mask = obj_mask.cpu().numpy()
 
-        for j, class_idx in enumerate(seg_predictions[0]["instances"].pred_classes.cpu().numpy()):
-            if class_idx in list(coco_categories_mapping.keys()):
-                idx = coco_categories_mapping[class_idx]
-                obj_mask = seg_predictions[0]["instances"].pred_masks[j] * 1.0
-                obj_mask = obj_mask.cpu().numpy()
+                    if depths is not None:
+                        depth = depths[i]
+                        md = np.median(depth[obj_mask == 1])
+                        if md == 0:
+                            filter_mask = np.ones_like(obj_mask, dtype=bool)
+                        else:
+                            # Restrict objects to 2m depth
+                            filter_mask = (depth >= md + 50) | (depth <= md - 50)
+                        # print(
+                        #     f"Median object depth: {md.item()}, filtering out {np.count_nonzero(filter_mask)} pixels"
+                        # )
+                        obj_mask[filter_mask] = 0.0
 
-                if depth is not None:
-                    md = np.median(depth[obj_mask == 1])
-                    if md == 0:
-                        filter_mask = np.ones_like(obj_mask, dtype=bool)
-                    else:
-                        # Restrict objects to 2m depth
-                        filter_mask = (depth >= md + 50) | (depth <= md - 50)
-                    # print(
-                    #     f"Median object depth: {md.item()}, filtering out {np.count_nonzero(filter_mask)} pixels"
-                    # )
-                    obj_mask[filter_mask] = 0.0
-
-                semantic_pred[:, :, idx] += obj_mask
+                    one_hot_predictions[i, :, :, idx] += obj_mask
 
         if self.visualize:
-            img = vis_output.get_image()
+            # TODO Replace RGB with visualization
+            pass
+            # img = vis_output.get_image()
 
-        t3 = time.time()
-        print("t3 - t2", t3 - t2)
-
-        return semantic_pred, img
+        return one_hot_predictions, images
 
 
 class ImageSegmentation:
@@ -127,8 +129,8 @@ class ImageSegmentation:
         cfg = setup_cfg(args)
         self.demo = VisualizationDemo(cfg)
 
-    def get_predictions(self, img, visualize=False):
-        return self.demo.run_on_image(img, visualize=visualize)
+    def get_predictions(self, images, visualize=False):
+        return self.demo.run_on_image(images, visualize=visualize)
 
 
 def setup_cfg(args):
@@ -190,38 +192,39 @@ class VisualizationDemo(object):
 
         self.predictor = BatchPredictor(cfg)
 
-    def run_on_image(self, image_list, visualize=0):
+    def run_on_image(self, images, visualize=0):
         """
         Args:
-            image (np.ndarray): an image of shape (H, W, C) (in BGR order).
-                This is the format used by OpenCV.
+            images (np.ndarray): image of shape (batch_size, H, W, C)
+             (in BGR order). This is the format used by OpenCV.
         Returns:
-            predictions (dict): the output of the model.
-            vis_output (VisImage): the visualized image output.
+            all_predictions (dict): the output of the model
+            all_vis_output (VisImage): the visualized image output
         """
-        vis_output = None
-        all_predictions = self.predictor(image_list)
-        # Convert image from OpenCV BGR format to Matplotlib RGB format.
+        all_predictions = self.predictor(images)
+        all_vis_outputs = []
 
         if visualize:
-            predictions = all_predictions[0]
-            image = image_list[0]
-            visualizer = Visualizer(image, self.metadata, instance_mode=self.instance_mode)
-            if "panoptic_seg" in predictions:
-                panoptic_seg, segments_info = predictions["panoptic_seg"]
-                vis_output = visualizer.draw_panoptic_seg_predictions(
-                    panoptic_seg.to(self.cpu_device), segments_info
-                )
-            else:
-                if "sem_seg" in predictions:
-                    vis_output = visualizer.draw_sem_seg(
-                        predictions["sem_seg"].argmax(dim=0).to(self.cpu_device)
+            for i in range(all_predictions.shape[0]):
+                predictions = all_predictions[i]
+                image = images[i]
+                visualizer = Visualizer(image, self.metadata, instance_mode=self.instance_mode)
+                if "panoptic_seg" in predictions:
+                    panoptic_seg, segments_info = predictions["panoptic_seg"]
+                    vis_output = visualizer.draw_panoptic_seg_predictions(
+                        panoptic_seg.to(self.cpu_device), segments_info
                     )
-                if "instances" in predictions:
-                    instances = predictions["instances"].to(self.cpu_device)
-                    vis_output = visualizer.draw_instance_predictions(predictions=instances)
+                else:
+                    if "sem_seg" in predictions:
+                        vis_output = visualizer.draw_sem_seg(
+                            predictions["sem_seg"].argmax(dim=0).to(self.cpu_device)
+                        )
+                    if "instances" in predictions:
+                        instances = predictions["instances"].to(self.cpu_device)
+                        vis_output = visualizer.draw_instance_predictions(predictions=instances)
+                all_vis_outputs.append(vis_output)
 
-        return all_predictions, vis_output
+        return all_predictions, all_vis_outputs
 
 
 class BatchPredictor:
