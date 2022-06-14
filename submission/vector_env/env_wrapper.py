@@ -23,7 +23,7 @@ class EnvWrapper(Env):
         self.visualizer = Visualizer(config)
         self.obs_preprocessor = ObsPreprocessor(config, 1, self.device)
 
-        print("config.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID", config.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID)
+        print("config.TASK_CONFIG.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID", config.TASK_CONFIG.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID)
         print("self.sim.gpu_device", self.sim.gpu_device)
         print("self.device", self.device)
 
