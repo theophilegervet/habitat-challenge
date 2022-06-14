@@ -5,7 +5,6 @@ import torch.nn as nn
 from torch.nn import functional as F
 import numpy as np
 import skimage.morphology
-import time
 
 import submission.utils.depth_utils as du
 import submission.utils.rotation_utils as ru
@@ -215,8 +214,6 @@ class SemanticMapModule(nn.Module):
              and location of shape (batch_size, 4 + num_sem_categories, M, M)
             current_pose: current pose updated with pose delta of shape (batch_size, 3)
         """
-        t0 = time.time()
-
         batch_size, obs_channels, h, w = obs.size()
         device, dtype = obs.device, obs.dtype
 
@@ -319,9 +316,6 @@ class SemanticMapModule(nn.Module):
         maps = torch.cat((prev_map.unsqueeze(1), translated.unsqueeze(1)), 1)
         current_map, _ = torch.max(maps[:, :, :4 + self.num_sem_categories], 1)
 
-        t1 = time.time()
-        print(f"t1 - t0: {t1 - t0}")
-
         # Reset current location
         current_map[:, 2, :, :].fill_(0.)
         curr_loc = current_pose[:, :2]
@@ -341,9 +335,6 @@ class SemanticMapModule(nn.Module):
                 y - radius: y + radius + 1,
                 x - radius: x + radius + 1
             ][explored_disk == 1] = 1
-
-        t2 = time.time()
-        print(f"t2 - t1: {t2 - t1}")
 
         return current_map, current_pose
 
