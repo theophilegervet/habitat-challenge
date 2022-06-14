@@ -1,6 +1,7 @@
 from typing import Tuple, Optional
 import torch
 from torch import Tensor
+import torch.nn as nn
 import skimage.morphology
 
 from .policy import Policy
@@ -25,13 +26,19 @@ class FrontierExplorationPolicy(Policy):
     def __init__(self):
         super().__init__()
 
-        self.dilate_explored_kernel = torch.from_numpy(
-            skimage.morphology.disk(10)
-        ).unsqueeze(0).unsqueeze(0).float()
+        self.dilate_explored_kernel = nn.Parameter(
+            torch.from_numpy(
+                skimage.morphology.disk(10)
+            ).unsqueeze(0).unsqueeze(0).float(),
+            requires_grad=False
+        )
 
-        self.select_border_kernel = torch.from_numpy(
-            skimage.morphology.disk(1)
-        ).unsqueeze(0).unsqueeze(0).float()
+        self.select_border_kernel = nn.Parameter(
+            torch.from_numpy(
+                skimage.morphology.disk(1)
+            ).unsqueeze(0).unsqueeze(0).float(),
+            requires_grad=False
+        )
 
     def forward(self,
                 map_features: Tensor,
