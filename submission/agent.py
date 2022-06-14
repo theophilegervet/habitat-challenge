@@ -255,6 +255,7 @@ class Agent(habitat.Agent):
         self.visualizer.visualize(**planner_inputs[0], **vis_inputs[0])
         t4 = time.time()
         print(f"[Agent] Visualization time: {t4 - t3:.2f}")
+
         print(f"[Agent] Total time: {t4 - t0:.2f}")
         print()
         return {"action": action}

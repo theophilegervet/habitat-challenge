@@ -1,6 +1,7 @@
 from typing import Tuple, Optional
 from torch import Tensor
 import torch.nn as nn
+import time
 
 from .semantic_map.semantic_map_module import SemanticMapModule
 from .policy.policy import Policy
@@ -110,6 +111,8 @@ class AgentModule(nn.Module):
             seq_lmb = None
             seq_origins = None
 
+        t0 = time.time()
+
         # Predict high-level goals from map features
         # batched across sequence length x num environments
         map_features = seq_map_features.flatten(0, 1)
@@ -118,6 +121,9 @@ class AgentModule(nn.Module):
         seq_goal_map = goal_map.view(batch_size, sequence_length, *goal_map.shape[-2:])
         seq_regression_logits = (regression_logits.view(batch_size, sequence_length, -1)
                                  if regression_logits is not None else None)
+
+        t1 = time.time()
+        print(f"Policy time: {t1 - t0}")
 
         return (
             seq_goal_map,
