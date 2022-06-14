@@ -5,6 +5,7 @@
 import argparse
 import torch
 import numpy as np
+import time
 
 from detectron2.config import get_cfg
 from detectron2.utils.logger import setup_logger
@@ -22,13 +23,54 @@ class MaskRCNN:
         self.visualize = visualize
         self.num_sem_categories = len(coco_categories)
 
+    # def get_prediction(self, img, depth=None):
+    #     image_list = []
+    #     img = img[:, :, ::-1]
+    #     image_list.append(img)
+    #     seg_predictions, vis_output = self.segmentation_model.get_predictions(
+    #         image_list, visualize=self.visualize
+    #     )
+    #
+    #     semantic_pred = np.zeros((img.shape[0], img.shape[1], self.num_sem_categories))
+    #
+    #     for j, class_idx in enumerate(seg_predictions[0]["instances"].pred_classes.cpu().numpy()):
+    #         if class_idx in list(coco_categories_mapping.keys()):
+    #             idx = coco_categories_mapping[class_idx]
+    #             obj_mask = seg_predictions[0]["instances"].pred_masks[j] * 1.0
+    #             obj_mask = obj_mask.cpu().numpy()
+    #
+    #             if depth is not None:
+    #                 md = np.median(depth[obj_mask == 1])
+    #                 if md == 0:
+    #                     filter_mask = np.ones_like(obj_mask, dtype=bool)
+    #                 else:
+    #                     # Restrict objects to 2m depth
+    #                     filter_mask = (depth >= md + 50) | (depth <= md - 50)
+    #                 # print(
+    #                 #     f"Median object depth: {md.item()}, filtering out {np.count_nonzero(filter_mask)} pixels"
+    #                 # )
+    #                 obj_mask[filter_mask] = 0.0
+    #
+    #             semantic_pred[:, :, idx] += obj_mask
+    #
+    #     if self.visualize:
+    #         img = vis_output.get_image()
+    #
+    #     return semantic_pred, img
+
     def get_prediction(self, img, depth=None):
+        t0 = time.time()
         image_list = []
         img = img[:, :, ::-1]
         image_list.append(img)
+        t1 = time.time()
+        print("t1 - t0", t1 - t0)
+
         seg_predictions, vis_output = self.segmentation_model.get_predictions(
             image_list, visualize=self.visualize
         )
+        t2 = time.time()
+        print("t2 - t1", t2 - t1)
 
         semantic_pred = np.zeros((img.shape[0], img.shape[1], self.num_sem_categories))
 
@@ -54,6 +96,9 @@ class MaskRCNN:
 
         if self.visualize:
             img = vis_output.get_image()
+
+        t3 = time.time()
+        print("t3 - t2", t3 - t2)
 
         return semantic_pred, img
 

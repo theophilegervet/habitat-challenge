@@ -7,7 +7,6 @@ from PIL import Image
 
 from habitat import Config
 from habitat.core.simulator import Observations
-from habitat.sims.habitat_simulator.actions import HabitatSimActions
 
 import submission.utils.pose_utils as pu
 from submission.utils.constants import (
