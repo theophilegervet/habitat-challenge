@@ -208,6 +208,7 @@ class VisualizationDemo(object):
         t0 = time.time()
         all_predictions = self.predictor(images)
         t1 = time.time()
+        print("images.shape", images.shape)
         print("t1 - t0", t1 - t0)
 
         all_vis_outputs = []
