@@ -75,6 +75,7 @@ class MaskRCNN:
         )
         one_hot_predictions = np.zeros((batch_size, height, width, self.num_sem_categories))
 
+        t2 = time.time()
         for i in range(batch_size):
             for j, class_idx in enumerate(predictions[i]["instances"].pred_classes.cpu().numpy()):
                 if class_idx in list(coco_categories_mapping.keys()):
@@ -96,6 +97,9 @@ class MaskRCNN:
                         obj_mask[filter_mask] = 0.0
 
                     one_hot_predictions[i, :, :, idx] += obj_mask
+
+        t3 = time.time()
+        print("t3 - t2", t3 - t2)
 
         if self.visualize:
             # TODO Replace RGB with visualization
@@ -201,7 +205,11 @@ class VisualizationDemo(object):
             all_predictions (List[dict]): the output of the model
             all_vis_output (List[VisImage]): the visualized image output
         """
+        t0 = time.time()
         all_predictions = self.predictor(images)
+        t1 = time.time()
+        print("t1 - t0", t1 - t0)
+
         all_vis_outputs = []
 
         if visualize:
@@ -224,9 +232,9 @@ class VisualizationDemo(object):
                         vis_output = visualizer.draw_instance_predictions(predictions=instances)
                 all_vis_outputs.append(vis_output)
 
-        print("run_on_image()")
-        print(len(all_predictions))
-        print(len(all_vis_outputs))
+        t2 = time.time()
+        print("t2 - t1", t2 - t1)
+
         return all_predictions, all_vis_outputs
 
 
