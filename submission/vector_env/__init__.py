@@ -43,6 +43,9 @@ def make_vector_envs(config: Config,
     num_envs = config.NUM_ENVIRONMENTS
     assert (num_envs >= num_gpus and num_envs % num_gpus == 0)
     num_envs_per_gpu = num_envs // num_gpus
+    print("gpus", gpus)
+    print("num_envs", num_envs)
+    print("num_envs_per_gpu", num_envs_per_gpu)
 
     dataset = make_dataset(config.TASK_CONFIG.DATASET.TYPE)
     scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
