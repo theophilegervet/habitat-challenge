@@ -16,7 +16,7 @@ class VectorizedEvaluator:
         self.config_str = config_str
         self.agent = Agent(config=config, rank=0, ddp=False)
 
-    def eval(self, num_episodes=20):
+    def eval(self, num_episodes=100):  # 2000 total in val split
         start_time = time.time()
         episode_metrics = {}
         episode_idx = 0
