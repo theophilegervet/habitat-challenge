@@ -76,7 +76,7 @@ def make_vector_envs(config: Config,
             task_config = proc_config.TASK_CONFIG
             task_config.SEED += proc_id
             task_config.DATASET.CONTENT_SCENES = scene_splits[proc_id]
-            if proc_config.NO_GPU:
+            if not proc_config.NO_GPU:
                 task_config.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID = gpus[i]
             task_config.ENVIRONMENT.ITERATOR_OPTIONS.MAX_SCENE_REPEAT_STEPS = -1
             task_config.ENVIRONMENT.ITERATOR_OPTIONS.MAX_SCENE_REPEAT_EPISODES = max_scene_repeat_episodes
