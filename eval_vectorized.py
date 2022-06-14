@@ -1,12 +1,11 @@
 import time
-from pathlib import Path
 import pprint
 
 from habitat import Config
 
 from submission.utils.config_utils import get_config
 from submission.agent import Agent
-from evaluation.utils import make_vector_envs
+from submission.vector_env import make_vector_envs
 
 
 class VectorizedEvaluator:
@@ -74,7 +73,6 @@ class VectorizedEvaluator:
 
 
 if __name__ == "__main__":
-    config_path = str(Path().absolute() / "submission/configs/config.yaml")
-    config, config_str = get_config(config_path)
+    config, config_str = get_config("submission/configs/config.yaml")
     evaluator = VectorizedEvaluator(config, config_str)
     evaluator.eval()
