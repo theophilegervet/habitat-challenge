@@ -42,37 +42,31 @@ class ObsPreprocessor:
             visualize=True
         )
 
-        other_models = [
-            MaskRCNN(
-                sem_pred_prob_thr=0.9,
-                sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
-                visualize=True
-            )
-            for _ in range(20)
-        ]
-
         self.instance_id_to_category_id = None
         self.one_hot_encoding = torch.eye(
             self.num_sem_categories, device=self.device, dtype=self.precision)
         self.color_palette = [int(x * 255.) for x in frame_color_palette]
-        self.forward_count = [0]
+
+        self.last_poses = None
+        self.last_actions = None
+
+    def reset(self):
+        self.last_poses = [np.zeros(3)] * self.num_environments
+        self.last_actions = [None] * self.num_environments
 
     def set_instance_id_to_category_id(self, instance_id_to_category_id):
         self.instance_id_to_category_id = instance_id_to_category_id.to(self.device)
 
     def preprocess(self,
                    obs: List[Observations],
-                   last_poses: List[np.ndarray],
-                   ) -> Tuple[Tensor, np.ndarray, List[np.ndarray],
-                              Tensor, Tensor, List[str]]:
+                   ) -> Tuple[Tensor, np.ndarray, Tensor, Tensor, List[str]]:
         """Preprocess observation."""
         obs_preprocessed, semantic_frame = self.preprocess_frame(obs)
-        pose_delta, curr_poses = self.preprocess_pose(obs, last_poses)
+        pose_delta, self.last_poses = self.preprocess_pose(obs, self.last_poses)
         goal, goal_name = self.preprocess_goal(obs)
         return (
             obs_preprocessed,
             semantic_frame,
-            curr_poses,
             pose_delta,
             goal,
             goal_name

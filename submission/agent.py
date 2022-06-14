@@ -61,8 +61,6 @@ class Agent(habitat.Agent):
         self.visualizer = Visualizer(config)
 
         self.timesteps = None
-        self.last_poses = None
-        self.last_actions = None
 
     # ------------------------------------------------------------------
     # Inference methods to interact with vectorized environments
@@ -153,6 +151,7 @@ class Agent(habitat.Agent):
             {
                 "explored_map": self.semantic_map.get_explored_map(e),
                 "semantic_map": self.semantic_map.get_semantic_map(e),
+                "timestep": self.timesteps[e]
             }
             for e in range(self.num_environments)
         ]
@@ -162,50 +161,12 @@ class Agent(habitat.Agent):
     def reset_vectorized(self):
         """Initialize agent state."""
         self.timesteps = [0] * self.num_environments
-        self.last_poses = [np.zeros(3)] * self.num_environments
-        self.last_actions = [None] * self.num_environments
         self.semantic_map.init_map_and_pose()
 
     def reset_vectorized_for_env(self, e: int):
         """Initialize agent state for a specific environment."""
         self.timesteps[e] = 0
-        self.last_poses[e] = np.zeros(3)
-        self.last_actions[e] = None
         self.semantic_map.init_map_and_pose_for_env(e)
-
-    @torch.no_grad()
-    def act_vectorized(self,
-                       obs: Tuple[Observations],
-                       infos: Tuple[dict]
-                       ) -> Tuple[List[dict], List[dict]]:
-        """Act end-to-end."""
-        self.last_actions = [info["last_action"] for info in infos]
-
-        # 1 - Obs preprocessing
-        t0 = time.time()
-        (
-            obs_preprocessed,
-            semantic_frame,
-            self.last_poses,
-            pose_delta,
-            goal_category,
-            goal_name
-        ) = self.obs_preprocessor.preprocess(obs, self.last_poses)
-        t1 = time.time()
-        print(f"[Agent] Obs preprocessing time: {t1 - t0:.2f}")
-
-        # 2 - Semantic mapping + policy
-        planner_inputs, vis_inputs = self.prepare_planner_inputs(
-            obs_preprocessed, pose_delta, goal_category)
-        t2 = time.time()
-        print(f"[Agent] Semantic mapping and policy time: {t2 - t1:.2f}")
-
-        for e in range(self.num_environments):
-            vis_inputs[e]["semantic_frame"] = semantic_frame[e]
-            vis_inputs[e]["goal_name"] = goal_name[e]
-            vis_inputs[e]["timestep"] = self.timesteps[e]
-
-        return planner_inputs, vis_inputs
 
     # ------------------------------------------------------------------
     # Inference methods to interact with a single un-vectorized environment
@@ -214,6 +175,7 @@ class Agent(habitat.Agent):
     def reset(self):
         """Initialize agent state."""
         self.reset_vectorized()
+        self.obs_preprocessor.reset()
         self.planner.reset()
         self.visualizer.reset()
 
@@ -228,11 +190,10 @@ class Agent(habitat.Agent):
         (
             obs_preprocessed,
             semantic_frame,
-            self.last_poses,
             pose_delta,
             goal_category,
             goal_name
-        ) = self.obs_preprocessor.preprocess([obs], self.last_poses)
+        ) = self.obs_preprocessor.preprocess([obs])
         t1 = time.time()
         print(f"[Agent] Obs preprocessing time: {t1 - t0:.2f}")
 
@@ -244,14 +205,13 @@ class Agent(habitat.Agent):
 
         # 3 - Planning
         action = self.planner.plan(**planner_inputs[0])
-        self.last_actions[0] = action
+        self.obs_preprocessor.last_actions[0] = action
         t3 = time.time()
         print(f"[Agent] Planning time: {t3 - t2:.2f}")
 
         # 4 - Visualization
         vis_inputs[0]["semantic_frame"] = semantic_frame[0]
         vis_inputs[0]["goal_name"] = goal_name[0]
-        vis_inputs[0]["timestep"] = self.timesteps[0]
         self.visualizer.visualize(**planner_inputs[0], **vis_inputs[0])
         t4 = time.time()
         print(f"[Agent] Visualization time: {t4 - t3:.2f}")

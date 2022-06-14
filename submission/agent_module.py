@@ -114,7 +114,7 @@ class AgentModule(nn.Module):
             seq_origins = None
 
         t1 = time.time()
-        print(f"[Semantic mapping] Total time: {t1 - t0}")
+        print(f"[Semantic mapping] Total time: {t1 - t0:.2f}")
 
         # Predict high-level goals from map features
         # batched across sequence length x num environments
@@ -126,7 +126,7 @@ class AgentModule(nn.Module):
                                  if regression_logits is not None else None)
 
         t2 = time.time()
-        print(f"[Policy] Total time: {t2 - t1}")
+        print(f"[Policy] Total time: {t2 - t1:.2f}")
 
         return (
             seq_goal_map,

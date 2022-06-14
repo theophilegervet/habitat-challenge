@@ -80,7 +80,7 @@ class MaskRCNN:
                     one_hot_predictions[i, :, :, idx] += obj_mask
 
         t1 = time.time()
-        print(f"[Obs preprocessing] Segmentation depth filtering time: {t1 - t0}")
+        print(f"[Obs preprocessing] Segmentation depth filtering time: {t1 - t0:.2f}")
 
         if self.visualize:
             visualizations = np.stack(
@@ -194,7 +194,7 @@ class VisualizationDemo:
         visualizations = []
 
         t1 = time.time()
-        print(f"[Obs preprocessing] Segmentation prediction time: {t1 - t0}")
+        print(f"[Obs preprocessing] Segmentation prediction time: {t1 - t0:.2f}")
 
         if visualize:
             for i in range(batch_size):
@@ -219,7 +219,7 @@ class VisualizationDemo:
                 visualizations.append(vis)
 
         t2 = time.time()
-        print(f"[Obs preprocessing] Segmentation visualization time: {t2 - t1}")
+        print(f"[Obs preprocessing] Segmentation visualization time: {t2 - t1:.2f}")
 
         return predictions, visualizations
 

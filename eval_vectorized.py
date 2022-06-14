@@ -1,5 +1,6 @@
 import time
 import pprint
+import torch
 
 from habitat import Config
 
@@ -22,22 +23,31 @@ class VectorizedEvaluator:
 
         envs = make_vector_envs(self.config)
 
-        obs = envs.reset()
-        infos = [{"last_action": None}] * len(obs)
+        obs, infos = zip(*envs.call(["reset"] * envs.num_envs))
         self.agent.reset_vectorized()
 
         while episode_idx < num_episodes:
             t0 = time.time()
-            planner_inputs, vis_inputs = self.agent.act_vectorized(obs, infos)
+
+            obs = torch.cat(obs)
+            pose_delta = torch.cat([info["pose_delta"] for info in infos])
+            goal_category = torch.cat([info["goal_category"] for info in infos])
+
+            planner_inputs, vis_inputs = self.agent.prepare_planner_inputs(
+                obs, pose_delta, goal_category)
 
             t1 = time.time()
+            print(f"[Agent] Semantic mapping and policy time: {t1 - t0:.2f}")
+
             obs, dones, infos = zip(*envs.call(
                 ["plan_and_step"] * envs.num_envs,
                 [{"planner_inputs": p_in, "vis_inputs": v_in}
                  for p_in, v_in in zip(planner_inputs, vis_inputs)]
             ))
+
             t2 = time.time()
-            print(f"[Vectorized Env] Planning and step time: {t2 - t1:.2f}")
+            print(f"[Vectorized Env] Obs preprocessing, planning, "
+                  f"and step time: {t2 - t1:.2f}")
             print(f"Total time: {t2 - t0:.2f}")
             print()
 
