@@ -174,20 +174,33 @@ if __name__ == "__main__":
     episodes = {
         "split": "val",
         "episode_keys": [
-            # "cvZr5TUy5C5_23",
-            "Dd4bFSTQ8gi_93",
-            "mv2HUxq3B53_89",
-            "p53SfW6mjZe_1",
-            "QaLdnwvtxbs_50",
-            "qyAac8rV8Zk_47",
-            "svBbv1Pavdk_22",
-            "svBbv1Pavdk_41",
-            "svBbv1Pavdk_48",
-            "svBbv1Pavdk_72",
-            "TEEsavR23oF_20",
-            "TEEsavR23oF_38",
-            "TEEsavR23oF_64",
-            "zt1RVoi7PcG_113",
-        ]
+            episode_key.strip()
+            for episode_key in
+            """
+            4ok3usBNeis_91
+            5cdEh9F2hJL_28
+            5cdEh9F2hJL_34
+            5cdEh9F2hJL_61
+            6s7QHgap2fW_3
+            6s7QHgap2fW_31
+            6s7QHgap2fW_40
+            bxsVRursffK_53
+            bxsVRursffK_55
+            cvZr5TUy5C5_84
+            DYehNKdT76V_55
+            mL8ThkuaVTM_3
+            mv2HUxq3B53_11
+            q3zU7Yy5E5s_21
+            q3zU7Yy5E5s_75
+            qyAac8rV8Zk_59
+            qyAac8rV8Zk_81
+            svBbv1Pavdk_62
+            XB4GS9ShBRE_28
+            ziup5kvtCCR_17
+            ziup5kvtCCR_97
+            zt1RVoi7PcG_106
+            zt1RVoi7PcG_109
+        """.split("\n")
+        if episode_key]
     }
     evaluator.eval_on_specific_episodes(episodes)
