@@ -24,7 +24,7 @@ class VectorizedEvaluator:
         self.results_dir = f"{config.DUMP_LOCATION}/results/{config.EXP_NAME}"
         os.makedirs(self.results_dir, exist_ok=True)
 
-    def eval(self, split="val", num_episodes_per_env=2):
+    def eval(self, split="val", num_episodes_per_env=5):
         # train split = 80 scenes with 50K episodes each (4M total)
         # val split = 20 scenes with 100 episodes each (2K total)
         assert split in ["train", "val"]
@@ -169,25 +169,25 @@ if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
     evaluator = VectorizedEvaluator(config, config_str)
 
-    evaluator.eval()
+    # evaluator.eval()
 
-    # episodes = {
-    #     "split": "val",
-    #     "episode_keys": [
-    #         # "cvZr5TUy5C5_23",
-    #         "Dd4bFSTQ8gi_93",
-    #         "mv2HUxq3B53_89",
-    #         "p53SfW6mjZe_1",
-    #         "QaLdnwvtxbs_50",
-    #         "qyAac8rV8Zk_47",
-    #         "svBbv1Pavdk_22",
-    #         "svBbv1Pavdk_41",
-    #         "svBbv1Pavdk_48",
-    #         "svBbv1Pavdk_72",
-    #         "TEEsavR23oF_20",
-    #         "TEEsavR23oF_38",
-    #         "TEEsavR23oF_64",
-    #         "zt1RVoi7PcG_113",
-    #     ]
-    # }
-    # evaluator.eval_on_specific_episodes(episodes)
+    episodes = {
+        "split": "val",
+        "episode_keys": [
+            # "cvZr5TUy5C5_23",
+            "Dd4bFSTQ8gi_93",
+            "mv2HUxq3B53_89",
+            "p53SfW6mjZe_1",
+            "QaLdnwvtxbs_50",
+            "qyAac8rV8Zk_47",
+            "svBbv1Pavdk_22",
+            "svBbv1Pavdk_41",
+            "svBbv1Pavdk_48",
+            "svBbv1Pavdk_72",
+            "TEEsavR23oF_20",
+            "TEEsavR23oF_38",
+            "TEEsavR23oF_64",
+            "zt1RVoi7PcG_113",
+        ]
+    }
+    evaluator.eval_on_specific_episodes(episodes)
