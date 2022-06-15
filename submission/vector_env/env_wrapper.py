@@ -55,7 +55,10 @@ class EnvWrapper(Env):
 
         self.scene_id = self.current_episode.scene_id.split("/")[-1].split(".")[0]
         self.episode_id = self.current_episode.episode_id
-        self._set_vis_dir(self.scene_id, self.episode_id)
+        if (len(self.forced_episode_ids) == 0 or
+                (len(self.forced_episode_ids) > 0 and
+                 self.episode_id in self.forced_episode_ids)):
+            self._set_vis_dir(self.scene_id, self.episode_id)
 
         obs_preprocessed, info = self._preprocess_obs(obs)
         return obs_preprocessed, info
