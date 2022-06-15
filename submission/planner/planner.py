@@ -50,16 +50,17 @@ class Planner:
         self.frame_height = config.ENVIRONMENT.frame_height
         self.obs_shape = (3 + 1 + self.num_sem_categories,
                           self.frame_height, self.frame_width)
-        self.stop_distance = config.ENVIRONMENT.success_distance
         self.turn_angle = config.ENVIRONMENT.turn_angle
         self.collision_threshold = config.AGENT.PLANNER.collision_threshold
-        if config.AGENT.PLANNER.denoise_selem_radius > 0:
-            self.denoise_selem = skimage.morphology.disk(
-                config.AGENT.PLANNER.denoise_selem_radius)
+        if config.AGENT.PLANNER.obs_denoise_selem_radius > 0:
+            self.obs_denoise_selem = skimage.morphology.disk(
+                config.AGENT.PLANNER.obs_denoise_selem_radius)
         else:
-            self.denoise_selem = None
-        self.dilation_selem = skimage.morphology.disk(
-            config.AGENT.PLANNER.dilation_selem_radius)
+            self.obs_denoise_selem = None
+        self.obs_dilation_selem = skimage.morphology.disk(
+            config.AGENT.PLANNER.obs_dilation_selem_radius)
+        self.goal_dilation_selem = skimage.morphology.disk(
+            config.AGENT.PLANNER.goal_dilation_selem_radius)
 
         self.vis_dir = None
         self.collision_map = None
@@ -116,13 +117,6 @@ class Planner:
         start = [int(start_y * 100. / self.map_resolution - gx1),
                  int(start_x * 100. / self.map_resolution - gy1)]
         start = pu.threshold_poses(start, obstacle_map.shape)
-
-        # If we're close enough to the closest goal, stop
-        # TODO Compute distance in meters instead of map cells
-        goal_locations = np.argwhere(goal_map == 1)
-        distances = np.linalg.norm(goal_locations - start, axis=1)
-        if distances.min() < 12.:
-            return HabitatSimActions.STOP
 
         self.curr_pose = [start_x, start_y, start_o]
         self.visited_map[gx1:gx2, gy1:gy2][start[0] - 0:start[0] + 1,
@@ -195,16 +189,16 @@ class Planner:
 
         # Remove noise with standard morphological transformation
         # (closing -> opening)
-        if self.denoise_selem is not None:
+        if self.obs_denoise_selem is not None:
             denoised_obstacles = cv2.morphologyEx(
                 obstacles,
                 cv2.MORPH_CLOSE,
-                self.denoise_selem
+                self.obs_denoise_selem
             )
             denoised_obstacles = cv2.morphologyEx(
                 denoised_obstacles,
                 cv2.MORPH_OPEN,
-                self.denoise_selem
+                self.obs_denoise_selem
             )
         else:
             denoised_obstacles = obstacles
@@ -212,7 +206,7 @@ class Planner:
         # Increase the size of obstacles
         dilated_obstacles = cv2.dilate(
             denoised_obstacles,
-            self.dilation_selem,
+            self.obs_dilation_selem,
             iterations=1
         )
 
@@ -235,14 +229,13 @@ class Planner:
 
         planner = FMMPlanner(
             traversible,
-            self.stop_distance,
             vis_dir=self.vis_dir,
             visualize=self.visualize,
             print_images=self.print_images
         )
 
-        selem = skimage.morphology.disk(10)
-        goal_map = skimage.morphology.binary_dilation(goal_map, selem) != True
+        goal_map = skimage.morphology.binary_dilation(
+            goal_map, self.goal_dilation_selem) != True
         goal_map = 1 - goal_map * 1.
         planner.set_multi_goal(goal_map, self.timestep)
         self.timestep += 1

@@ -13,7 +13,6 @@ PRINT_IMAGES: 1           # 1: save visualization as images, 0: no image saving
 ENVIRONMENT:
   num_sem_categories: 16  # number of semantic segmentation categories
   turn_angle: 30.0        # agent turn angle (in degrees)
-  success_distance: 0.1   # success distance (in metres)
   frame_height: 480       # first-person frame height (in pixels)
   frame_width: 640        # first-person frame width (in pixels)
   camera_height: 0.88     # camera sensor height (in metres)
@@ -36,9 +35,10 @@ AGENT:
     map_pred_threshold: 1.0  # number of depth points to be in bin to consider it as obstacle
 
   PLANNER:
-    collision_threshold: 0.20  # distance under which we consider there's a collision
-    denoise_selem_radius: 0    # radius (in cells) of noise removal structuring element
-    dilation_selem_radius: 1   # radius (in cells) of dilation structuring element
+    collision_threshold: 0.20      # distance under which we consider there's a collision
+    obs_denoise_selem_radius: 0    # radius (in cells) of obstacle noise removal structuring element
+    obs_dilation_selem_radius: 1   # radius (in cells) of obstacle dilation structuring element
+    goal_dilation_selem_radius: 10  # radius (in cells) of goal dilation structuring element
 
   POLICY:
     type: frontier  # one of "frontier" or "semantic"

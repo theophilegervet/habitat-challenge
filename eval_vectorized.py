@@ -38,7 +38,7 @@ class VectorizedEvaluator:
         self._eval(
             agent,
             envs,
-            episodes["split"],
+            split,
             num_episodes=num_episodes,
             episode_keys=None
         )

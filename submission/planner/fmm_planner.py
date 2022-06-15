@@ -13,7 +13,6 @@ class FMMPlanner:
 
     def __init__(self,
                  traversible: np.ndarray,
-                 stop_distance: float,
                  scale: int = 1,
                  step_size: int = 5,
                  vis_dir: str = "data/images/planner",
@@ -22,7 +21,6 @@ class FMMPlanner:
         """
         Arguments:
             traversible: (M + 1, M + 1) binary map encoding traversible regions
-            stop_distance: distance to goal (in metres) under which to stop
             scale: map scale
             step_size: maximum distance of the short-term goal selected by the
              planner
@@ -33,7 +31,6 @@ class FMMPlanner:
         self.vis_dir = vis_dir
         os.makedirs(self.vis_dir, exist_ok=True)
 
-        self.stop_distance = stop_distance
         self.scale = scale
         self.step_size = step_size
         if scale != 1.:
@@ -100,12 +97,7 @@ class FMMPlanner:
         subset *= mask
         subset += (1 - mask) * self.fmm_dist.shape[0] ** 2
 
-        # TODO Should we compute this as a function of the environment
-        #  success distance (self.stop_distance)?
-        if subset[self.du, self.du] < 1.0:
-            stop = True
-        else:
-            stop = False
+        stop = subset[self.du, self.du] < self.step_size
 
         subset -= subset[self.du, self.du]
         ratio1 = subset / dist_mask

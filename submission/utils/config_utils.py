@@ -77,6 +77,5 @@ def get_config(path: str, opts: Optional[list] = None) -> Tuple[Config, str]:
     assert config.ENVIRONMENT.min_depth == depth_sensor.MIN_DEPTH
     assert config.ENVIRONMENT.max_depth == depth_sensor.MAX_DEPTH
     assert config.ENVIRONMENT.turn_angle == config.TASK_CONFIG.SIMULATOR.TURN_ANGLE
-    assert config.ENVIRONMENT.success_distance == config.TASK_CONFIG.TASK.SUCCESS.SUCCESS_DISTANCE
 
     return config, config_str
