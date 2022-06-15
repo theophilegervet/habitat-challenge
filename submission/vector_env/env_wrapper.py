@@ -55,10 +55,10 @@ class EnvWrapper(Env):
 
         self.scene_id = self.current_episode.scene_id.split("/")[-1].split(".")[0]
         self.episode_id = self.current_episode.episode_id
-        if (len(self.forced_episode_ids) == 0 or
-                (len(self.forced_episode_ids) > 0 and
-                 self.episode_id in self.forced_episode_ids)):
-            self._set_vis_dir(self.scene_id, self.episode_id)
+        self._set_vis_dir(self.scene_id, self.episode_id)
+        if (len(self.forced_episode_ids) > 0 and
+                self.episode_id not in self.forced_episode_ids):
+            self._disable_print_images()
 
         obs_preprocessed, info = self._preprocess_obs(obs)
         return obs_preprocessed, info
@@ -145,3 +145,7 @@ class EnvWrapper(Env):
         """Reset visualization directory."""
         self.planner.set_vis_dir(scene_id, episode_id)
         self.visualizer.set_vis_dir(scene_id, episode_id)
+
+    def _disable_print_images(self):
+        self.planner.disable_print_images()
+        self.visualizer.disable_print_images()
