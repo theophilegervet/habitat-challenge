@@ -131,17 +131,20 @@ class VectorizedEvaluator:
                     #  ignore all other episodes
                     if episode_keys is not None:
                         if episode_key in episode_keys:
-                            episode_idx += 1
                             done_episode_keys.add(episode_key)
                             episode_metrics[episode_key] = info["last_episode_metrics"]
+                            print(
+                                f"Finished episode {episode_key} after "
+                                f"{round(time.time() - start_time, 2)} seconds")
 
                     else:
                         episode_idx += 1
                         episode_metrics[episode_key] = info["last_episode_metrics"]
+                        print(
+                            f"Finished episode {episode_idx} after "
+                            f"{round(time.time() - start_time, 2)} seconds")
 
                     agent.reset_vectorized_for_env(e)
-                    print(f"Finished episode {episode_key} number {episode_idx} "
-                          f"after {round(time.time() - start_time, 2)} seconds")
 
         envs.close()
 
