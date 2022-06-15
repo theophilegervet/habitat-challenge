@@ -292,12 +292,10 @@ class SemanticMapModule(nn.Module):
         x2 = x1 + self.vision_range
         y1 = self.local_map_size_cm // (self.xy_resolution * 2)
         y2 = y1 + self.vision_range
-        agent_view[:, 0:1, y1:y2, x1:x2] = torch.clamp(fp_map_pred, min=0., max=1.)
-        agent_view[:, 1:2, y1:y2, x1:x2] = torch.clamp(fp_exp_pred, min=0., max=1.)
-        agent_view[:, 4:4 + self.num_sem_categories, y1:y2, x1:x2] = torch.clamp(
-            all_height_proj[:, 1:1 + self.num_sem_categories] / self.cat_pred_threshold,
-            min=0., max=1
-        )
+        agent_view[:, 0:1, y1:y2, x1:x2] = fp_map_pred
+        agent_view[:, 1:2, y1:y2, x1:x2] = fp_exp_pred
+        agent_view[:, 4:4 + self.num_sem_categories, y1:y2, x1:x2] = all_height_proj[
+            :, 1:1 + self.num_sem_categories] / self.cat_pred_threshold
 
         current_pose = pu.get_new_pose_batch(prev_pose.clone(), pose_delta)
         st_pose = current_pose.clone().detach()
@@ -312,6 +310,9 @@ class SemanticMapModule(nn.Module):
         rot_mat, trans_mat = ru.get_grid(st_pose, agent_view.size(), dtype)
         rotated = F.grid_sample(agent_view, rot_mat, align_corners=True)
         translated = F.grid_sample(rotated, trans_mat, align_corners=True)
+
+        # Clamp to [0, 1] after transform agent view to map coordinates
+        translated = torch.clamp(translated,  min=0., max=1.)
 
         maps = torch.cat((prev_map.unsqueeze(1), translated.unsqueeze(1)), 1)
         current_map, _ = torch.max(maps[:, :, :4 + self.num_sem_categories], 1)
