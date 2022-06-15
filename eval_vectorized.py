@@ -63,7 +63,7 @@ class VectorizedEvaluator:
             envs,
             episodes["split"],
             num_episodes=None,
-            episode_keys=episodes["episode_keys"]
+            episode_keys=set(episodes["episode_keys"])
         )
 
     def _eval(self,
