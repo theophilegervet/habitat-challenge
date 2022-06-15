@@ -1,5 +1,5 @@
 import torch
-from typing import Tuple
+from typing import Tuple, Optional, List
 
 from habitat import Config
 from habitat.core.env import Env
@@ -13,12 +13,24 @@ from submission.visualizer.visualizer import Visualizer
 
 class EnvWrapper(Env):
 
-    def __init__(self, config: Config):
+    def __init__(self,
+                 config: Config,
+                 episode_ids: Optional[List[str]] = None):
+        """
+        Arguments:
+            episode_ids: if specified, force the environment to iterate
+             through these episodes before others - this is useful to
+             debug behavior on specific episodes
+        """
         super().__init__(config=config.TASK_CONFIG)
 
         self.device = (torch.device("cpu") if config.NO_GPU else
                        torch.device(f"cuda:{self.sim.gpu_device}"))
         self.max_steps = config.AGENT.max_steps
+
+        self.forced_episode_ids = episode_ids if episode_ids else []
+        self.episode_idx = 0
+
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
         self.obs_preprocessor = ObsPreprocessor(config, 1, self.device)
@@ -29,7 +41,14 @@ class EnvWrapper(Env):
         self.last_goal_name = None
 
     def reset(self) -> Tuple[torch.Tensor, dict]:
-        obs = super().reset()
+        if self.episode_idx < len(self.forced_episode_ids):
+            obs = self._reset_to_episode(
+                self.forced_episode_ids[self.episode_idx])
+        else:
+            obs = super().reset()
+
+        self.episode_idx += 1
+
         self.obs_preprocessor.reset()
         self.planner.reset()
         self.visualizer.reset()
@@ -40,6 +59,29 @@ class EnvWrapper(Env):
 
         obs_preprocessed, info = self._preprocess_obs(obs)
         return obs_preprocessed, info
+
+    def _reset_to_episode(self, episode_id: str) -> Observations:
+        """
+        Adapted from:
+        https://github.com/facebookresearch/habitat-lab/blob/main/habitat/core/env.py
+        """
+        self._reset_stats()
+
+        episode = [e for e in self.episodes if e.episode_id == episode_id][0]
+        self._current_episode = episode
+
+        self._episode_from_iter_on_reset = True
+        self._episode_force_changed = False
+
+        self.reconfigure(self._config)
+
+        observations = self.task.reset(episode=self.current_episode)
+        self._task.measurements.reset_measures(
+            episode=self.current_episode,
+            task=self.task,
+            observations=observations,
+        )
+        return observations
 
     def _preprocess_obs(self, obs: Observations) -> Tuple[torch.Tensor, dict]:
         (

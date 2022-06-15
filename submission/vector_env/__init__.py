@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 import random
 
 from habitat import Config
@@ -29,8 +29,7 @@ def _get_env_gpus(config: Config, rank: int) -> List[int]:
 def make_vector_envs(config: Config,
                      max_scene_repeat_episodes: int = -1
                      ) -> VectorEnv:
-    """Create vectorized online acting environments and split scenes
-    across environments.
+    """Create vectorized environments and split scenes across environments.
 
     Arguments:
         max_scene_repeat_episodes: if > 0, this is the maximum number of
@@ -88,5 +87,51 @@ def make_vector_envs(config: Config,
     return envs
 
 
+def make_vector_envs_on_specific_episodes(
+        config: Config,
+        scene2episodes: Dict[str, List[str]]
+        ) -> VectorEnv:
+    """Create vectorized environments to evaluate specific episodes.
+
+    Arguments:
+        scene2episodes: mapping from scene ID to episode IDs
+    """
+    scenes = list(scene2episodes.keys())
+
+    gpus = _get_env_gpus(config, rank=0)
+    num_gpus = len(gpus)
+    num_envs = len(scenes)  # One environment per scene
+    assert (num_envs >= num_gpus and num_envs % num_gpus == 0)
+    num_envs_per_gpu = num_envs // num_gpus
+
+    configs = []
+    episode_ids = []
+    for i in range(num_gpus):
+        for j in range(num_envs_per_gpu):
+            proc_config = config.clone()
+            proc_config.defrost()
+            proc_id = (i * num_envs_per_gpu) + j
+            task_config = proc_config.TASK_CONFIG
+            task_config.SEED += proc_id
+            task_config.DATASET.CONTENT_SCENES = [scenes[proc_id]]
+            if not proc_config.NO_GPU:
+                task_config.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID = gpus[i]
+            task_config.ENVIRONMENT.ITERATOR_OPTIONS.MAX_SCENE_REPEAT_STEPS = -1
+            proc_config.freeze()
+            configs.append(proc_config)
+            episode_ids.append(scene2episodes[scenes[proc_id]])
+
+    envs = VectorEnv(
+        make_env_fn=make_env_on_specific_episodes_fn,
+        env_fn_args=tuple([(configs[rank], episode_ids[rank])
+                           for rank in range(len(configs))])
+    )
+    return envs
+
+
 def make_env_fn(config):
     return EnvWrapper(config)
+
+
+def make_env_on_specific_episodes_fn(config, episode_ids):
+    return EnvWrapper(config, episode_ids)
