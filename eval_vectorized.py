@@ -35,11 +35,17 @@ class VectorizedEvaluator:
         agent = Agent(config=self.config, rank=0, ddp=False)
         envs = make_vector_envs(self.config, max_scene_repeat_episodes=5)
 
-        self._eval(agent, envs, split, num_episodes)
+        self._eval(
+            agent,
+            envs,
+            episodes["split"],
+            num_episodes=num_episodes,
+            episode_keys=None
+        )
 
     def eval_on_specific_episodes(self, episodes):
         scene2episodes = defaultdict(list)
-        for episode in episodes["episodes"]:
+        for episode in episodes["episode_keys"]:
             scene_id, episode_id = episode.split("_")
             scene2episodes[scene_id].append(episode_id)
         scene2episodes = dict(scene2episodes)
@@ -49,27 +55,45 @@ class VectorizedEvaluator:
         self.config.NUM_ENVIRONMENTS = len(scene2episodes)
         self.config.freeze()
 
-        # Vectorized environments will keep generating new episodes
-        #  after specified episodes are iterated through - this makes sure
-        #  we roughly cover all episodes of interest
-        # TODO Stop environments after they iterate through episodes
-        #  they're assigned
-        num_episodes = max(len(eps) for eps in scene2episodes.values()) * len(scene2episodes)
-
         agent = Agent(config=self.config, rank=0, ddp=False)
         envs = make_vector_envs_on_specific_episodes(self.config, scene2episodes)
 
-        self._eval(agent, envs, episodes["split"], num_episodes)
+        self._eval(
+            agent,
+            envs,
+            episodes["split"],
+            num_episodes=None,
+            episode_keys=episodes["episode_keys"]
+        )
 
-    def _eval(self, agent: Agent, envs: VectorEnv, split: str, num_episodes: int):
+    def _eval(self,
+              agent: Agent,
+              envs: VectorEnv,
+              split: str,
+              num_episodes=None,
+              episode_keys=None):
+
+        # The stopping condition is either specified through num_episodes
+        # (stop after max number of episodes) or episode_keys (stop after
+        # iterate through these specific episodes)
+        assert ((num_episodes is not None and episode_keys is None) or
+                (num_episodes is None and episode_keys is not None))
+
+        def stop():
+            if num_episodes is not None:
+                return episode_idx >= num_episodes
+            elif episode_keys is not None:
+                return done_episode_keys == episode_keys
+
         start_time = time.time()
         episode_metrics = {}
         episode_idx = 0
+        done_episode_keys = set()
 
         obs, infos = zip(*envs.call(["reset"] * envs.num_envs))
         agent.reset_vectorized()
 
-        while episode_idx < num_episodes:
+        while not stop():
             # t0 = time.time()
 
             obs = torch.cat([ob.to(agent.device) for ob in obs])
@@ -102,11 +126,22 @@ class VectorizedEvaluator:
                 if done:
                     episode_key = (f"{info['last_episode_scene_id']}_"
                                    f"{info['last_episode_id']}")
-                    episode_metrics[episode_key] = info["last_episode_metrics"]
+
+                    # If the episode keys we care about are specified,
+                    #  ignore all other episodes
+                    if episode_keys is not None:
+                        if episode_key in episode_keys:
+                            episode_idx += 1
+                            done_episode_keys.add(episode_key)
+                            episode_metrics[episode_key] = info["last_episode_metrics"]
+
+                    else:
+                        episode_idx += 1
+                        episode_metrics[episode_key] = info["last_episode_metrics"]
+
                     agent.reset_vectorized_for_env(e)
-                    episode_idx += 1
-                    print(f"Finished episode {episode_idx} after "
-                          f"{round(time.time() - start_time, 2)} seconds")
+                    print(f"Finished episode {episode_key} number {episode_idx} "
+                          f"after {round(time.time() - start_time, 2)} seconds")
 
         envs.close()
 
@@ -119,11 +154,9 @@ class VectorizedEvaluator:
             aggregated_metrics[f"{k}/max"] = max(
                 v[k] for v in episode_metrics.values())
 
-        with open(f"{self.results_dir}/{split}_aggregated_results.json",
-                  "w") as f:
+        with open(f"{self.results_dir}/{split}_aggregated_results.json", "w") as f:
             json.dump(aggregated_metrics, f, indent=4)
-        with open(f"{self.results_dir}/{split}_episode_results.json",
-                  "w") as f:
+        with open(f"{self.results_dir}/{split}_episode_results.json", "w") as f:
             json.dump(episode_metrics, f, indent=4)
 
 
@@ -135,7 +168,7 @@ if __name__ == "__main__":
 
     episodes = {
         "split": "val",
-        "episodes": [
+        "episode_keys": [
             # "cvZr5TUy5C5_23",
             "Dd4bFSTQ8gi_93",
             "mv2HUxq3B53_89",
