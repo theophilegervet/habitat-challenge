@@ -24,7 +24,7 @@ class VectorizedEvaluator:
         self.results_dir = f"{config.DUMP_LOCATION}/results/{config.EXP_NAME}"
         os.makedirs(self.results_dir, exist_ok=True)
 
-    def eval(self, split="val", num_episodes=40):
+    def eval(self, split="val", num_episodes_per_env=2):
         # train split = 80 scenes with 50K episodes each (4M total)
         # val split = 20 scenes with 100 episodes each (2K total)
         assert split in ["train", "val"]
@@ -39,7 +39,7 @@ class VectorizedEvaluator:
             agent,
             envs,
             split,
-            num_episodes=num_episodes,
+            num_episodes_per_env=num_episodes_per_env,
             episode_keys=None
         )
 
@@ -62,7 +62,7 @@ class VectorizedEvaluator:
             agent,
             envs,
             episodes["split"],
-            num_episodes=None,
+            num_episodes_per_env=None,
             episode_keys=set(episodes["episode_keys"])
         )
 
