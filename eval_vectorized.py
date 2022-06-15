@@ -24,7 +24,7 @@ class VectorizedEvaluator:
         self.results_dir = f"{config.DUMP_LOCATION}/results/{config.EXP_NAME}"
         os.makedirs(self.results_dir, exist_ok=True)
 
-    def eval(self, split="val", num_episodes=100):
+    def eval(self, split="val", num_episodes=40):
         # train split = 80 scenes with 50K episodes each (4M total)
         # val split = 20 scenes with 100 episodes each (2K total)
         assert split in ["train", "val"]
@@ -70,24 +70,25 @@ class VectorizedEvaluator:
               agent: Agent,
               envs: VectorEnv,
               split: str,
-              num_episodes=None,
+              num_episodes_per_env=None,
               episode_keys=None):
 
-        # The stopping condition is either specified through num_episodes
-        # (stop after max number of episodes) or episode_keys (stop after
-        # iterate through these specific episodes)
-        assert ((num_episodes is not None and episode_keys is None) or
-                (num_episodes is None and episode_keys is not None))
+        # The stopping condition is either specified through
+        # num_episodes_per_env (stop after each environment
+        # finishes a certain number of episodes) or episode_keys
+        # (stop after we iterate through a list of specific episodes)
+        assert ((num_episodes_per_env is not None and episode_keys is None) or
+                (num_episodes_per_env is None and episode_keys is not None))
 
         def stop():
-            if num_episodes is not None:
-                return episode_idx >= num_episodes
+            if num_episodes_per_env is not None:
+                return all([i >= num_episodes_per_env for i in episode_idxs])
             elif episode_keys is not None:
                 return done_episode_keys == episode_keys
 
         start_time = time.time()
         episode_metrics = {}
-        episode_idx = 0
+        episode_idxs = [0] * envs.num_envs
         done_episode_keys = set()
 
         obs, infos = zip(*envs.call(["reset"] * envs.num_envs))
@@ -137,12 +138,13 @@ class VectorizedEvaluator:
                                 f"Finished episode {episode_key} after "
                                 f"{round(time.time() - start_time, 2)} seconds")
 
-                    else:
-                        episode_idx += 1
-                        episode_metrics[episode_key] = info["last_episode_metrics"]
+                    elif num_episodes_per_env is not None:
+                        if episode_idxs[e] < num_episodes_per_env:
+                            episode_metrics[episode_key] = info["last_episode_metrics"]
+                        episode_idxs[e] += 1
                         print(
-                            f"Finished episode {episode_idx} after "
-                            f"{round(time.time() - start_time, 2)} seconds")
+                            f"Episode indexes {episode_idxs} / {num_episodes_per_env} "
+                            f"after {round(time.time() - start_time, 2)} seconds")
 
                     agent.reset_vectorized_for_env(e)
 
