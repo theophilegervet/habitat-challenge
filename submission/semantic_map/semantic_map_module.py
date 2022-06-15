@@ -295,7 +295,7 @@ class SemanticMapModule(nn.Module):
         agent_view[:, 0:1, y1:y2, x1:x2] = torch.clamp(fp_map_pred, min=0., max=1.)
         agent_view[:, 1:2, y1:y2, x1:x2] = torch.clamp(fp_exp_pred, min=0., max=1.)
         agent_view[:, 4:4 + self.num_sem_categories, y1:y2, x1:x2] = torch.clamp(
-            agent_height_proj[:, 1:1 + self.num_sem_categories] / self.cat_pred_threshold,
+            all_height_proj[:, 1:1 + self.num_sem_categories] / self.cat_pred_threshold,
             min=0., max=1
         )
 
