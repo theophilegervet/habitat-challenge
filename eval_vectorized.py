@@ -174,14 +174,10 @@ if __name__ == "__main__":
     episodes = {
         "split": "val",
         "episode_keys": [
-            "p53SfW6mjZe_1",
-            "qyAac8rV8Zk_47",
-            "q3zU7Yy5E5s_40",
-            "wcojb4TFT35_26",
-            "cvZr5TUy5C5_84",
-            "DYehNKdT76V_55",
-            "q3zU7Yy5E5s_21",
-            "ziup5kvtCCR_17",
+            "6s7QHgap2fW_47",
+            "Nfvxx8J5NCo_9",
+            "QaLdnwvtxbs_46",
+            "ziup5kvtCCR_77",
         ]
     }
     evaluator.eval_on_specific_episodes(episodes)
