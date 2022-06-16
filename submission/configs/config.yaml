@@ -6,7 +6,7 @@ NO_GPU: 0                 # 1: ignore IDs above and run on CPU, 0: run on GPUs w
 NUM_ENVIRONMENTS: 20      # number of environments (per agent process)
 DUMP_LOCATION: data       # path to dump models and log
 EXP_NAME: exp             # experiment name
-MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
+MIXED_PRECISION: 1        # 1: mixed precision inference, 0: fp32
 VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
 PRINT_IMAGES: 1           # 1: save visualization as images, 0: no image saving
 
