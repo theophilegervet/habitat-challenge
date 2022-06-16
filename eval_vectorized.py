@@ -169,23 +169,23 @@ if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
     evaluator = VectorizedEvaluator(config, config_str)
 
-    # evaluator.eval()
+    evaluator.eval()
 
-    episodes = {
-        "split": "val",
-        "episode_keys": [
-            # segmentation fp
-            "cvZr5TUy5C5_0",
-            "mv2HUxq3B53_34",
-            "wcojb4TFT35_11",
-            "ziup5kvtCCR_51",
-            "6s7QHgap2fW_3",
-            # segmentation fn
-            "QaLdnwvtxbs_78",
-            "qyAac8rV8Zk_14",
-            "TEEsavR23oF_40",
-            "XB4GS9ShBRE_48",
-            "5cdEh9F2hJL_28",
-        ]
-    }
-    evaluator.eval_on_specific_episodes(episodes)
+    # episodes = {
+    #     "split": "val",
+    #     "episode_keys": [
+    #         # segmentation fp
+    #         "cvZr5TUy5C5_0",
+    #         "mv2HUxq3B53_34",
+    #         "wcojb4TFT35_11",
+    #         "ziup5kvtCCR_51",
+    #         "6s7QHgap2fW_3",
+    #         # segmentation fn
+    #         "QaLdnwvtxbs_78",
+    #         "qyAac8rV8Zk_14",
+    #         "TEEsavR23oF_40",
+    #         "XB4GS9ShBRE_48",
+    #         "5cdEh9F2hJL_28",
+    #     ]
+    # }
+    # evaluator.eval_on_specific_episodes(episodes)
