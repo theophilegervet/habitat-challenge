@@ -30,7 +30,7 @@ class ObsPreprocessor:
                  device: torch.device):
         self.num_environments = num_environments
         self.device = device
-        self.precision = torch.float16 if config.MIXED_PRECISION_AGENT else torch.float32
+        self.precision = torch.float16 if config.MIXED_PRECISION else torch.float32
         self.num_sem_categories = config.ENVIRONMENT.num_sem_categories
         self.frame_height = config.ENVIRONMENT.frame_height
         self.frame_width = config.ENVIRONMENT.frame_width
@@ -137,7 +137,8 @@ class ObsPreprocessor:
                 rgb.cpu().numpy(),
                 depth.cpu().squeeze(-1).numpy()
             )
-            semantic = torch.from_numpy(semantic).long().to(self.device)
+            semantic = torch.from_numpy(semantic).to(
+                self.precision).to(self.device)
 
         rgb = rgb.permute(0, 3, 1, 2)
         depth = depth.permute(0, 3, 1, 2)

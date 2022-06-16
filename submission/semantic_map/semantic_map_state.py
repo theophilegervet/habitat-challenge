@@ -13,7 +13,7 @@ class SemanticMapState:
     def __init__(self, config, rank):
         self.device = (torch.device("cpu") if config.NO_GPU else
                        torch.device(f"cuda:{config.AGENT_GPU_IDS[rank]}"))
-        self.precision = torch.float16 if config.MIXED_PRECISION_AGENT else torch.float32
+        self.precision = torch.float16 if config.MIXED_PRECISION else torch.float32
         self.num_environments = config.NUM_ENVIRONMENTS
         self.num_sem_categories = config.ENVIRONMENT.num_sem_categories
 

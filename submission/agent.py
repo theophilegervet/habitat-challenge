@@ -32,7 +32,7 @@ class Agent(habitat.Agent):
     def __init__(self, config: Config, rank: int, ddp: bool = False):
         self.max_steps = config.AGENT.max_steps
         self.goal_update_steps = config.AGENT.goal_update_steps
-        self.precision = torch.float16 if config.MIXED_PRECISION_AGENT else torch.float32
+        self.precision = torch.float16 if config.MIXED_PRECISION else torch.float32
         self.num_environments = config.NUM_ENVIRONMENTS
 
         policy = exploration_policies[config.AGENT.POLICY.type]()
