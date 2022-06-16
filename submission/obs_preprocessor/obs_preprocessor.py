@@ -50,7 +50,7 @@ class ObsPreprocessor:
 
         self.instance_id_to_category_id = None
         self.one_hot_encoding = torch.eye(
-            self.num_sem_categories, device=self.device, dtype=self.precision)
+            self.num_sem_categories, device=self.device)
         self.color_palette = [int(x * 255.) for x in frame_color_palette]
 
         self.last_poses = None
@@ -111,10 +111,8 @@ class ObsPreprocessor:
 
         env_frame_height, env_frame_width = obs[0]["rgb"].shape[:2]
 
-        rgb = torch.from_numpy(np.stack([ob["rgb"] for ob in obs])).to(
-            self.precision).to(self.device)
-        depth = torch.from_numpy(np.stack([ob["depth"] for ob in obs])).to(
-            self.precision).to(self.device)
+        rgb = torch.from_numpy(np.stack([ob["rgb"] for ob in obs])).to(self.device)
+        depth = torch.from_numpy(np.stack([ob["depth"] for ob in obs])).to(self.device)
 
         depth = preprocess_depth(depth)
 
@@ -137,8 +135,7 @@ class ObsPreprocessor:
                 rgb.cpu().numpy(),
                 depth.cpu().squeeze(-1).numpy()
             )
-            semantic = torch.from_numpy(semantic).to(
-                self.precision).to(self.device)
+            semantic = torch.from_numpy(semantic).to(self.device)
 
         rgb = rgb.permute(0, 3, 1, 2)
         depth = depth.permute(0, 3, 1, 2)
@@ -146,6 +143,7 @@ class ObsPreprocessor:
 
         rgb, depth, semantic = downscale(rgb, depth, semantic)
         obs_preprocessed = torch.cat([rgb, depth, semantic], dim=1)
+        obs_preprocessed = obs_preprocessed.to(self.precision)
 
         return obs_preprocessed, semantic_vis
 
