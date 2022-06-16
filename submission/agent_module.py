@@ -141,7 +141,7 @@ class AgentModule(nn.Module):
             init_lmb,
             init_origins
         ):
-            print(x.dtype)
+            print(x.dtype if x is not None else "None")
 
         print("Module out dtypes:")
         for x in (
@@ -154,7 +154,7 @@ class AgentModule(nn.Module):
             seq_lmb,
             seq_origins,
         ):
-            print(x.dtype)
+            print(x.dtype if x is not None else "None")
         print()
 
         return (
