@@ -176,10 +176,12 @@ if __name__ == "__main__":
         "episode_keys": [
             "p53SfW6mjZe_1",
             "qyAac8rV8Zk_47",
+            "q3zU7Yy5E5s_40",
+            "wcojb4TFT35_26",
             "cvZr5TUy5C5_84",
             "DYehNKdT76V_55",
             "q3zU7Yy5E5s_21",
-            "ziup5kvtCCR_17"
+            "ziup5kvtCCR_17",
         ]
     }
     evaluator.eval_on_specific_episodes(episodes)
