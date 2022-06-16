@@ -3,6 +3,7 @@ import numpy as np
 from typing import Optional, Tuple
 
 from mmdet.apis import init_detector, inference_detector
+from mmcv.runner import wrap_fp16_model
 
 from submission.utils.constants import mmdetection_categories_mapping, coco_categories
 
@@ -23,6 +24,7 @@ class MMDetectionSegmentation:
             "submission/obs_preprocessor/mmdet_qinst_hm3d.pth",
             device=device
         )
+        wrap_fp16_model(self.segmentation_model)
         self.visualize = visualize
         self.num_sem_categories = len(coco_categories)
         self.score_thr = sem_pred_prob_thr
