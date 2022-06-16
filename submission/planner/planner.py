@@ -57,7 +57,7 @@ class Planner:
                 config.AGENT.PLANNER.obs_denoise_selem_radius)
         else:
             self.obs_denoise_selem = None
-        self.obs_dilation_selem = skimage.morphology.disk(
+        self.start_obs_dilation_selem_radius = (
             config.AGENT.PLANNER.obs_dilation_selem_radius)
         self.goal_dilation_selem = skimage.morphology.disk(
             config.AGENT.PLANNER.goal_dilation_selem_radius)
@@ -70,6 +70,8 @@ class Planner:
         self.curr_pose = None
         self.last_action = None
         self.timestep = None
+        self.curr_obs_dilation_selem_radius = None
+        self.obs_dilation_selem = None
 
     def reset(self):
         self.vis_dir = self.default_vis_dir
@@ -81,6 +83,9 @@ class Planner:
                           self.map_size_cm / 100. / 2., 0.]
         self.last_action = None
         self.timestep = 1
+        self.curr_obs_dilation_selem_radius = self.start_obs_dilation_selem_radius
+        self.obs_dilation_selem = skimage.morphology.disk(
+            self.curr_obs_dilation_selem_radius)
 
     def set_vis_dir(self, scene_id: str, episode_id: str):
         self.print_images = True
@@ -127,10 +132,21 @@ class Planner:
 
         # High-level goal -> short-term goal
         # t0 = time.time()
-        short_term_goal, stop = self._get_short_term_goal(
+        short_term_goal, replan, stop = self._get_short_term_goal(
             obstacle_map, np.copy(goal_map), start, planning_window)
         # t1 = time.time()
         # print(f"[Planning] get_short_term_goal() time: {t1 - t0}")
+
+        # We were not able to find a path to the high-level goal
+        if replan:
+            # Clean collision map
+            self.collision_map *= 0
+
+            # Reduce obstacle dilation
+            if self.curr_obs_dilation_selem_radius > 1:
+                self.curr_obs_dilation_selem_radius -= 1
+                self.obs_dilation_selem = skimage.morphology.disk(
+                    self.curr_obs_dilation_selem_radius)
 
         # Short-term goal -> deterministic local policy
         if stop:
@@ -162,7 +178,7 @@ class Planner:
                              goal_map: np.ndarray,
                              start: List[int],
                              planning_window: List[int],
-                             ) -> Tuple[Tuple[int, int], bool]:
+                             ) -> Tuple[Tuple[int, int], bool, bool]:
         """Get short-term goal.
 
         Args:
@@ -241,10 +257,10 @@ class Planner:
         self.timestep += 1
 
         state = [start[0] - x1 + 1, start[1] - y1 + 1]
-        stg_x, stg_y, _, stop = planner.get_short_term_goal(state)
+        stg_x, stg_y, replan, stop = planner.get_short_term_goal(state)
         stg_x, stg_y = stg_x + x1 - 1, stg_y + y1 - 1
         short_term_goal = int(stg_x), int(stg_y)
-        return short_term_goal, stop
+        return short_term_goal, replan, stop
 
     def _check_collision(self):
         """Check whether we had a collision and update the collision map."""
