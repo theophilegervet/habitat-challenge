@@ -43,6 +43,8 @@ class EnvWrapper(Env):
         self.last_goal_name = None
 
     def reset(self) -> Tuple[torch.Tensor, dict]:
+        self.timestep = 1
+
         if self.episode_idx < len(self.forced_episode_ids):
             obs = self._reset_to_episode(
                 self.forced_episode_ids[self.episode_idx])
@@ -64,7 +66,6 @@ class EnvWrapper(Env):
 
         obs_preprocessed, info = self._preprocess_obs(obs)
 
-        self.timestep = 1
         return obs_preprocessed, info
 
     def _reset_to_episode(self, episode_id: str) -> Observations:
@@ -102,7 +103,7 @@ class EnvWrapper(Env):
 
         if self.visualizer.print_images:
             cv2.imwrite(os.path.join(self.visualizer.vis_dir, f"rgb_{self.timestep}.png"), vis_info["rgb"])
-            cv2.imwrite(os.path.join(self.visualizer.vis_dir, f"detectron_pred_{self.timestep}.png", vis_info["pred"]))
+            cv2.imwrite(os.path.join(self.visualizer.vis_dir, f"detectron_pred_{self.timestep}.png"), vis_info["pred"])
         self.timestep += 1
 
         self.last_semantic_frame = semantic_frame[0]
