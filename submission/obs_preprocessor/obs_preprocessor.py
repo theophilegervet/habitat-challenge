@@ -14,8 +14,8 @@ from submission.utils.constants import (
     goal_categories,
     goal_categories_mapping
 )
-from .detectron2_segmentation import Detectron2Segmentation
-# from .mmdetection_segmentation import MMDetectionSegmentation
+# from .detectron2_segmentation import Detectron2Segmentation
+from .mmdetection_segmentation import MMDetectionSegmentation
 
 
 class ObsPreprocessor:
@@ -37,16 +37,16 @@ class ObsPreprocessor:
         self.min_depth = config.ENVIRONMENT.min_depth
         self.max_depth = config.ENVIRONMENT.max_depth
 
-        self.segmentation = Detectron2Segmentation(
-            sem_pred_prob_thr=0.9,
-            sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
-            visualize=True
-        )
-        # self.segmentation = MMDetectionSegmentation(
+        # self.segmentation = Detectron2Segmentation(
         #     sem_pred_prob_thr=0.9,
-        #     device=self.device,
+        #     sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
         #     visualize=True
         # )
+        self.segmentation = MMDetectionSegmentation(
+            sem_pred_prob_thr=0.9,
+            device=self.device,
+            visualize=True
+        )
 
         self.instance_id_to_category_id = None
         self.one_hot_encoding = torch.eye(
