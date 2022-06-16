@@ -1,3 +1,5 @@
+import cv2
+import os
 import torch
 from typing import Tuple, Optional, List
 
@@ -61,6 +63,8 @@ class EnvWrapper(Env):
             self._disable_print_images()
 
         obs_preprocessed, info = self._preprocess_obs(obs)
+
+        self.timestep = 1
         return obs_preprocessed, info
 
     def _reset_to_episode(self, episode_id: str) -> Observations:
@@ -92,8 +96,14 @@ class EnvWrapper(Env):
             semantic_frame,
             pose_delta,
             goal_category,
-            goal_name
+            goal_name,
+            vis_info
         ) = self.obs_preprocessor.preprocess([obs])
+
+        if self.visualizer.print_images:
+            cv2.imwrite(os.path.join(self.visualizer.vis_dir, f"rgb_{self.timestep}.png"), vis_info["rgb"])
+            cv2.imwrite(os.path.join(self.visualizer.vis_dir, f"detectron_pred_{self.timestep}.png", vis_info["pred"]))
+        self.timestep += 1
 
         self.last_semantic_frame = semantic_frame[0]
         self.last_goal_name = goal_name[0]

@@ -61,7 +61,7 @@ class ObsPreprocessor:
                    obs: List[Observations],
                    ) -> Tuple[Tensor, np.ndarray, Tensor, Tensor, List[str]]:
         """Preprocess observation."""
-        obs_preprocessed, semantic_frame = self.preprocess_frame(obs)
+        obs_preprocessed, semantic_frame, vis_info = self.preprocess_frame(obs)
         pose_delta, self.last_poses = self.preprocess_pose(obs, self.last_poses)
         goal, goal_name = self.preprocess_goal(obs)
         return (
@@ -69,7 +69,8 @@ class ObsPreprocessor:
             semantic_frame,
             pose_delta,
             goal,
-            goal_name
+            goal_name,
+            vis_info
         )
 
     def preprocess_goal(self, obs: List[Observations]) -> Tuple[Tensor, List[str]]:
@@ -133,6 +134,11 @@ class ObsPreprocessor:
             )
             semantic = torch.from_numpy(semantic).long().to(self.device)
 
+            vis_info = {
+                "rgb": rgb[0].cpu().numpy(),
+                "pred": semantic_vis[0]
+            }
+
         rgb = rgb.permute(0, 3, 1, 2)
         depth = depth.permute(0, 3, 1, 2)
         semantic = semantic.permute(0, 3, 1, 2)
@@ -140,7 +146,7 @@ class ObsPreprocessor:
         rgb, depth, semantic = downscale(rgb, depth, semantic)
         obs_preprocessed = torch.cat([rgb, depth, semantic], dim=1)
 
-        return obs_preprocessed, semantic_vis
+        return obs_preprocessed, semantic_vis, vis_info
 
     def _get_semantic_frame_vis(self, rgb: np.ndarray, semantics: np.ndarray):
         """Visualize first-person semantic segmentation frame."""
