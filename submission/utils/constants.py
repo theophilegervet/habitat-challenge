@@ -35,7 +35,8 @@ coco_categories = {
     "no-category": 15,
 }
 
-coco_categories_mapping = {
+# detectron2 model
+detectron2_categories_mapping = {
     56: 0,  # chair
     57: 1,  # couch
     58: 2,  # potted plant
@@ -53,7 +54,20 @@ coco_categories_mapping = {
     39: 14,  # bottle
 }
 
-# TODO This mapping seems only valid for scene wcojb4TFT35
+# mmdetection model
+mmdetection_categories_mapping = {
+    0: 0,   # chair
+    5: 1,   # couch
+    8: 2,   # potted plant
+    6: 3,   # bed
+    10: 4,  # toilet
+    13: 5,  # tv
+    1: 6,   # dining table
+    9: 8,   # sink
+}
+
+# ground-truth semantics
+# TODO This mapping is only valid for scene wcojb4TFT35 (used for debugging)
 hm3d_categories_mapping = {
     # chair
     196: 0,  # folding chair

@@ -7,7 +7,14 @@ conda install habitat-sim-challenge-2022 headless -c conda-forge -c aihabitat
 git clone --branch challenge-2022 https://github.com/facebookresearch/habitat-lab.git
 pushd habitat-lab;pip install -r requirements.txt; python setup.py develop --all; popd
 pip install -r submission/requirements.txt
+
+# Detectron2
 python -m pip install git+https://github.com/facebookresearch/detectron2.git
+
+# MMDetection - customize with your PyTorch and CUDA versions
+pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.11.0/index.html
+git clone https://github.com/open-mmlab/mmdetection.git
+pushd mmdetection; pip install -r requirements/build.txt; pip install "git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI"; pip install -v -e .; popd
 ```
 
 ## Make a Submission

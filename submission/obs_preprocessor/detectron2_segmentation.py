@@ -15,10 +15,10 @@ from detectron2.modeling import build_model
 from detectron2.checkpoint import DetectionCheckpointer
 from detectron2.utils.visualizer import ColorMode, Visualizer, VisImage
 
-from submission.utils.constants import coco_categories_mapping, coco_categories
+from submission.utils.constants import detectron2_categories_mapping, coco_categories
 
 
-class MaskRCNN:
+class Detectron2Segmentation:
     def __init__(self, sem_pred_prob_thr: float, sem_gpu_id: int, visualize: bool):
         """
         Arguments:
@@ -36,7 +36,7 @@ class MaskRCNN:
                        ) -> Tuple[np.ndarray, np.ndarray]:
         """
         Arguments:
-            images: images of shape (batch_size, H, W, 3) (in RGB order)
+            images: images of shape (batch_size, H, W, 3) (in BGR order)
             depths: depth frames of shape (batch_size, H, W)
 
         Returns:
@@ -47,7 +47,6 @@ class MaskRCNN:
              original images
         """
         batch_size, height, width, _ = images.shape
-        images = images[:, :, :, ::-1]
 
         predictions, visualizations = self.segmentation_model.get_predictions(
             images, visualize=self.visualize)
@@ -58,8 +57,8 @@ class MaskRCNN:
 
         for i in range(batch_size):
             for j, class_idx in enumerate(predictions[i]["instances"].pred_classes.cpu().numpy()):
-                if class_idx in list(coco_categories_mapping.keys()):
-                    idx = coco_categories_mapping[class_idx]
+                if class_idx in list(detectron2_categories_mapping.keys()):
+                    idx = detectron2_categories_mapping[class_idx]
                     obj_mask = predictions[i]["instances"].pred_masks[j] * 1.0
                     obj_mask = obj_mask.cpu().numpy()
 
@@ -83,10 +82,12 @@ class MaskRCNN:
         # print(f"[Obs preprocessing] Segmentation depth filtering time: {t1 - t0:.2f}")
 
         if self.visualize:
-            visualizations = np.stack(
-                [vis.get_image() for vis in visualizations])
+            visualizations = np.stack([
+                vis.get_image() for vis in visualizations
+            ])
         else:
-            visualizations = images
+            # Convert BGR to RGB for visualization
+            visualizations = images[:, :, :, ::-1]
 
         return one_hot_predictions, visualizations
 
@@ -192,6 +193,9 @@ class VisualizationDemo:
         predictions = self.predictor(images)
         batch_size = len(predictions)
         visualizations = []
+
+        # Convert BGR to RGB for visualization
+        images = images[:, :, :, ::-1]
 
         # t1 = time.time()
         # print(f"[Obs preprocessing] Segmentation prediction time: {t1 - t0:.2f}")
