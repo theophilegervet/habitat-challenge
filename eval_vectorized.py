@@ -184,8 +184,8 @@ if __name__ == "__main__":
             "QaLdnwvtxbs_78",
             "qyAac8rV8Zk_14",
             "TEEsavR23oF_40",
-            "wcojb4TFT35_94",
             "XB4GS9ShBRE_48",
+            "5cdEh9F2hJL_28",
         ]
     }
     evaluator.eval_on_specific_episodes(episodes)
