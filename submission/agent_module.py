@@ -128,6 +128,35 @@ class AgentModule(nn.Module):
         # t2 = time.time()
         # print(f"[Policy] Total time: {t2 - t1:.2f}")
 
+        print("Module in dtypes:")
+        for x in (
+            seq_obs,
+            seq_pose_delta,
+            seq_dones,
+            seq_update_global,
+            init_local_map,
+            init_global_map,
+            init_local_pose,
+            init_global_pose,
+            init_lmb,
+            init_origins
+        ):
+            print(x.dtype)
+
+        print("Module out dtypes:")
+        for x in (
+            seq_goal_map,
+            seq_regression_logits,
+            final_local_map,
+            final_global_map,
+            seq_local_pose,
+            seq_global_pose,
+            seq_lmb,
+            seq_origins,
+        ):
+            print(x.dtype)
+        print()
+
         return (
             seq_goal_map,
             seq_regression_logits,
