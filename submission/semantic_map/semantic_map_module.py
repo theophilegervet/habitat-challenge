@@ -40,7 +40,7 @@ class SemanticMapModule(nn.Module):
              local map that is visible by the agent located in its center
              (unit is the number of local map cells)
             global_downscaling (int): ratio of global over local map
-            du_scale (int): depth unit scale
+            du_scale (int): frame downscaling before projecting to point cloud
             cat_pred_threshold (float): number of depth points to be in bin to
              classify it as a certain semantic category
             exp_pred_threshold (float): number of depth points to be in bin to
