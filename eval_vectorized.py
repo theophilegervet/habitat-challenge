@@ -174,29 +174,12 @@ if __name__ == "__main__":
     episodes = {
         "split": "val",
         "episode_keys": [
-            "4ok3usBNeis_91",
-            "5cdEh9F2hJL_28",
-            "5cdEh9F2hJL_34",
-            "5cdEh9F2hJL_61",
-            "6s7QHgap2fW_3",
-            "6s7QHgap2fW_31",
-            "6s7QHgap2fW_40",
-            "bxsVRursffK_53",
-            "bxsVRursffK_55",
+            "p53SfW6mjZe_1",
+            "qyAac8rV8Zk_47",
             "cvZr5TUy5C5_84",
             "DYehNKdT76V_55",
-            "mL8ThkuaVTM_3",
-            "mv2HUxq3B53_11",
             "q3zU7Yy5E5s_21",
-            "q3zU7Yy5E5s_75",
-            "qyAac8rV8Zk_59",
-            "qyAac8rV8Zk_81",
-            "svBbv1Pavdk_62",
-            "XB4GS9ShBRE_28",
-            "ziup5kvtCCR_17",
-            "ziup5kvtCCR_97",
-            "zt1RVoi7PcG_106",
-            "zt1RVoi7PcG_109",
+            "ziup5kvtCCR_17"
         ]
     }
     evaluator.eval_on_specific_episodes(episodes)
