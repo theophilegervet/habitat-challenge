@@ -60,6 +60,7 @@ class Visualizer:
                   sensor_pose: np.ndarray,
                   obstacle_map: np.ndarray,
                   goal_map: np.ndarray,
+                  found_goal: bool,
                   explored_map: np.ndarray,
                   semantic_map: np.ndarray,
                   semantic_frame: np.ndarray,
@@ -72,6 +73,7 @@ class Visualizer:
              and local map boundaries planning window (gy1, gy2, gx1, gy2)
             obstacle_map: (M, M) binary local obstacle map prediction
             goal_map: (M, M) binary array denoting goal location
+            found_goal: whether we found the object goal category
             explored_map: (M, M) binary local explored map prediction
             semantic_map: (M, M) local semantic map predictions
             semantic_frame: semantic frame visualization
