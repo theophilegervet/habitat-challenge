@@ -178,23 +178,23 @@ if __name__ == "__main__":
     evaluator = VectorizedEvaluator(config, config_str)
 
     # evaluator.eval(split="train", num_episodes_per_env=5 * 10)
-    # evaluator.eval(split="val", num_episodes_per_env=5 * 10)
+    evaluator.eval(split="val", num_episodes_per_env=1)
 
-    episodes = {
-        "split": "val",
-        "episode_keys": [
-            # too far
-            "6s7QHgap2fW_6",  # success 12
-            "mL8ThkuaVTM_7",  # x => this episode seems buggy
-            "mv2HUxq3B53_45", # x => hard, the tv is positioned weirdly
-            "svBbv1Pavdk_53", # x 12, planner gets stuck
-            "svBbv1Pavdk_66", # success 12
-            "zt1RVoi7PcG_27", # x 12, segmentation fp
-            "zt1RVoi7PcG_48", # success 12
-            # success
-            "4ok3usBNeis_42", # success 12
-            "6s7QHgap2fW_86", # success 12
-            "mL8ThkuaVTM_4",  # x 12, frontier exploration messes up
-        ]
-    }
-    evaluator.eval_on_specific_episodes(episodes)
+    # episodes = {
+    #     "split": "val",
+    #     "episode_keys": [
+    #         # too far
+    #         "6s7QHgap2fW_6",  # success 12
+    #         "mL8ThkuaVTM_7",  # x => this episode seems buggy
+    #         "mv2HUxq3B53_45", # x => hard, the tv is positioned weirdly
+    #         "svBbv1Pavdk_53", # x 12, planner gets stuck
+    #         "svBbv1Pavdk_66", # success 12
+    #         "zt1RVoi7PcG_27", # x 12, segmentation fp
+    #         "zt1RVoi7PcG_48", # success 12
+    #         # success
+    #         "4ok3usBNeis_42", # success 12
+    #         "6s7QHgap2fW_86", # success 12
+    #         "mL8ThkuaVTM_4",  # x 12, frontier exploration messes up
+    #     ]
+    # }
+    # evaluator.eval_on_specific_episodes(episodes)
