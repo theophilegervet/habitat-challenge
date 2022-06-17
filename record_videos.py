@@ -16,7 +16,10 @@ if __name__ == "__main__":
 
         # Semantic map vis
         img_array = []
-        for filename in natsorted(glob.glob(f"{episode_dir}/snapshot*.png")):
+        filenames = natsorted(glob.glob(f"{episode_dir}/snapshot*.png"))
+        if len(filenames) == 0:
+            return
+        for filename in filenames:
             img = cv2.imread(filename)
             height, width, _ = img.shape
             size = (width, height)
