@@ -169,23 +169,24 @@ if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
     evaluator = VectorizedEvaluator(config, config_str)
 
-    evaluator.eval(split="train", num_episodes_per_env=5 * 6)
+    # evaluator.eval(split="train", num_episodes_per_env=5 * 10)
+    # evaluator.eval(split="val", num_episodes_per_env=5 * 10)
 
-    # episodes = {
-    #     "split": "val",
-    #     "episode_keys": [
-    #         # segmentation fp
-    #         "cvZr5TUy5C5_0",
-    #         "mv2HUxq3B53_34",
-    #         "wcojb4TFT35_11",
-    #         "ziup5kvtCCR_51",
-    #         "6s7QHgap2fW_3",
-    #         # segmentation fn
-    #         "QaLdnwvtxbs_78",
-    #         "qyAac8rV8Zk_14",
-    #         "TEEsavR23oF_40",
-    #         "XB4GS9ShBRE_48",
-    #         "5cdEh9F2hJL_28",
-    #     ]
-    # }
-    # evaluator.eval_on_specific_episodes(episodes)
+    episodes = {
+        "split": "val",
+        "episode_keys": [
+            # too far
+            "6s7QHgap2fW_6",
+            "mL8ThkuaVTM_7",
+            "mv2HUxq3B53_45",
+            "svBbv1Pavdk_53",
+            "svBbv1Pavdk_66",
+            "zt1RVoi7PcG_27",
+            "zt1RVoi7PcG_48",
+            # success
+            "4ok3usBNeis_42",
+            "6s7QHgap2fW_86",
+            "mL8ThkuaVTM_4",
+        ]
+    }
+    evaluator.eval_on_specific_episodes(episodes)
