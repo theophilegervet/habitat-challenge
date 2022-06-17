@@ -261,7 +261,6 @@ class Planner:
         )
 
         # Dilate the goal
-        print("found_goal", found_goal)
         if found_goal:
             selem = self.final_goal_dilation_selem
         else:
