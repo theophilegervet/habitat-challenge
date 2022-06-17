@@ -1,9 +1,13 @@
 import time
 import torch
-import os
 import json
 from collections import defaultdict
 import numpy as np
+import os
+import shutil
+import cv2
+import glob
+from natsort import natsorted
 
 from habitat import Config
 from habitat.core.vector_env import VectorEnv
@@ -171,7 +175,7 @@ class VectorizedEvaluator:
                 f"{k1}_mean": np.mean(v1),
                 f"{k1}_min": np.min(v1),
                 f"{k1}_max": np.max(v1),
-            }
+            }.items()
         }
 
         with open(f"{self.results_dir}/{split}_aggregated_results.json", "w") as f:
@@ -179,29 +183,90 @@ class VectorizedEvaluator:
         with open(f"{self.results_dir}/{split}_episode_results.json", "w") as f:
             json.dump(episode_metrics, f, indent=4)
 
+    def record_videos(self,
+                      source_dir: str,
+                      target_dir: str,
+                      record_planner: bool = False):
+
+        def record_video(episode_dir: str):
+            episode_name = episode_dir.split("/")[-1]
+            print(f"Recording video {episode_name}")
+
+            # Semantic map vis
+            img_array = []
+            filenames = natsorted(glob.glob(f"{episode_dir}/snapshot*.png"))
+            if len(filenames) == 0:
+                return
+            for filename in filenames:
+                img = cv2.imread(filename)
+                height, width, _ = img.shape
+                size = (width, height)
+                img_array.append(img)
+            out = cv2.VideoWriter(
+                f"{target_dir}/{episode_name}.avi",
+                cv2.VideoWriter_fourcc(*"DIVX"), 15, size
+            )
+            for i in range(len(img_array)):
+                out.write(img_array[i])
+            out.release()
+
+            # Planner vis
+            if record_planner:
+                img_array = []
+                for filename in natsorted(
+                    glob.glob(f"{episode_dir}/planner_snapshot*.png")):
+                    img = cv2.imread(filename)
+                    height, width, _ = img.shape
+                    size = (width, height)
+                    img_array.append(img)
+                out = cv2.VideoWriter(
+                    f"{target_dir}/planner_{episode_name}.avi",
+                    cv2.VideoWriter_fourcc(*"DIVX"), 15, size
+                )
+                for i in range(len(img_array)):
+                    out.write(img_array[i])
+                out.release()
+
+        shutil.rmtree(target_dir, ignore_errors=True)
+        os.makedirs(target_dir, exist_ok=True)
+
+        for episode_dir in glob.glob(f"{source_dir}/*"):
+            record_video(episode_dir)
+
 
 if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
     evaluator = VectorizedEvaluator(config, config_str)
 
-    # evaluator.eval(split="train", num_episodes_per_env=5 * 10)
-    evaluator.eval(split="val", num_episodes_per_env=1)
+    if not config.EVAL_VECTORIZED.specific_episodes:
+        evaluator.eval(
+            split=config.EVAL_VECTORIZED.split,
+            num_episodes_per_env=config.EVAL.num_episodes_per_env
+        )
 
-    # episodes = {
-    #     "split": "val",
-    #     "episode_keys": [
-    #         # too far
-    #         "6s7QHgap2fW_6",  # success 12
-    #         "mL8ThkuaVTM_7",  # x => this episode seems buggy
-    #         "mv2HUxq3B53_45", # x => hard, the tv is positioned weirdly
-    #         "svBbv1Pavdk_53", # x 12, planner gets stuck
-    #         "svBbv1Pavdk_66", # success 12
-    #         "zt1RVoi7PcG_27", # x 12, segmentation fp
-    #         "zt1RVoi7PcG_48", # success 12
-    #         # success
-    #         "4ok3usBNeis_42", # success 12
-    #         "6s7QHgap2fW_86", # success 12
-    #         "mL8ThkuaVTM_4",  # x 12, frontier exploration messes up
-    #     ]
-    # }
-    # evaluator.eval_on_specific_episodes(episodes)
+    else:
+        episodes = {
+            "split": "val",
+            "episode_keys": [
+                # too far
+                "6s7QHgap2fW_6",  # success 12
+                "mL8ThkuaVTM_7",  # x => this episode seems buggy
+                "mv2HUxq3B53_45", # x => hard, the tv is positioned weirdly
+                "svBbv1Pavdk_53", # x 12, planner gets stuck
+                "svBbv1Pavdk_66", # success 12
+                "zt1RVoi7PcG_27", # x 12, segmentation fp
+                "zt1RVoi7PcG_48", # success 12
+                # success
+                "4ok3usBNeis_42", # success 12
+                "6s7QHgap2fW_86", # success 12
+                "mL8ThkuaVTM_4",  # x 12, frontier exploration messes up
+            ]
+        }
+        evaluator.eval_on_specific_episodes(episodes)
+
+    if config.EVAL_VECTORIZED.record_videos:
+        evaluator.record_videos(
+            source_dir=f"{config.DUMP_LOCATION}/images/{config.EXP_NAME}",
+            target_dir="data/videos",
+            record_planner=config.EVAL_VECTORIZED.record_planner_videos
+        )
