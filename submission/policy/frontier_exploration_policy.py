@@ -43,7 +43,7 @@ class FrontierExplorationPolicy(Policy):
     def forward(self,
                 map_features: Tensor,
                 goal_category: Tensor
-                ) -> Tuple[Tensor, Optional[Tensor]]:
+                ) -> Tuple[Tensor, Tensor, Optional[Tensor]]:
         batch_size, _, height, width = map_features.shape
         device = map_features.device
 
@@ -73,4 +73,4 @@ class FrontierExplorationPolicy(Policy):
             else:
                 goal_map[e] = frontier_map[e]
 
-        return goal_map, regression_logits
+        return goal_map, found_goal, regression_logits
