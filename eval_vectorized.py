@@ -241,7 +241,7 @@ if __name__ == "__main__":
     if not config.EVAL_VECTORIZED.specific_episodes:
         evaluator.eval(
             split=config.EVAL_VECTORIZED.split,
-            num_episodes_per_env=config.EVAL.num_episodes_per_env
+            num_episodes_per_env=config.EVAL_VECTORIZED.num_episodes_per_env
         )
 
     else:
