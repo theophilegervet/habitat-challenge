@@ -23,6 +23,11 @@ pushd mmdetection; pip install -r requirements/build.txt; pip install "git+https
 # Build image
 docker build . --file Objectnav.Dockerfile -t objectnav_submission
 
+# Test locally
+./test_locally_objectnav_rgbd.sh --docker-name objectnav_submission
+
 # Submit it to the leaderboard
-evalai push objectnav_submission:latest --phase habitat-objectnav-minival-2022-1615
+evalai push objectnav_submission:latest --phase habitat-objectnav-minival-2022-1615 --private
+evalai push objectnav_submission:latest --phase habitat-objectnav-test-standard-2022-1615 --private
+evalai push objectnav_submission:latest --phase habitat-objectnav-test-challenge-2022-1615 --private
 ```
