@@ -168,15 +168,15 @@ class VectorizedEvaluator:
             for k in metrics:
                 aggregated_metrics[f"{k}/total"].append(v[k])
                 aggregated_metrics[f"{k}/{v['goal_name']}"].append(v[k])
-        aggregated_metrics = {
+        aggregated_metrics = dict(sorted({
             k2: v2
             for k1, v1 in aggregated_metrics.items()
             for k2, v2 in {
-                f"{k1}_mean": np.mean(v1),
-                f"{k1}_min": np.min(v1),
-                f"{k1}_max": np.max(v1),
+                f"{k1}/mean": np.mean(v1),
+                f"{k1}/min": np.min(v1),
+                f"{k1}/max": np.max(v1),
             }.items()
-        }
+        }.items()))
 
         with open(f"{self.results_dir}/{split}_aggregated_results.json", "w") as f:
             json.dump(aggregated_metrics, f, indent=4)
