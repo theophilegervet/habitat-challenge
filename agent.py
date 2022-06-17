@@ -25,7 +25,7 @@ def main():
     )
     args = parser.parse_args()
 
-    config, config_str = get_config("submission/configs/config.yaml")
+    config, config_str = get_config("submission/configs/challenge_config.yaml")
     agent = Agent(config=config, rank=0, ddp=False)
 
     if args.evaluation == "local":
