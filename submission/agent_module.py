@@ -30,7 +30,7 @@ class AgentModule(nn.Module):
                 seq_map_features: Optional[Tensor] = None,
                 ) -> Tuple[Optional[Tensor], Optional[Tensor], Optional[Tensor],
                            Optional[Tensor], Optional[Tensor], Optional[Tensor],
-                           Optional[Tensor], Optional[Tensor]]:
+                           Optional[Tensor], Optional[Tensor], Optional[Tensor]]:
         """Update maps and poses with a sequence of observations, and predict
         high-level goals from map features.
 
@@ -63,6 +63,8 @@ class AgentModule(nn.Module):
         Returns:
             seq_goal_map: sequence of binary maps encoding goal(s) of shape
              (batch_size, sequence_length, M, M)
+            seq_found_goal: binary variables to denote whether we found the object
+             goal category of shape (batch_size, sequence_length)
             seq_regression_logits: if we're using a regression policy, pre-sigmoid
              (y, x) locations to use in MSE loss of shape
              (batch_size, sequence_length, 2)
@@ -120,8 +122,13 @@ class AgentModule(nn.Module):
         # batched across sequence length x num environments
         map_features = seq_map_features.flatten(0, 1)
         goal_category = seq_goal_category.flatten(0, 1)
-        goal_map, regression_logits = self.policy(map_features, goal_category)
+        (
+            goal_map,
+            found_goal,
+            regression_logits
+        ) = self.policy(map_features, goal_category)
         seq_goal_map = goal_map.view(batch_size, sequence_length, *goal_map.shape[-2:])
+        seq_found_goal = found_goal.view(batch_size, sequence_length)
         seq_regression_logits = (regression_logits.view(batch_size, sequence_length, -1)
                                  if regression_logits is not None else None)
 
@@ -130,6 +137,7 @@ class AgentModule(nn.Module):
 
         return (
             seq_goal_map,
+            seq_found_goal,
             seq_regression_logits,
             final_local_map,
             final_global_map,

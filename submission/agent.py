@@ -106,6 +106,7 @@ class Agent(habitat.Agent):
 
         (
             goal_map,
+            found_goal,
             _,
             self.semantic_map.local_map,
             self.semantic_map.global_map,
@@ -133,6 +134,7 @@ class Agent(habitat.Agent):
         self.semantic_map.origins = seq_origins[:, -1]
 
         goal_map = goal_map.squeeze(1).cpu().numpy()
+        found_goal = found_goal.squeeze(1).cpu()
 
         for e in range(self.num_environments):
             if update_global[e]:
@@ -142,6 +144,7 @@ class Agent(habitat.Agent):
             {
                 "obstacle_map": self.semantic_map.get_obstacle_map(e),
                 "goal_map": self.semantic_map.get_goal_map(e),
+                "found_goal": found_goal[e].item(),
                 "sensor_pose": self.semantic_map.get_planner_pose_inputs(e)
             }
             for e in range(self.num_environments)

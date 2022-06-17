@@ -59,16 +59,18 @@ class FrontierExplorationPolicy(Policy):
             frontier_map, self.select_border_kernel) - frontier_map
 
         goal_map = torch.zeros((batch_size, height, width), device=device)
+        found_goal = torch.zeros(batch_size, dtype=torch.bool, device=device)
+        regression_logits = None
 
         for e in range(batch_size):
             # If the object goal category is present in the local map, go to it
             category_map = map_features[e, goal_category[e] + 8, :, :]
             if (category_map == 1).sum() > 0:
                 goal_map[e] = category_map == 1
+                found_goal[e] = True
 
             # Else, set unexplored area as the goal
             else:
                 goal_map[e] = frontier_map[e]
 
-        regression_logits = None
         return goal_map, regression_logits

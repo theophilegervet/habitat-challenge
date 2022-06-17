@@ -59,7 +59,8 @@ class Planner:
             self.obs_denoise_selem = None
         self.start_obs_dilation_selem_radius = (
             config.AGENT.PLANNER.obs_dilation_selem_radius)
-        self.goal_dilation_selem = skimage.morphology.disk(
+        self.intermediate_goal_dilation_selem = skimage.morphology.disk(10)
+        self.final_goal_dilation_selem = skimage.morphology.disk(
             config.AGENT.PLANNER.goal_dilation_selem_radius)
 
         self.vis_dir = None
@@ -100,7 +101,8 @@ class Planner:
     def plan(self,
              obstacle_map: np.ndarray,
              sensor_pose: np.ndarray,
-             goal_map: np.ndarray) -> int:
+             goal_map: np.ndarray,
+             found_goal: bool) -> int:
         """Plan a low-level action.
 
         Args:
@@ -108,6 +110,7 @@ class Planner:
             sensor_pose: (7,) array denoting global pose (x, y, o)
              and local map boundaries planning window (gx1, gx2, gy1, gy2)
             goal_map: (M, M) binary array denoting goal location
+            found_goal: whether we found the object goal category
 
         Returns:
             action: low-level action
@@ -133,7 +136,12 @@ class Planner:
         # High-level goal -> short-term goal
         # t0 = time.time()
         short_term_goal, replan, stop = self._get_short_term_goal(
-            obstacle_map, np.copy(goal_map), start, planning_window)
+            obstacle_map,
+            np.copy(goal_map),
+            found_goal,
+            start,
+            planning_window
+        )
         # t1 = time.time()
         # print(f"[Planning] get_short_term_goal() time: {t1 - t0}")
 
@@ -176,6 +184,7 @@ class Planner:
     def _get_short_term_goal(self,
                              obstacle_map: np.ndarray,
                              goal_map: np.ndarray,
+                             found_goal: bool,
                              start: List[int],
                              planning_window: List[int],
                              ) -> Tuple[Tuple[int, int], bool, bool]:
@@ -184,6 +193,7 @@ class Planner:
         Args:
             obstacle_map: (M, M) binary local obstacle map prediction
             goal_map: (M, M) binary array denoting goal location
+            found_goal: whether we found the object goal category
             start: start location (x, y)
             planning_window: local map boundaries (gx1, gx2, gy1, gy2)
 
@@ -250,8 +260,12 @@ class Planner:
             print_images=self.print_images
         )
 
-        goal_map = skimage.morphology.binary_dilation(
-            goal_map, self.goal_dilation_selem) != True
+        # Dilate the goal
+        if found_goal:
+            selem = self.final_goal_dilation_selem
+        else:
+            selem = self.intermediate_goal_dilation_selem
+        goal_map = skimage.morphology.binary_dilation(goal_map, selem) != True
         goal_map = 1 - goal_map * 1.
         planner.set_multi_goal(goal_map, self.timestep)
         self.timestep += 1
