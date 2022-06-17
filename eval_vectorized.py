@@ -151,7 +151,7 @@ class VectorizedEvaluator:
         envs.close()
 
         aggregated_metrics = {}
-        for k in episode_metrics[episode_key].keys():
+        for k in list(episode_metrics.values())[0].keys():
             aggregated_metrics[f"{k}/mean"] = sum(
                 v[k] for v in episode_metrics.values()) / len(episode_metrics)
             aggregated_metrics[f"{k}/min"] = min(
