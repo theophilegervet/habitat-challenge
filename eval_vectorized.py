@@ -3,6 +3,7 @@ import torch
 import os
 import json
 from collections import defaultdict
+import numpy as np
 
 from habitat import Config
 from habitat.core.vector_env import VectorEnv
@@ -156,16 +157,22 @@ class VectorizedEvaluator:
 
         envs.close()
 
-        aggregated_metrics = {}
-        for k in list(episode_metrics.values())[0].keys():
-            if k == "goal_name":
-                continue
-            aggregated_metrics[f"{k}/mean"] = sum(
-                v[k] for v in episode_metrics.values()) / len(episode_metrics)
-            aggregated_metrics[f"{k}/min"] = min(
-                v[k] for v in episode_metrics.values())
-            aggregated_metrics[f"{k}/max"] = max(
-                v[k] for v in episode_metrics.values())
+        aggregated_metrics = defaultdict(list)
+        metrics = set([k for k in list(episode_metrics.values())[0].keys()
+                       if k != "goal_name"])
+        for v in episode_metrics.values():
+            for k in metrics:
+                aggregated_metrics[f"{k}/total"].append(v[k])
+                aggregated_metrics[f"{k}/{v['goal_name']}"].append(v[k])
+        aggregated_metrics = {
+            k2: v2
+            for k1, v1 in aggregated_metrics.items()
+            for k2, v2 in {
+                f"{k1}_mean": np.mean(v1),
+                f"{k1}_min": np.min(v1),
+                f"{k1}_max": np.max(v1),
+            }
+        }
 
         with open(f"{self.results_dir}/{split}_aggregated_results.json", "w") as f:
             json.dump(aggregated_metrics, f, indent=4)
