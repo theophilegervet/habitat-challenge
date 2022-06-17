@@ -131,6 +131,7 @@ class EnvWrapper(Env):
             done_info = {
                 "last_episode_scene_id": self.scene_id,
                 "last_episode_id": self.episode_id,
+                "last_goal_name": self.last_goal_name,
                 "last_episode_metrics": self.get_metrics()
             }
             obs_preprocessed, info = self.reset()

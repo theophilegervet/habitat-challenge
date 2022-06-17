@@ -133,14 +133,20 @@ class VectorizedEvaluator:
                     if episode_keys is not None:
                         if episode_key in episode_keys:
                             done_episode_keys.add(episode_key)
-                            episode_metrics[episode_key] = info["last_episode_metrics"]
+                            episode_metrics[episode_key] = {
+                                **info["last_episode_metrics"],
+                                "goal_name": info["last_goal_name"]
+                            }
                             print(
                                 f"Finished episode {episode_key} after "
                                 f"{round(time.time() - start_time, 2)} seconds")
 
                     elif num_episodes_per_env is not None:
                         if episode_idxs[e] < num_episodes_per_env:
-                            episode_metrics[episode_key] = info["last_episode_metrics"]
+                            episode_metrics[episode_key] = {
+                                **info["last_episode_metrics"],
+                                "goal_name": info["last_goal_name"]
+                            }
                         episode_idxs[e] += 1
                         print(
                             f"Episode indexes {episode_idxs} / {num_episodes_per_env} "
@@ -152,6 +158,8 @@ class VectorizedEvaluator:
 
         aggregated_metrics = {}
         for k in list(episode_metrics.values())[0].keys():
+            if k == "goal_name":
+                continue
             aggregated_metrics[f"{k}/mean"] = sum(
                 v[k] for v in episode_metrics.values()) / len(episode_metrics)
             aggregated_metrics[f"{k}/min"] = min(
@@ -176,17 +184,17 @@ if __name__ == "__main__":
         "split": "val",
         "episode_keys": [
             # too far
-            "6s7QHgap2fW_6",
-            "mL8ThkuaVTM_7",
-            "mv2HUxq3B53_45",
-            "svBbv1Pavdk_53",
-            "svBbv1Pavdk_66",
-            "zt1RVoi7PcG_27",
-            "zt1RVoi7PcG_48",
+            "6s7QHgap2fW_6",  # success 12
+            "mL8ThkuaVTM_7",  # x => this episode seems buggy
+            "mv2HUxq3B53_45", # x => hard, the tv is positioned weirdly
+            "svBbv1Pavdk_53", # x 12, planner gets stuck
+            "svBbv1Pavdk_66", # success 12
+            "zt1RVoi7PcG_27", # x 12, segmentation fp
+            "zt1RVoi7PcG_48", # success 12
             # success
-            "4ok3usBNeis_42",
-            "6s7QHgap2fW_86",
-            "mL8ThkuaVTM_4",
+            "4ok3usBNeis_42", # success 12
+            "6s7QHgap2fW_86", # success 12
+            "mL8ThkuaVTM_4",  # x 12, frontier exploration messes up
         ]
     }
     evaluator.eval_on_specific_episodes(episodes)
