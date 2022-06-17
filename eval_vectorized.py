@@ -169,7 +169,7 @@ if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
     evaluator = VectorizedEvaluator(config, config_str)
 
-    evaluator.eval(split="train", num_episodes_per_env=50)
+    evaluator.eval(split="train", num_episodes_per_env=5 * 6)
 
     # episodes = {
     #     "split": "val",

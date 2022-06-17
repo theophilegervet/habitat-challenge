@@ -328,14 +328,17 @@ class SemanticMapModule(nn.Module):
             # Set a disk around the agent to explored
             # TODO Move this to GPU
             # TODO Check that the explored disk fits in the map
-            radius = 10
-            explored_disk = torch.from_numpy(skimage.morphology.disk(radius))
-            current_map[
-                e,
-                1,
-                y - radius: y + radius + 1,
-                x - radius: x + radius + 1
-            ][explored_disk == 1] = 1
+            try:
+                radius = 10
+                explored_disk = torch.from_numpy(skimage.morphology.disk(radius))
+                current_map[
+                    e,
+                    1,
+                    y - radius: y + radius + 1,
+                    x - radius: x + radius + 1
+                ][explored_disk == 1] = 1
+            except IndexError:
+                pass
 
         return current_map, current_pose
 
