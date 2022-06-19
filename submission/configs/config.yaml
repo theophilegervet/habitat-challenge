@@ -45,7 +45,6 @@ AGENT:
     collision_threshold: 0.20       # distance under which we consider there's a collision
     obs_denoise_selem_radius: 0     # radius (in cells) of obstacle noise removal structuring element
     obs_dilation_selem_radius: 3    # radius (in cells) of obstacle dilation structuring element
-    goal_dilation_selem_radius: 12  # radius (in cells) of goal dilation structuring element
 
   POLICY:
     type: frontier  # one of "frontier" or "semantic"

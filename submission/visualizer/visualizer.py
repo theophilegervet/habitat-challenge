@@ -65,6 +65,7 @@ class Visualizer:
                   semantic_map: np.ndarray,
                   semantic_frame: np.ndarray,
                   goal_name: str,
+                  goal_category: int,
                   timestep: int):
         """Visualize frame input and semantic map.
 
@@ -78,6 +79,7 @@ class Visualizer:
             semantic_map: (M, M) local semantic map predictions
             semantic_frame: semantic frame visualization
             goal_name: semantic goal category
+            goal_category: semantic goal category ID
             timestep: time stamp within the episode
         """
         if self.image_vis is None:

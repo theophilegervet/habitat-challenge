@@ -60,8 +60,16 @@ class Planner:
         self.start_obs_dilation_selem_radius = (
             config.AGENT.PLANNER.obs_dilation_selem_radius)
         self.intermediate_goal_dilation_selem = skimage.morphology.disk(10)
-        self.final_goal_dilation_selem = skimage.morphology.disk(
-            config.AGENT.PLANNER.goal_dilation_selem_radius)
+        self.final_goal_dilation_selems = {
+            # Don't need much dilation because in open space:
+            0: skimage.morphology.disk(10),  # chair
+            1: skimage.morphology.disk(10),  # couch
+            3: skimage.morphology.disk(10),  # bed
+            4: skimage.morphology.disk(10),  # toilet
+            # Need more dilation because often within an obstacle:
+            2: skimage.morphology.disk(12),  # potted plant
+            5: skimage.morphology.disk(12),  # tv
+        }
 
         self.vis_dir = None
         self.collision_map = None
@@ -102,7 +110,8 @@ class Planner:
              obstacle_map: np.ndarray,
              sensor_pose: np.ndarray,
              goal_map: np.ndarray,
-             found_goal: bool) -> int:
+             found_goal: bool,
+             goal_category: int) -> int:
         """Plan a low-level action.
 
         Args:
@@ -111,6 +120,7 @@ class Planner:
              and local map boundaries planning window (gx1, gx2, gy1, gy2)
             goal_map: (M, M) binary array denoting goal location
             found_goal: whether we found the object goal category
+            goal_category: semantic goal category ID
 
         Returns:
             action: low-level action
@@ -139,6 +149,7 @@ class Planner:
             obstacle_map,
             np.copy(goal_map),
             found_goal,
+            goal_category,
             start,
             planning_window
         )
@@ -156,7 +167,7 @@ class Planner:
                 self.obs_dilation_selem = skimage.morphology.disk(
                     self.curr_obs_dilation_selem_radius)
 
-            # TODO Increase goal dilation
+            # TODO Increase goal dilation?
 
         # Short-term goal -> deterministic local policy
         if stop:
@@ -187,6 +198,7 @@ class Planner:
                              obstacle_map: np.ndarray,
                              goal_map: np.ndarray,
                              found_goal: bool,
+                             goal_category: int,
                              start: List[int],
                              planning_window: List[int],
                              ) -> Tuple[Tuple[int, int], bool, bool]:
@@ -196,6 +208,7 @@ class Planner:
             obstacle_map: (M, M) binary local obstacle map prediction
             goal_map: (M, M) binary array denoting goal location
             found_goal: whether we found the object goal category
+            goal_category: semantic goal category ID
             start: start location (x, y)
             planning_window: local map boundaries (gx1, gx2, gy1, gy2)
 
@@ -274,7 +287,7 @@ class Planner:
 
         # Dilate the goal
         if found_goal:
-            selem = self.final_goal_dilation_selem
+            selem = self.final_goal_dilation_selems[goal_category]
         else:
             selem = self.intermediate_goal_dilation_selem
         goal_map = skimage.morphology.binary_dilation(goal_map, selem) != True

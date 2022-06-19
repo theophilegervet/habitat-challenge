@@ -135,6 +135,7 @@ class Agent(habitat.Agent):
 
         goal_map = goal_map.squeeze(1).cpu().numpy()
         found_goal = found_goal.squeeze(1).cpu()
+        goal_category = goal_category.cpu()
 
         for e in range(self.num_environments):
             if update_global[e]:
@@ -145,6 +146,7 @@ class Agent(habitat.Agent):
                 "obstacle_map": self.semantic_map.get_obstacle_map(e),
                 "goal_map": self.semantic_map.get_goal_map(e),
                 "found_goal": found_goal[e].item(),
+                "goal_category": goal_category[e].item(),
                 "sensor_pose": self.semantic_map.get_planner_pose_inputs(e)
             }
             for e in range(self.num_environments)
