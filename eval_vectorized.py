@@ -252,13 +252,13 @@ if __name__ == "__main__":
             # couch close but not close enough
             "episode_keys": [
                 # couch
-                "TEEsavR23oF_1",
-                # "TEEsavR23oF_2",
+                # "TEEsavR23oF_1",
+                "TEEsavR23oF_2",
                 # "TEEsavR23oF_31",
-                # "XB4GS9ShBRE_22",
-                # "XB4GS9ShBRE_30",
+                "XB4GS9ShBRE_22",
+                "XB4GS9ShBRE_30",
                 # chair
-                "bxsVRursffK_4",
+                # "bxsVRursffK_4",
                 # "p53SfW6mjZe_89",
                 # "TEEsavR23oF_68",
                 # "zt1RVoi7PcG_77",
