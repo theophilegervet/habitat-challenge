@@ -79,7 +79,7 @@ class FrontierExplorationPolicy(Policy):
         )
         self.denoise_goal_kernel = nn.Parameter(
             torch.from_numpy(
-                skimage.morphology.disk(5)
+                skimage.morphology.disk(1)
             ).unsqueeze(0).unsqueeze(0).float(),
             requires_grad=False
         )
@@ -120,14 +120,18 @@ class FrontierExplorationPolicy(Policy):
                     category_map -= map_features[e, 0 + 8, :, :]
                     category_map -= map_features[e, 3 + 8, :, :]
 
-                if goal_category_cpu[e] == 3:
-                    # If we're looking for a bed, filter out couch and chair
+                elif goal_category_cpu[e] == 3:
+                    # If we're looking for a bed, filter out couch
                     category_map -= map_features[e, 1 + 8, :, :]
-                    category_map -= map_features[e, 0 + 8, :, :]
+
+                elif goal_category_cpu[e] == 0:
+                    # If we're looking for a chair, filter out couch and
+                    # bed (frame)
+                    category_map -= map_features[e, 1 + 8, :, :]
+                    category_map -= map_features[e, 3 + 8, :, :]
 
                 # Remove noise with standard morphological transformation
                 # (closing -> opening)
-                # TODO Fix bxsVRursffK_4, TEEsavR23oF_1
                 category_map = binary_denoising(
                     category_map.unsqueeze(0).unsqueeze(0),
                     self.denoise_goal_kernel
