@@ -73,8 +73,8 @@ class FrontierExplorationPolicy(Policy):
                 if goal_category_cpu[e] == 1:
                     # If we're looking for a couch, remove all cells that
                     # also have been classified as a chair or a bed
-                    category_map[e, 1 + 8, :, :] -= map_features[e, 0 + 8, :, :]
-                    category_map[e, 1 + 8, :, :] -= map_features[e, 3 + 8, :, :]
+                    category_map -= map_features[e, 0 + 8, :, :]
+                    category_map -= map_features[e, 3 + 8, :, :]
 
             if (category_map == 1).sum() > 0:
                 goal_map[e] = category_map == 1
