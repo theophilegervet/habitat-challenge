@@ -8,6 +8,14 @@ from .policy import Policy
 
 
 def binary_dilation(binary_image, kernel):
+    """
+    Arguments:
+        binary_image: binary image tensor of shape (bs, 1, H1, W1)
+        kernel: binary structuring element tensor of shape (1, 1, H2, W2)
+
+    Returns:
+        binary image tensor of the same shape as input
+    """
     return torch.clamp(
         torch.nn.functional.conv2d(
             binary_image,
@@ -16,6 +24,37 @@ def binary_dilation(binary_image, kernel):
         ),
         0, 1
     )
+
+
+def binary_erosion(binary_image, kernel):
+    """
+    Arguments:
+        binary_image: binary image tensor of shape (bs, 1, H1, W1)
+        kernel: binary structuring element tensor of shape (1, 1, H2, W2)
+
+    Returns:
+        binary image tensor of the same shape as input
+    """
+    return 1 - torch.clamp(
+        torch.nn.functional.conv2d(
+            1 - binary_image,
+            kernel,
+            padding=kernel.shape[-1] // 2
+        ),
+        0, 1
+    )
+
+
+def binary_opening(binary_image, kernel):
+    return binary_dilation(binary_erosion(binary_image, kernel), kernel)
+
+
+def binary_closing(binary_image, kernel):
+    return binary_erosion(binary_dilation(binary_image, kernel), kernel)
+
+
+def binary_denoising(binary_image, kernel):
+    return binary_opening(binary_closing(binary_image, kernel), kernel)
 
 
 class FrontierExplorationPolicy(Policy):
@@ -32,8 +71,13 @@ class FrontierExplorationPolicy(Policy):
             ).unsqueeze(0).unsqueeze(0).float(),
             requires_grad=False
         )
-
         self.select_border_kernel = nn.Parameter(
+            torch.from_numpy(
+                skimage.morphology.disk(1)
+            ).unsqueeze(0).unsqueeze(0).float(),
+            requires_grad=False
+        )
+        self.denoise_goal_kernel = nn.Parameter(
             torch.from_numpy(
                 skimage.morphology.disk(1)
             ).unsqueeze(0).unsqueeze(0).float(),
@@ -71,10 +115,22 @@ class FrontierExplorationPolicy(Policy):
             # engineering to remove false positives:
             if (category_map == 1).sum() > 0:
                 if goal_category_cpu[e] == 1:
-                    # If we're looking for a couch, remove all cells that
+                    # If we're looking for a couch, filter out all cells that
                     # also have been classified as a chair or a bed
                     category_map -= map_features[e, 0 + 8, :, :]
                     category_map -= map_features[e, 3 + 8, :, :]
+
+                if goal_category_cpu[e] == 3:
+                    # If we're looking for a bed, filter out couch and chair
+                    category_map -= map_features[e, 1 + 8, :, :]
+                    category_map -= map_features[e, 0 + 8, :, :]
+
+                # Remove noise with standard morphological transformation
+                # (closing -> opening)
+                category_map = binary_denoising(
+                    category_map.unsqueeze(0).unsqueeze(0),
+                    self.denoise_goal_kernel
+                ).squeeze(0).squeeze(0)
 
             if (category_map == 1).sum() > 0:
                 goal_map[e] = category_map == 1
