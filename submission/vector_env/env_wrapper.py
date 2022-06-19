@@ -29,6 +29,7 @@ class EnvWrapper(Env):
         self.max_steps = config.AGENT.max_steps
 
         self.forced_episode_ids = episode_ids if episode_ids else []
+        self.forced_category = config.EVAL_VECTORIZED.specific_category
         self.episode_idx = 0
 
         self.planner = Planner(config)
@@ -61,6 +62,10 @@ class EnvWrapper(Env):
             self._disable_print_images()
 
         obs_preprocessed, info = self._preprocess_obs(obs)
+
+        if self.forced_category and info["goal_category"] != self.forced_category:
+            return self.reset()
+
         return obs_preprocessed, info
 
     def _reset_to_episode(self, episode_id: str) -> Observations:
