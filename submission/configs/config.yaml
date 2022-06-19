@@ -11,7 +11,7 @@ VISUALIZE: 0              # 1: render observation and predicted semantic map, 0:
 PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
 
 EVAL_VECTORIZED:
-  specific_episodes: 1      # 1: eval on specific episodes (for debugging), 0: eval on split normally
+  specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
   split: val                # eval split
   num_episodes_per_env: 5   # number of eval episodes per environment
   record_videos: 0          # 1: record videos from printed images, 0: don't
