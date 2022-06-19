@@ -24,11 +24,11 @@ if __name__ == "__main__":
         # if episode_name not in ['p53SfW6mjZe_89', 'wcojb4TFT35_54', 'wcojb4TFT35_57', 'q3zU7Yy5E5s_87', 'ziup5kvtCCR_11', 'q3zU7Yy5E5s_26', 'TEEsavR23oF_68', 'zt1RVoi7PcG_96', 'q3zU7Yy5E5s_97', 'zt1RVoi7PcG_77', 'wcojb4TFT35_49', 'wcojb4TFT35_80', 'XB4GS9ShBRE_74', 'bxsVRursffK_4', 'bxsVRursffK_51']:
         #     return
         # # toilet close but not close enough
-        if episode_name not in ['q3zU7Yy5E5s_8', 'q3zU7Yy5E5s_50', 'zt1RVoi7PcG_80', 'Dd4bFSTQ8gi_14', 'XB4GS9ShBRE_52', 'XB4GS9ShBRE_79', 'XB4GS9ShBRE_94']:
-            return
-        # # tv close but not close enough
-        # if episode_name not in ['5cdEh9F2hJL_63', '5cdEh9F2hJL_81', '5cdEh9F2hJL_0', '5cdEh9F2hJL_87', '5cdEh9F2hJL_3', '5cdEh9F2hJL_28', 'q3zU7Yy5E5s_43', 'qyAac8rV8Zk_97']:
+        # if episode_name not in ['q3zU7Yy5E5s_8', 'q3zU7Yy5E5s_50', 'zt1RVoi7PcG_80', 'Dd4bFSTQ8gi_14', 'XB4GS9ShBRE_52', 'XB4GS9ShBRE_79', 'XB4GS9ShBRE_94']:
         #     return
+        # # tv close but not close enough
+        if episode_name not in ['5cdEh9F2hJL_63', '5cdEh9F2hJL_81', '5cdEh9F2hJL_0', '5cdEh9F2hJL_87', '5cdEh9F2hJL_3', '5cdEh9F2hJL_28', 'q3zU7Yy5E5s_43', 'qyAac8rV8Zk_97']:
+            return
 
         print(f"Recording video {episode_name}")
 
