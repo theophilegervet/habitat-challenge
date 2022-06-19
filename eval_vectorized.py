@@ -251,18 +251,12 @@ if __name__ == "__main__":
             # "episode_keys": ['TEEsavR23oF_3', '6s7QHgap2fW_35', '6s7QHgap2fW_17', 'TEEsavR23oF_38', 'ziup5kvtCCR_62', 'TEEsavR23oF_5', 'ziup5kvtCCR_26', 'ziup5kvtCCR_97', '6s7QHgap2fW_29', 'TEEsavR23oF_84', '6s7QHgap2fW_69', 'ziup5kvtCCR_0', '6s7QHgap2fW_6', 'TEEsavR23oF_17', 'cvZr5TUy5C5_72', 'TEEsavR23oF_89', 'TEEsavR23oF_36', 'TEEsavR23oF_61', 'cvZr5TUy5C5_4', 'TEEsavR23oF_64', 'cvZr5TUy5C5_65', 'TEEsavR23oF_86', '6s7QHgap2fW_47', 'TEEsavR23oF_6', 'cvZr5TUy5C5_95', 'ziup5kvtCCR_5', 'TEEsavR23oF_74', 'TEEsavR23oF_62', 'ziup5kvtCCR_94', 'TEEsavR23oF_26', 'ziup5kvtCCR_9', 'cvZr5TUy5C5_5', 'TEEsavR23oF_73', 'ziup5kvtCCR_98', 'ziup5kvtCCR_90', 'TEEsavR23oF_13', 'cvZr5TUy5C5_16', 'ziup5kvtCCR_68', '6s7QHgap2fW_78', 'TEEsavR23oF_72', '6s7QHgap2fW_22', 'TEEsavR23oF_97', 'cvZr5TUy5C5_25', 'ziup5kvtCCR_15', 'cvZr5TUy5C5_31', 'TEEsavR23oF_35', 'TEEsavR23oF_49', 'ziup5kvtCCR_84', 'TEEsavR23oF_21', 'cvZr5TUy5C5_30', '6s7QHgap2fW_57', '6s7QHgap2fW_92']
             # couch close but not close enough
             "episode_keys": [
-                # couch
-                # "TEEsavR23oF_1",
-                "TEEsavR23oF_2",
-                # "TEEsavR23oF_31",
-                "XB4GS9ShBRE_22",
-                "XB4GS9ShBRE_30",
-                # chair
-                # "bxsVRursffK_4",
-                # "p53SfW6mjZe_89",
-                # "TEEsavR23oF_68",
-                # "zt1RVoi7PcG_77",
-                # "zt1RVoi7PcG_96",
+                # potted plant
+                "6s7QHgap2fW_6",   # not close enough
+                "6s7QHgap2fW_29",  # not dilated enough
+                # tv
+                "mv2HUxq3B53_3",
+                "mv2HUxq3B53_60",
             ]
         }
         evaluator.eval_on_specific_episodes(episodes)
