@@ -79,7 +79,7 @@ class FrontierExplorationPolicy(Policy):
         )
         self.denoise_goal_kernel = nn.Parameter(
             torch.from_numpy(
-                skimage.morphology.disk(2)
+                skimage.morphology.disk(5)
             ).unsqueeze(0).unsqueeze(0).float(),
             requires_grad=False
         )
