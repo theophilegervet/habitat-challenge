@@ -259,7 +259,7 @@ if __name__ == "__main__":
                 "XB4GS9ShBRE_30",
                 # chair
                 "bxsVRursffK_4",
-                "p53SfW6mjZe_89",
+                # "p53SfW6mjZe_89",
                 "TEEsavR23oF_68",
                 "zt1RVoi7PcG_77",
                 "zt1RVoi7PcG_96",
