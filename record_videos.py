@@ -5,8 +5,8 @@ import glob
 from natsort import natsorted
 
 
-source_dir = "data/images/all_val"
-# source_dir = "data/images/remove_fp0"
+# source_dir = "data/images/all_val"
+source_dir = "data/images/remove_fp1"
 target_dir = "data/videos"
 
 
@@ -27,8 +27,8 @@ if __name__ == "__main__":
         # if episode_name not in ['q3zU7Yy5E5s_8', 'q3zU7Yy5E5s_50', 'zt1RVoi7PcG_80', 'Dd4bFSTQ8gi_14', 'XB4GS9ShBRE_52', 'XB4GS9ShBRE_79', 'XB4GS9ShBRE_94']:
         #     return
         # # tv close but not close enough
-        if episode_name not in ['5cdEh9F2hJL_63', '5cdEh9F2hJL_81', '5cdEh9F2hJL_0', '5cdEh9F2hJL_87', '5cdEh9F2hJL_3', '5cdEh9F2hJL_28', 'q3zU7Yy5E5s_43', 'qyAac8rV8Zk_97']:
-            return
+        # if episode_name not in ['5cdEh9F2hJL_63', '5cdEh9F2hJL_81', '5cdEh9F2hJL_0', '5cdEh9F2hJL_87', '5cdEh9F2hJL_3', '5cdEh9F2hJL_28', 'q3zU7Yy5E5s_43', 'qyAac8rV8Zk_97']:
+        #     return
 
         print(f"Recording video {episode_name}")
 
