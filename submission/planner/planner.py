@@ -156,6 +156,8 @@ class Planner:
                 self.obs_dilation_selem = skimage.morphology.disk(
                     self.curr_obs_dilation_selem_radius)
 
+            # TODO Increase goal dilation
+
         # Short-term goal -> deterministic local policy
         if stop:
             action = HabitatSimActions.STOP
@@ -267,6 +269,16 @@ class Planner:
             selem = self.intermediate_goal_dilation_selem
         goal_map = skimage.morphology.binary_dilation(goal_map, selem) != True
         goal_map = 1 - goal_map * 1.
+
+        # TODO If goal found, select largest connected component as the
+        #  goal (try before and after dilation):
+        #  TEEsavR23oF_2, XB4GS9ShBRE_22, XB4GS9ShBRE_30
+        if found_goal:
+            _, component_masks, stats, _ = cv2.connectedComponentsWithStats(goal_map)
+            component_areas = stats[:, -1]
+            largest_goal_component = np.argsort(component_areas)[-2]
+            goal_map[component_masks != largest_goal_component] = 0
+
         planner.set_multi_goal(goal_map, self.timestep)
         self.timestep += 1
 
