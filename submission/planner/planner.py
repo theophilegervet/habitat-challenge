@@ -274,7 +274,8 @@ class Planner:
         #  goal (try before and after dilation):
         #  TEEsavR23oF_2, XB4GS9ShBRE_22, XB4GS9ShBRE_30
         if found_goal:
-            _, component_masks, stats, _ = cv2.connectedComponentsWithStats(goal_map)
+            _, component_masks, stats, _ = cv2.connectedComponentsWithStats(
+                goal_map.astype(np.uint8))
             component_areas = stats[:, -1]
             largest_goal_component = np.argsort(component_areas)[-2]
             goal_map[component_masks != largest_goal_component] = 0
