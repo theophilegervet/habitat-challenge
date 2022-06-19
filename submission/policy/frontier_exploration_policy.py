@@ -46,6 +46,7 @@ class FrontierExplorationPolicy(Policy):
                 ) -> Tuple[Tensor, Tensor, Optional[Tensor]]:
         batch_size, _, height, width = map_features.shape
         device = map_features.device
+        goal_category_cpu = goal_category.cpu().numpy()
 
         # Select unexplored area
         frontier_map = (map_features[:, [1], :, :] == 0).float()
@@ -65,6 +66,16 @@ class FrontierExplorationPolicy(Policy):
         for e in range(batch_size):
             # If the object goal category is present in the local map, go to it
             category_map = map_features[e, goal_category[e] + 8, :, :]
+
+            # If we think we've found the goal, let's add a bit of extra
+            # engineering to remove false positives:
+            if (category_map == 1).sum() > 0:
+                if goal_category_cpu[e] == 1:
+                    # If we're looking for a couch, remove all cells that
+                    # also have been classified as a chair or a bed
+                    category_map[e, 1 + 8, :, :] -= map_features[e, 0 + 8, :, :]
+                    category_map[e, 1 + 8, :, :] -= map_features[e, 3 + 8, :, :]
+
             if (category_map == 1).sum() > 0:
                 goal_map[e] = category_map == 1
                 found_goal[e] = True
