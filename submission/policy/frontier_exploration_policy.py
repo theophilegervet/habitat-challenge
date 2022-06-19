@@ -79,7 +79,7 @@ class FrontierExplorationPolicy(Policy):
         )
         self.denoise_goal_kernel = nn.Parameter(
             torch.from_numpy(
-                skimage.morphology.disk(1)
+                skimage.morphology.disk(2)
             ).unsqueeze(0).unsqueeze(0).float(),
             requires_grad=False
         )
@@ -127,6 +127,7 @@ class FrontierExplorationPolicy(Policy):
 
                 # Remove noise with standard morphological transformation
                 # (closing -> opening)
+                # TODO Fix bxsVRursffK_4, TEEsavR23oF_1
                 category_map = binary_denoising(
                     category_map.unsqueeze(0).unsqueeze(0),
                     self.denoise_goal_kernel
