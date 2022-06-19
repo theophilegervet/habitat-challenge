@@ -14,7 +14,7 @@ EVAL_VECTORIZED:
   specific_episodes: 1      # 1: eval on specific episodes (for debugging), 0: eval on split normally
   split: val                # eval split
   num_episodes_per_env: 99  # number of eval episodes per environment
-  record_videos: 0          # 1: record videos from printed images, 0: don't
+  record_videos: 1          # 1: record videos from printed images, 0: don't
   record_planner_videos: 1  # 1: record planner videos (if record videos), 0: don't
 
 ENVIRONMENT:
