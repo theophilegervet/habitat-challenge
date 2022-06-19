@@ -262,16 +262,14 @@ class Planner:
             print_images=self.print_images
         )
 
-        # TODO If goal found, select largest connected component as the
-        #  goal (try before and after dilation):
-        #  TEEsavR23oF_2, XB4GS9ShBRE_22, XB4GS9ShBRE_30
+        # If we found the goal category, select only the largest connected
+        # component as the goal - although this can slightly reduce SPL,
+        # it helps filter out false positives and increases success rate
         if found_goal:
             _, component_masks, stats, _ = cv2.connectedComponentsWithStats(
                 goal_map.astype(np.uint8))
             component_areas = stats[:, -1]
-            # print("component_areas", component_areas)
             largest_goal_component = np.argsort(component_areas)[-2]
-            # print("largest_goal_component", largest_goal_component)
             goal_map[component_masks != largest_goal_component] = 0
 
         # Dilate the goal
