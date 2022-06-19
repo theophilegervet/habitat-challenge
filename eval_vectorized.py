@@ -256,13 +256,13 @@ if __name__ == "__main__":
                 "TEEsavR23oF_2",
                 "TEEsavR23oF_31",
                 "XB4GS9ShBRE_22",
-                "XB4GS9ShBRE_30"
+                "XB4GS9ShBRE_30",
                 # chair
                 "bxsVRursffK_4",
                 "p53SfW6mjZe_89",
                 "TEEsavR23oF_68",
                 "zt1RVoi7PcG_77",
-                "zt1RVoi7PcG_96"
+                "zt1RVoi7PcG_96",
             ]
         }
         evaluator.eval_on_specific_episodes(episodes)
