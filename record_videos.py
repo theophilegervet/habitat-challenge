@@ -5,8 +5,8 @@ import glob
 from natsort import natsorted
 
 
-# source_dir = "data/images/all_val"
-source_dir = "data/images/remove_fp0"
+source_dir = "data/images/all_val"
+# source_dir = "data/images/remove_fp0"
 target_dir = "data/videos"
 
 
