@@ -33,18 +33,26 @@ class EnvWrapper(Env):
         self.episode_idx = 0
 
         # Put episodes with specified object category first
-        self.forced_category = config.EVAL_VECTORIZED.specific_category
-        assert not (len(self.forced_episode_ids) > 0 and self.forced_category)
-        if self.forced_category:
+        forced_category = config.EVAL_VECTORIZED.specific_category
+        num_ep = config.EVAL_VECTORIZED.num_episodes_per_env
+        assert not (len(self.forced_episode_ids) > 0 and forced_category)
+        if forced_category:
             episodes_with_category = []
             other_episodes = []
-            for ep in self.episodes:
+            idx = 0
+            while len(episodes_with_category) < num_ep and idx < len(self.episodes):
+                ep = self.episodes[idx]
                 cat = challenge_goal_name_to_goal_name[ep.object_category]
-                if cat == self.forced_category:
+                if cat == forced_category:
                     episodes_with_category.append(ep)
                 else:
                     other_episodes.append(ep)
-                self.episodes = [*episodes_with_category, *other_episodes]
+                idx += 1
+            self.episodes = [
+                *episodes_with_category,
+                *other_episodes,
+                *self.episodes[idx:]
+            ]
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
