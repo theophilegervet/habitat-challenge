@@ -117,7 +117,7 @@ class ObsPreprocessor:
         import matplotlib.pyplot as plt
         self.timestep += 1
         filename = f"image{self.timestep}"
-        depth_ = self.min_depth * 100. + obs[0]["depth"] * self.max_depth * 100.
+        depth_ = (self.min_depth * 100. + obs[0]["depth"] * self.max_depth * 100.).squeeze(-1)
         plt.imsave(f"pictures/{filename}_rgb.png", obs[0]["rgb"])
         plt.imsave(f"pictures/{filename}_depth.png", depth_)
         np.save(f"pictures/{filename}_rgb.npy", obs[0]["rgb"])
