@@ -54,16 +54,12 @@ class EnvWrapper(Env):
                 *other_episodes,
                 *self.episodes[idx:]
             ]
-            # self.episodes = new_episode_order.copy()
-            print("new_episode_order[0].object_category BEFORE", new_episode_order[0].object_category)
             self._dataset.episodes = new_episode_order
             self.episode_iterator = EpisodeIterator(
                 new_episode_order,
                 shuffle=False, group_by_scene=False,
             )
             self._current_episode = None
-            print("self.episode_iterator.episodes[0].object_category", self.episode_iterator.episodes[0].object_category)
-            print("new_episode_order[0].object_category AFTER", new_episode_order[0].object_category)
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
@@ -100,6 +96,9 @@ class EnvWrapper(Env):
 
     def _reset_to_episode(self, episode_id: str) -> Observations:
         """
+        Reset the environment to a specific episode ID — this only works if
+        the environment is currently in the right scene.
+
         Adapted from:
         https://github.com/facebookresearch/habitat-lab/blob/main/habitat/core/env.py
         """

@@ -67,7 +67,7 @@ class Planner:
             3: skimage.morphology.disk(10),  # bed
             4: skimage.morphology.disk(10),  # toilet
             # Need more dilation because often within an obstacle:
-            2: skimage.morphology.disk(10),  # potted plant
+            2: skimage.morphology.disk(12),  # potted plant
             5: skimage.morphology.disk(12),  # tv
         }
 
