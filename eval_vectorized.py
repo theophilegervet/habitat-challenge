@@ -8,6 +8,7 @@ import shutil
 import cv2
 import glob
 from natsort import natsorted
+import argparse
 
 from habitat import Config
 from habitat.core.vector_env import VectorEnv
@@ -235,8 +236,24 @@ class VectorizedEvaluator:
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/config.yaml")
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "opts",
+        default=None,
+        nargs=argparse.REMAINDER,
+        help="Modify config options from command line",
+    )
+
+    print("Arguments:")
+    args = parser.parse_args()
+    print(json.dumps(vars(args), indent=4))
+    print("-" * 100)
+
+    print("Config:")
+    config, config_str = get_config("submission/configs/config.yaml", args.opts)
     evaluator = VectorizedEvaluator(config, config_str)
+    print(config_str)
+    print("-" * 100)
 
     if not config.EVAL_VECTORIZED.specific_episodes:
         evaluator.eval(
@@ -252,7 +269,7 @@ if __name__ == "__main__":
             # couch close but not close enough
             "episode_keys": [
                 # potted plant
-                "6s7QHgap2fW_6",   # not close enough
+                "6s7QHgap2fW_6",   # not close enough => good with dilation 12
                 "6s7QHgap2fW_29",  # not dilated enough
                 # tv
                 "mv2HUxq3B53_3",
