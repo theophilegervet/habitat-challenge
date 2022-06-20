@@ -61,14 +61,13 @@ class Planner:
             config.AGENT.PLANNER.obs_dilation_selem_radius)
         self.intermediate_goal_dilation_selem = skimage.morphology.disk(10)
         self.final_goal_dilation_selems = {
-            # Don't need much dilation because in open space:
+            # Customizing does not seem to help
             0: skimage.morphology.disk(10),  # chair
             1: skimage.morphology.disk(10),  # couch
             3: skimage.morphology.disk(10),  # bed
             4: skimage.morphology.disk(10),  # toilet
-            # Need more dilation because often within an obstacle:
-            2: skimage.morphology.disk(config.AGENT.PLANNER.plant_dilation_selem_radius),  # potted plant
-            5: skimage.morphology.disk(config.AGENT.PLANNER.tv_dilation_selem_radius),  # tv
+            2: skimage.morphology.disk(10),  # potted plant
+            5: skimage.morphology.disk(10),  # tv
         }
 
         self.vis_dir = None
