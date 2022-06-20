@@ -54,11 +54,16 @@ class EnvWrapper(Env):
                 *other_episodes,
                 *self.episodes[idx:]
             ]
-            self.episodes = new_episode_order.copy()
+            # self.episodes = new_episode_order.copy()
+            print("new_episode_order[0].object_category BEFORE", new_episode_order[0].object_category)
+            self._dataset.episodes = new_episode_order
             self.episode_iterator = EpisodeIterator(
-                new_episode_order.copy(),
+                new_episode_order,
                 shuffle=False, group_by_scene=False,
             )
+            self._current_episode = None
+            print("self.episode_iterator.episodes[0].object_category", self.episode_iterator.episodes[0].object_category)
+            print("new_episode_order[0].object_category AFTER", new_episode_order[0].object_category)
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
