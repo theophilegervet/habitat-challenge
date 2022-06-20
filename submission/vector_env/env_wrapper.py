@@ -41,7 +41,6 @@ class EnvWrapper(Env):
             episodes_with_category = []
             other_episodes = []
             idx = 0
-            print("len(self.episodes)", len(self.episodes))
             while len(episodes_with_category) < num_ep and idx < len(self.episodes):
                 ep = self.episodes[idx]
                 cat = challenge_goal_name_to_goal_name[ep.object_category]
@@ -55,16 +54,11 @@ class EnvWrapper(Env):
                 *other_episodes,
                 *self.episodes[idx:]
             ]
-            print("new_episode_order[0].object_category BEFORE", new_episode_order[0].object_category)
             self.episodes = new_episode_order.copy()
             self.episode_iterator = EpisodeIterator(
                 new_episode_order.copy(),
                 shuffle=False, group_by_scene=False,
             )
-            print("new_episode_order[0].object_category AFTER", new_episode_order[0].object_category)
-            print("self.episodes[0].object_category", self.episodes[0].object_category)
-            print("self.episode_iterator.episodes[0].object_category",
-                  self.episode_iterator.episodes[0].object_category)
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
