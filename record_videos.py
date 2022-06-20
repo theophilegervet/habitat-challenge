@@ -34,7 +34,10 @@ if __name__ == "__main__":
         # if episode_name not in ['5cdEh9F2hJL_63', '5cdEh9F2hJL_81', '5cdEh9F2hJL_0', '5cdEh9F2hJL_87', '5cdEh9F2hJL_3', '5cdEh9F2hJL_28', 'q3zU7Yy5E5s_43', 'qyAac8rV8Zk_97']:
         #     return
         # train potted plant failures
-        if episode_name not in ['W16Bm4ysK8v_33337', 'TSJmdttd2GV_26433', 'W16Bm4ysK8v_36745', 'HxmXPBbFCkH_44951', 'QN2dRqwd84J_47943', 'xAHnY3QzFUN_27726', '1S7LAXRdDqK_10977', '1S7LAXRdDqK_13561', 'xWvSkKiWQpC_26734', 'qk9eeNeR4vw_33831', 'xWvSkKiWQpC_20630', '8wJuSPJ9FXG_7354', 'CQWES1bawee_31181', 'XiJhRLvpKpX_32469', 'fxbzYAGkrtm_16240', 'ACZZiU6BXLz_1736', 'TSJmdttd2GV_28757', 'u9rPN5cHWBg_1505', 'TSJmdttd2GV_26776']:
+        # if episode_name not in ['W16Bm4ysK8v_33337', 'TSJmdttd2GV_26433', 'W16Bm4ysK8v_36745', 'HxmXPBbFCkH_44951', 'QN2dRqwd84J_47943', 'xAHnY3QzFUN_27726', '1S7LAXRdDqK_10977', '1S7LAXRdDqK_13561', 'xWvSkKiWQpC_26734', 'qk9eeNeR4vw_33831', 'xWvSkKiWQpC_20630', '8wJuSPJ9FXG_7354', 'CQWES1bawee_31181', 'XiJhRLvpKpX_32469', 'fxbzYAGkrtm_16240', 'ACZZiU6BXLz_1736', 'TSJmdttd2GV_28757', 'u9rPN5cHWBg_1505', 'TSJmdttd2GV_26776']:
+        #     return
+        # train potted plant successes
+        if episode_name not in ['TSJmdttd2GV_25799', 'g7hUFVNac26_31011', 'HxmXPBbFCkH_44557', 'gQ3xxshDiCz_19929', 'FRQ75PjD278_31155', 'VoVGtfYrpuQ_19032', 'VoVGtfYrpuQ_23930', 'QVAA6zecMHu_15405', 'u9rPN5cHWBg_4616', 'TSJmdttd2GV_21329', 'TSJmdttd2GV_26039']:
             return
 
         print(f"Recording video {episode_name}")
