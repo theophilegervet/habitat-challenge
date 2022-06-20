@@ -51,14 +51,20 @@ class EnvWrapper(Env):
                     other_episodes.append(ep)
                 idx += 1
             print("len(episodes_with_category)", len(episodes_with_category))
-            self.episodes = [
-                *episodes_with_category,
-                *other_episodes,
-                *self.episodes[idx:]
-            ]
-            self._dataset._episode_iterator = EpisodeIterator(
-                self.episodes, shuffle=False, group_by_scene=False,
+            # self.episodes = [
+            #     *episodes_with_category,
+            #     *other_episodes,
+            #     *self.episodes[idx:]
+            # ]
+            self.episode_iterator = EpisodeIterator(
+                [
+                    *episodes_with_category,
+                    *other_episodes,
+                    *self.episodes[idx:]
+                ],
+                shuffle=False, group_by_scene=False,
             )
+            print("self.episode_iterator.episodes[0]", self.episode_iterator.episodes[0])
             if len(episodes_with_category) > 0:
                 print("episodes_with_category[0].object_category", episodes_with_category[0].object_category)
             print("self.episodes[0].object_category", self.episodes[0].object_category)
