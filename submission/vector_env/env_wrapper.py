@@ -53,7 +53,7 @@ class EnvWrapper(Env):
                 *other_episodes,
                 *self.episodes[idx:]
             ]
-            print("Starting with", self.episodes[0].object_category)
+            print("FIRST EPISODE OBJECT CATEGORY", self.episodes[0].object_category)
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
