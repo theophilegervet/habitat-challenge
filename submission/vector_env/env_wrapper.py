@@ -43,17 +43,20 @@ class EnvWrapper(Env):
             while len(episodes_with_category) < num_ep and idx < len(self.episodes):
                 ep = self.episodes[idx]
                 cat = challenge_goal_name_to_goal_name[ep.object_category]
+                print("cat", cat)
                 if cat == forced_category:
                     episodes_with_category.append(ep)
                 else:
                     other_episodes.append(ep)
                 idx += 1
+            print("len(episodes_with_category)", len(episodes_with_category))
+            print("episodes_with_category[0].object_category", episodes_with_category[0].object_category)
             self.episodes = [
                 *episodes_with_category,
                 *other_episodes,
                 *self.episodes[idx:]
             ]
-            print("FIRST EPISODE OBJECT CATEGORY", self.episodes[0].object_category)
+            print("self.episodes[0].object_category", self.episodes[0].object_category)
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
