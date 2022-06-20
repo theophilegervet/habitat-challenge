@@ -47,5 +47,9 @@ AGENT:
     obs_denoise_selem_radius: 0     # radius (in cells) of obstacle noise removal structuring element
     obs_dilation_selem_radius: 3    # radius (in cells) of obstacle dilation structuring element
 
+    # Temporary
+    plant_dilation_selem_radius: 12
+    tv_dilation_selem_radius: 10
+
   POLICY:
     type: frontier  # one of "frontier" or "semantic"

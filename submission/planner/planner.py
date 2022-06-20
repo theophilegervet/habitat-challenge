@@ -67,8 +67,8 @@ class Planner:
             3: skimage.morphology.disk(10),  # bed
             4: skimage.morphology.disk(10),  # toilet
             # Need more dilation because often within an obstacle:
-            2: skimage.morphology.disk(12),  # potted plant
-            5: skimage.morphology.disk(12),  # tv
+            2: skimage.morphology.disk(config.AGENT.PLANNER.plant_dilation_selem_radius),  # potted plant
+            5: skimage.morphology.disk(config.AGENT.PLANNER.tv_dilation_selem_radius),  # tv
         }
 
         self.vis_dir = None
