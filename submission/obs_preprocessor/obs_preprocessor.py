@@ -60,8 +60,6 @@ class ObsPreprocessor:
         self.last_poses = [np.zeros(3)] * self.num_environments
         self.last_actions = [None] * self.num_environments
 
-        self.timestep = 0
-
     def set_instance_id_to_category_id(self, instance_id_to_category_id):
         self.instance_id_to_category_id = instance_id_to_category_id.to(self.device)
 
@@ -112,16 +110,6 @@ class ObsPreprocessor:
                 return rgb, depth, semantic
 
         env_frame_height, env_frame_width = obs[0]["rgb"].shape[:2]
-
-        # TODO Temporary to take RGB/depth snapshots
-        import matplotlib.pyplot as plt
-        self.timestep += 1
-        filename = f"image{self.timestep}"
-        depth_ = (self.min_depth + obs[0]["depth"] * (self.max_depth - self.min_depth)).squeeze(-1)
-        plt.imsave(f"pictures/{filename}_rgb.png", obs[0]["rgb"])
-        plt.imsave(f"pictures/{filename}_depth.png", depth_)
-        np.save(f"pictures/{filename}_rgb.npy", obs[0]["rgb"])
-        np.save(f"pictures/{filename}_depth.npy", depth_)
 
         rgb = torch.from_numpy(np.stack([ob["rgb"] for ob in obs])).to(self.device)
         depth = torch.from_numpy(np.stack([ob["depth"] for ob in obs])).to(self.device)
