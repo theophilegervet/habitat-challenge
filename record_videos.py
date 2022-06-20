@@ -8,7 +8,7 @@ from natsort import natsorted
 # source_dir = "data/images/all_val"
 # source_dir = "data/images/remove_fp1"
 source_dir = "data/images/train_june19_14env_30ep_rollback"
-target_dir = "data/plant_videos"
+target_dir = "data/toilet_videos"
 
 
 if __name__ == "__main__":
@@ -37,7 +37,10 @@ if __name__ == "__main__":
         # if episode_name not in ['W16Bm4ysK8v_33337', 'TSJmdttd2GV_26433', 'W16Bm4ysK8v_36745', 'HxmXPBbFCkH_44951', 'QN2dRqwd84J_47943', 'xAHnY3QzFUN_27726', '1S7LAXRdDqK_10977', '1S7LAXRdDqK_13561', 'xWvSkKiWQpC_26734', 'qk9eeNeR4vw_33831', 'xWvSkKiWQpC_20630', '8wJuSPJ9FXG_7354', 'CQWES1bawee_31181', 'XiJhRLvpKpX_32469', 'fxbzYAGkrtm_16240', 'ACZZiU6BXLz_1736', 'TSJmdttd2GV_28757', 'u9rPN5cHWBg_1505', 'TSJmdttd2GV_26776']:
         #     return
         # train potted plant successes
-        if episode_name not in ['TSJmdttd2GV_25799', 'g7hUFVNac26_31011', 'HxmXPBbFCkH_44557', 'gQ3xxshDiCz_19929', 'FRQ75PjD278_31155', 'VoVGtfYrpuQ_19032', 'VoVGtfYrpuQ_23930', 'QVAA6zecMHu_15405', 'u9rPN5cHWBg_4616', 'TSJmdttd2GV_21329', 'TSJmdttd2GV_26039']:
+        # if episode_name not in ['TSJmdttd2GV_25799', 'g7hUFVNac26_31011', 'HxmXPBbFCkH_44557', 'gQ3xxshDiCz_19929', 'FRQ75PjD278_31155', 'VoVGtfYrpuQ_19032', 'VoVGtfYrpuQ_23930', 'QVAA6zecMHu_15405', 'u9rPN5cHWBg_4616', 'TSJmdttd2GV_21329', 'TSJmdttd2GV_26039']:
+        #     return
+        # train toilet failures
+        if episode_name not in ['oEPjPNSPmzL_27696', 'gmuS7Wgsbrx_18759', 'TSJmdttd2GV_37699', 'vDfkYo5VqEQ_44348', 'gmuS7Wgsbrx_14776', 'g7hUFVNac26_47457', 'W16Bm4ysK8v_6260', 'vLpv2VX547B_14762', 'gmuS7Wgsbrx_23332', 'TSJmdttd2GV_35867', 'TSJmdttd2GV_39212', 'b3WpMbPFB6q_38862', 'gmuS7Wgsbrx_19565', 'g8Xrdbe9fir_17149', 'qk9eeNeR4vw_21718', 'hWDDQnSDMXb_40564', 'xWvSkKiWQpC_40245', 'ggNAcMh8JPT_33582', 'NEVASPhcrxR_45761', 'NEVASPhcrxR_40463', 'Jfyvj3xn2aJ_10904', 'pcpn6mFqFCg_42643', 'GGBvSFddQgs_46324', 'CthA7sQNTPK_20679', 'oahi4u45xMf_40418', 'GtM3JtRvvvR_28591', 'pcpn6mFqFCg_49913', 'Jfyvj3xn2aJ_228', 'ACZZiU6BXLz_17443', '6imZUJGRUq4_42126', 'gmuS7Wgsbrx_14010', 'HfMobPm86Xn_22160', 'PPTLa8SkUfo_27071', 'QVAA6zecMHu_43482', 'YJDUB7hWg9h_33576', 'MVVzj944atG_30343', 'MVVzj944atG_25010', '77mMEyxhs44_12121']:
             return
 
         print(f"Recording video {episode_name}")
