@@ -55,6 +55,8 @@ class EnvWrapper(Env):
                 *other_episodes,
                 *self.episodes[idx:]
             ]
+            if len(episodes_with_category) > 0:
+                print("episodes_with_category[0].object_category", episodes_with_category[0].object_category)
             print("self.episodes[0].object_category", self.episodes[0].object_category)
 
         self.planner = Planner(config)
