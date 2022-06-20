@@ -9,7 +9,7 @@ from habitat.sims.habitat_simulator.actions import HabitatSimActions
 from submission.obs_preprocessor.obs_preprocessor import ObsPreprocessor
 from submission.planner.planner import Planner
 from submission.visualizer.visualizer import Visualizer
-
+from submission.utils.constants import challenge_goal_name_to_goal_name
 
 class EnvWrapper(Env):
 
@@ -29,8 +29,17 @@ class EnvWrapper(Env):
         self.max_steps = config.AGENT.max_steps
 
         self.forced_episode_ids = episode_ids if episode_ids else []
-        self.forced_category = config.EVAL_VECTORIZED.specific_category
         self.episode_idx = 0
+
+        self.forced_category = config.EVAL_VECTORIZED.specific_category
+        assert not (len(self.forced_episode_ids) > 0 and self.forced_category)
+        if self.forced_category:
+            self.episodes = [
+                ep for ep in self.episodes
+                if (challenge_goal_name_to_goal_name[ep.object_category] ==
+                    self.forced_category)
+            ]
+            assert len(self.episodes) > 0
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
@@ -62,9 +71,6 @@ class EnvWrapper(Env):
             self._disable_print_images()
 
         obs_preprocessed, info = self._preprocess_obs(obs)
-
-        if self.forced_category and info["goal_category"] != self.forced_category:
-            return self.reset()
 
         return obs_preprocessed, info
 

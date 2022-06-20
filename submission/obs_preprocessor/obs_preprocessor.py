@@ -11,8 +11,8 @@ from habitat.core.simulator import Observations
 import submission.utils.pose_utils as pu
 from submission.utils.constants import (
     frame_color_palette,
-    goal_categories,
-    goal_categories_mapping
+    goal_id_to_goal_name,
+    goal_id_to_coco_id
 )
 # from .detectron2_segmentation import Detectron2Segmentation
 from .mmdetection_segmentation import MMDetectionSegmentation
@@ -80,8 +80,8 @@ class ObsPreprocessor:
 
     def preprocess_goal(self, obs: List[Observations]) -> Tuple[Tensor, List[str]]:
         goal = torch.tensor([
-            goal_categories_mapping[ob["objectgoal"][0]] for ob in obs])
-        goal_name = [goal_categories[ob["objectgoal"][0]] for ob in obs]
+            goal_id_to_coco_id[ob["objectgoal"][0]] for ob in obs])
+        goal_name = [goal_id_to_goal_name[ob["objectgoal"][0]] for ob in obs]
         return goal, goal_name
 
     def preprocess_frame(self, obs: List[Observations]) -> Tuple[Tensor, np.ndarray]:

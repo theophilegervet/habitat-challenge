@@ -1,4 +1,13 @@
-goal_categories = {
+challenge_goal_name_to_goal_name = {
+    "chair": "chair",
+    "sofa": "couch",
+    "plant": "potted plant",
+    "bed": "bed",
+    "toilet": "toilet",
+    "tv_monitor": "tv"
+}
+
+goal_id_to_goal_name = {
     0: "chair",
     1: "bed",
     2: "potted plant",
@@ -7,7 +16,7 @@ goal_categories = {
     5: "couch",
 }
 
-goal_categories_mapping = {
+goal_id_to_coco_id = {
     0: 0,  # chair
     1: 3,  # bed
     2: 2,  # potted plant
