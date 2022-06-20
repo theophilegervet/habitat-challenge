@@ -5,6 +5,7 @@ from habitat import Config
 from habitat.core.env import Env
 from habitat.core.simulator import Observations
 from habitat.sims.habitat_simulator.actions import HabitatSimActions
+from habitat.core.dataset import EpisodeIterator
 
 from submission.obs_preprocessor.obs_preprocessor import ObsPreprocessor
 from submission.planner.planner import Planner
@@ -55,6 +56,9 @@ class EnvWrapper(Env):
                 *other_episodes,
                 *self.episodes[idx:]
             ]
+            self._dataset._episode_iterator = EpisodeIterator(
+                self.episodes, shuffle=False, group_by_scene=False,
+            )
             if len(episodes_with_category) > 0:
                 print("episodes_with_category[0].object_category", episodes_with_category[0].object_category)
             print("self.episodes[0].object_category", self.episodes[0].object_category)
