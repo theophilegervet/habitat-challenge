@@ -50,7 +50,6 @@ class EnvWrapper(Env):
                 else:
                     other_episodes.append(ep)
                 idx += 1
-            print("len(episodes_with_category)", len(episodes_with_category))
             new_episode_order = [
                 *episodes_with_category,
                 *other_episodes,
@@ -61,10 +60,10 @@ class EnvWrapper(Env):
                 new_episode_order,
                 shuffle=False, group_by_scene=False,
             )
-            print("self.episode_iterator.episodes[0].object_category", self.episode_iterator.episodes[0].object_category)
-            if len(episodes_with_category) > 0:
-                print("episodes_with_category[0].object_category", episodes_with_category[0].object_category)
+            print("new_episode_order[0].object_category", new_episode_order[0].object_category)
             print("self.episodes[0].object_category", self.episodes[0].object_category)
+            print("self.episode_iterator.episodes[0].object_category",
+                  self.episode_iterator.episodes[0].object_category)
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
