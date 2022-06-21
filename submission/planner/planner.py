@@ -277,13 +277,12 @@ class Planner:
         # If we found the goal category, select only the largest connected
         # component as the goal - although this can slightly reduce SPL,
         # it helps filter out false positives and increases success rate
-        # TODO Commenting this out to check whether it caused a regression
-        # if found_goal:
-        #     _, component_masks, stats, _ = cv2.connectedComponentsWithStats(
-        #         goal_map.astype(np.uint8))
-        #     component_areas = stats[:, -1]
-        #     largest_goal_component = np.argsort(component_areas)[-2]
-        #     goal_map[component_masks != largest_goal_component] = 0
+        if found_goal:
+            _, component_masks, stats, _ = cv2.connectedComponentsWithStats(
+                goal_map.astype(np.uint8))
+            component_areas = stats[:, -1]
+            largest_goal_component = np.argsort(component_areas)[-2]
+            goal_map[component_masks != largest_goal_component] = 0
 
         # Dilate the goal
         if found_goal:
