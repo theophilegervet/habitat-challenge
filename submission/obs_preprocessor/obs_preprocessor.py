@@ -91,7 +91,7 @@ class ObsPreprocessor:
             # zero_mask = depth == 0.
             # col_max = depth.max(axis=1, keepdims=True).values
             # depth += zero_mask * col_max
-            depth[depth == 0] = self.max_depth * 100.
+            depth[depth == 0] = self.max_depth
             depth = self.min_depth * 100. + depth * (self.max_depth - self.min_depth) * 100.
             print("AFTER (depth.min(), depth.max())", (depth.min().item(), depth.max().item()))
             print()
