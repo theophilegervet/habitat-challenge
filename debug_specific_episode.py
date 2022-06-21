@@ -37,7 +37,7 @@ if __name__ == "__main__":
     config, config_str = get_config("submission/configs/robot_config.yaml")
     config.defrost()
     config.NUM_ENVIRONMENTS = 1
-    config.NO_GPU = 1
+    config.AGENT_GPU_IDS = [1]
     config.EXP = "debug_specific_episode"
     config.freeze()
 
