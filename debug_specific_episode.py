@@ -45,8 +45,8 @@ if __name__ == "__main__":
     agent = Agent(config=config, rank=0, ddp=False)
     env = Env(config=config.TASK_CONFIG)
 
-    scene_id = "DYehNKdT76V"
-    episode_id = "55"
+    scene_id = "5cdEh9F2hJL"
+    episode_id = "17"
 
     obs = reset_to_episode(env, scene_id, episode_id)
     agent.reset()
