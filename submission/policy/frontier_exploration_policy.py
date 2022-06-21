@@ -117,26 +117,26 @@ class FrontierExplorationPolicy(Policy):
                 if goal_category_cpu[e] == 1:
                     # If we're looking for a couch, filter out all cells that
                     # also have been classified as a chair or a bed
-                    category_map -= map_features[e, 0 + 8, :, :]
-                    category_map -= map_features[e, 3 + 8, :, :]
+                    category_map -= (map_features[e, 0 + 8, :, :] == 1)
+                    category_map -= (map_features[e, 3 + 8, :, :] == 1)
 
                 elif goal_category_cpu[e] == 3:
                     # If we're looking for a bed, filter out couch
-                    category_map -= map_features[e, 1 + 8, :, :]
+                    category_map -= (map_features[e, 1 + 8, :, :] == 1)
 
                 elif goal_category_cpu[e] == 0:
                     # If we're looking for a chair, filter out couch and
                     # bed (frame)
-                    category_map -= map_features[e, 1 + 8, :, :]
-                    category_map -= map_features[e, 3 + 8, :, :]
+                    category_map -= (map_features[e, 1 + 8, :, :] == 1)
+                    category_map -= (map_features[e, 3 + 8, :, :] == 1)
 
-                # Remove noise with standard morphological transformation
-                # (closing -> opening)
-                # TODO Commenting this out to check whether it caused a regression
-                # category_map = binary_denoising(
-                #     category_map.unsqueeze(0).unsqueeze(0),
-                #     self.denoise_goal_kernel
-                # ).squeeze(0).squeeze(0)
+                if goal_category_cpu[e] in [0, 1, 3]:
+                    # For large objects (chair, couch, bed), remove noise with 
+                    # standard morphological transformation (closing -> opening)
+                    category_map = binary_denoising(
+                        category_map.unsqueeze(0).unsqueeze(0),
+                        self.denoise_goal_kernel
+                    ).squeeze(0).squeeze(0)
 
             if (category_map == 1).sum() > 0:
                 goal_map[e] = category_map == 1
