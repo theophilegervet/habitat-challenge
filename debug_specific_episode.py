@@ -39,14 +39,13 @@ if __name__ == "__main__":
     config.NUM_ENVIRONMENTS = 1
     config.AGENT_GPU_IDS = [1]
     config.EXP = "debug_specific_episode"
-    config.TASK_CONFIG.DATASET.split = "train"
     config.freeze()
 
     agent = Agent(config=config, rank=0, ddp=False)
     env = Env(config=config.TASK_CONFIG)
 
-    scene_id = "TSJmdttd2GV"
-    episode_id = "35867"
+    scene_id = "DYehNKdT76V"
+    episode_id = "55"
 
     obs = reset_to_episode(env, scene_id, episode_id)
     agent.reset()
