@@ -39,6 +39,7 @@ if __name__ == "__main__":
     config.NUM_ENVIRONMENTS = 1
     config.AGENT_GPU_IDS = [1]
     config.EXP = "debug_specific_episode"
+    config.PRINT_IMAGES = 1
     config.freeze()
 
     agent = Agent(config=config, rank=0, ddp=False)
