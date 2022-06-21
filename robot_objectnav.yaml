@@ -11,23 +11,23 @@ SIMULATOR:
     RADIUS: 0.18  # Should be 0.34 from https://hello-robot.com/product but cannot change
   HABITAT_SIM_V0:
     GPU_DEVICE_ID: 0
-    ALLOW_SLIDING: False  # This is really important
+    ALLOW_SLIDING: False    # This is really important
   RGB_SENSOR:
     WIDTH: 480              # From https://arxiv.org/pdf/2109.10892.pdf
     HEIGHT: 640             # From https://arxiv.org/pdf/2109.10892.pdf
-    HFOV: 50                # TODO Fix this
+    HFOV: 42                # From https://arxiv.org/pdf/2109.10892.pdf
     POSITION: [0, 1.31, 0]  # From https://arxiv.org/pdf/2109.10892.pdf
   DEPTH_SENSOR:
     WIDTH: 480              # From https://arxiv.org/pdf/2109.10892.pdf
     HEIGHT: 640             # From https://arxiv.org/pdf/2109.10892.pdf
-    HFOV: 50                # TODO Fix this
+    HFOV: 42                # From https://arxiv.org/pdf/2109.10892.pdf
     MIN_DEPTH: 0.5
     MAX_DEPTH: 4.0
     POSITION: [0, 1.31, 0]  # From https://arxiv.org/pdf/2109.10892.pdf
   SEMANTIC_SENSOR:
     WIDTH: 480
     HEIGHT: 640
-    HFOV: 50                # TODO Fix this
+    HFOV: 42 
     POSITION: [ 0, 1.31, 0 ]
 
 TASK:
