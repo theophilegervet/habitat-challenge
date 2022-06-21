@@ -96,8 +96,7 @@ class EnvWrapper(Env):
 
     def _reset_to_episode(self, episode_id: str) -> Observations:
         """
-        Reset the environment to a specific episode ID — this only works if
-        the environment is currently in the right scene.
+        Reset the environment to a specific episode ID
 
         Adapted from:
         https://github.com/facebookresearch/habitat-lab/blob/main/habitat/core/env.py
