@@ -96,7 +96,7 @@ class ObsPreprocessor:
             #  and semantic map - the line below would ensure it's beyond
             #  vision_range and does not get considered in the semantic map
             #  => check if this helps
-            depth[depth == 1.0] = np.inf
+            depth[depth == 1.0] = 1e6
             depth = self.min_depth * 100. + depth * (self.max_depth - self.min_depth) * 100.
             print("depth.max()", depth.max().item())
             return depth
