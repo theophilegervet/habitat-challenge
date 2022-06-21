@@ -87,10 +87,12 @@ class ObsPreprocessor:
     def preprocess_frame(self, obs: List[Observations]) -> Tuple[Tensor, np.ndarray]:
         """Preprocess frame information in the observation."""
         def preprocess_depth(depth):
+            print("BEFORE (depth.min(), depth.max())", (depth.min(), depth.max()))
             zero_mask = depth == 0.
             col_max = depth.max(axis=1, keepdims=True).values
             depth += zero_mask * col_max
-            depth = self.min_depth * 100. + depth * self.max_depth * 100.
+            depth = self.min_depth * 100. + depth * (self.max_depth - self.min_depth) * 100.
+            print("AFTER (depth.min(), depth.max())", (depth.min(), depth.max()))
             return depth
 
         def downscale(rgb, depth, semantic):

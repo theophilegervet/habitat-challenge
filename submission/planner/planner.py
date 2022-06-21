@@ -274,16 +274,6 @@ class Planner:
             print_images=self.print_images
         )
 
-        # If we found the goal category, select only the largest connected
-        # component as the goal - although this can slightly reduce SPL,
-        # it helps filter out false positives and increases success rate
-        if found_goal:
-            _, component_masks, stats, _ = cv2.connectedComponentsWithStats(
-                goal_map.astype(np.uint8))
-            component_areas = stats[:, -1]
-            largest_goal_component = np.argsort(component_areas)[-2]
-            goal_map[component_masks != largest_goal_component] = 0
-
         # Dilate the goal
         if found_goal:
             selem = self.final_goal_dilation_selems[goal_category]
