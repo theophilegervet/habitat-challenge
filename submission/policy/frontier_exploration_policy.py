@@ -114,7 +114,7 @@ class FrontierExplorationPolicy(Policy):
             category_map = map_features[e, goal_category[e] + 8, :, :]
 
             # If we think we've found the goal, let's add a bit of extra
-            # engineering to remove false positives:
+            # engineering to filter out false positives:
             if (category_map == 1).sum() > 0:
                 if goal_category_cpu[e] == 1:
                     # If we're looking for a couch, filter out all cells that
@@ -148,7 +148,7 @@ class FrontierExplorationPolicy(Policy):
                     (category_map == 1).cpu().numpy().astype(np.uint8))
                 component_areas = stats[:, -1]
                 largest_goal_component = np.argsort(component_areas)[-2]
-                goal_map[component_masks != largest_goal_component] = 0
+                category_map[component_masks != largest_goal_component] = 0
 
             if (category_map == 1).sum() > 0:
                 goal_map[e] = category_map == 1
