@@ -140,15 +140,16 @@ class FrontierExplorationPolicy(Policy):
                         self.denoise_goal_kernel
                     ).squeeze(0).squeeze(0)
 
-            if (category_map == 1).sum() > 0 and goal_category_cpu[e] == 1:
-                # If we're looking for a couch, select only the largest
-                # connected component as the goal - this further helps
-                # filter out chair false positives
-                _, component_masks, stats, _ = cv2.connectedComponentsWithStats(
-                    (category_map == 1).cpu().numpy().astype(np.uint8))
-                component_areas = stats[:, -1]
-                largest_goal_component = np.argsort(component_areas)[-2]
-                category_map[component_masks != largest_goal_component] = 0
+            # TODO This decreased performance on couches, try without
+            # if (category_map == 1).sum() > 0 and goal_category_cpu[e] == 1:
+            #     # If we're looking for a couch, select only the largest
+            #     # connected component as the goal - this further helps
+            #     # filter out chair false positives
+            #     _, component_masks, stats, _ = cv2.connectedComponentsWithStats(
+            #         (category_map == 1).cpu().numpy().astype(np.uint8))
+            #     component_areas = stats[:, -1]
+            #     largest_goal_component = np.argsort(component_areas)[-2]
+            #     category_map[component_masks != largest_goal_component] = 0
 
             if (category_map == 1).sum() > 0:
                 goal_map[e] = category_map == 1
