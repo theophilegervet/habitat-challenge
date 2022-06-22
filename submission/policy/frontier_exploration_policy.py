@@ -140,7 +140,6 @@ class FrontierExplorationPolicy(Policy):
                         self.denoise_goal_kernel
                     ).squeeze(0).squeeze(0)
 
-            # TODO This decreased performance on couches, try without
             # if (category_map == 1).sum() > 0 and goal_category_cpu[e] == 1:
             #     # If we're looking for a couch, select only the largest
             #     # connected component as the goal - this further helps
