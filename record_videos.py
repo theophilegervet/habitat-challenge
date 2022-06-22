@@ -7,8 +7,8 @@ from natsort import natsorted
 
 # source_dir = "data/images/all_val"
 # source_dir = "data/images/remove_fp1"
-source_dir = "data/images/train_june19_14env_30ep_rollback"
-target_dir = "data/toilet_videos"
+source_dir = "data/images/fix_depth_preprocessing_couch"
+target_dir = "data/new_successes_NEW"
 
 
 if __name__ == "__main__":
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         # if episode_name not in ['TSJmdttd2GV_25799', 'g7hUFVNac26_31011', 'HxmXPBbFCkH_44557', 'gQ3xxshDiCz_19929', 'FRQ75PjD278_31155', 'VoVGtfYrpuQ_19032', 'VoVGtfYrpuQ_23930', 'QVAA6zecMHu_15405', 'u9rPN5cHWBg_4616', 'TSJmdttd2GV_21329', 'TSJmdttd2GV_26039']:
         #     return
         # train toilet failures
-        if episode_name not in ['oEPjPNSPmzL_27696', 'gmuS7Wgsbrx_18759', 'TSJmdttd2GV_37699', 'vDfkYo5VqEQ_44348', 'gmuS7Wgsbrx_14776', 'g7hUFVNac26_47457', 'W16Bm4ysK8v_6260', 'vLpv2VX547B_14762', 'gmuS7Wgsbrx_23332', 'TSJmdttd2GV_35867', 'TSJmdttd2GV_39212', 'b3WpMbPFB6q_38862', 'gmuS7Wgsbrx_19565', 'g8Xrdbe9fir_17149', 'qk9eeNeR4vw_21718', 'hWDDQnSDMXb_40564', 'xWvSkKiWQpC_40245', 'ggNAcMh8JPT_33582', 'NEVASPhcrxR_45761', 'NEVASPhcrxR_40463', 'Jfyvj3xn2aJ_10904', 'pcpn6mFqFCg_42643', 'GGBvSFddQgs_46324', 'CthA7sQNTPK_20679', 'oahi4u45xMf_40418', 'GtM3JtRvvvR_28591', 'pcpn6mFqFCg_49913', 'Jfyvj3xn2aJ_228', 'ACZZiU6BXLz_17443', '6imZUJGRUq4_42126', 'gmuS7Wgsbrx_14010', 'HfMobPm86Xn_22160', 'PPTLa8SkUfo_27071', 'QVAA6zecMHu_43482', 'YJDUB7hWg9h_33576', 'MVVzj944atG_30343', 'MVVzj944atG_25010', '77mMEyxhs44_12121']:
+        if episode_name not in ['8wJuSPJ9FXG_32258', '3XYAD64HpDr_17947', 'Jfyvj3xn2aJ_9082', 'Jfyvj3xn2aJ_9082', 'xAHnY3QzFUN_45570', '3XYAD64HpDr_22429', '3XYAD64HpDr_19062', 'xAHnY3QzFUN_26274', 'GGBvSFddQgs_18141', 'qz3829g1Lzf_14881', 'JptJPosx1Z6_43234', '3CBBjsNkhqW_11865', 'HxmXPBbFCkH_35025', 'GGBvSFddQgs_38636', 'GGBvSFddQgs_38636', 'GtM3JtRvvvR_33979', 'qz3829g1Lzf_6780', 'HxmXPBbFCkH_27298', 'HxmXPBbFCkH_3719', 'HxmXPBbFCkH_27968', 'gQ3xxshDiCz_21465', 'gQ3xxshDiCz_21465', 'GtM3JtRvvvR_31794', 'wsAYBFtQaL7_18495', 'wsAYBFtQaL7_18495', 'wsAYBFtQaL7_18495', 'U3oQjwTuMX8_22484', 'U3oQjwTuMX8_22484', 'W9YAR9qcuvN_44195', 'W9YAR9qcuvN_44195', 'U3oQjwTuMX8_25658', 'U3oQjwTuMX8_25658', 'wsAYBFtQaL7_44841', 'xWvSkKiWQpC_11830', 'xWvSkKiWQpC_11830', 'W9YAR9qcuvN_1786', 'ixTj1aTMup2_17992', 'CQWES1bawee_5365', 'CQWES1bawee_285', 'TSJmdttd2GV_22493', 'FnDDfrBZPhh_33935', 'oEPjPNSPmzL_39601', 'oEPjPNSPmzL_34120', 'FnDDfrBZPhh_13023', 'TSJmdttd2GV_23939', 'NtnvZSMK3en_641', 'iKFn6fzyRqs_24285', 'oahi4u45xMf_18830', 'YMNvYDhK8mB_31002', 'xgLmjqzoAzF_16227', 'xgLmjqzoAzF_22251', 'xgLmjqzoAzF_22251', 'iKFn6fzyRqs_2251', 'iKFn6fzyRqs_2251', 'YMNvYDhK8mB_33215', 'nS8T59Aw3sf_15566', 'XiJhRLvpKpX_43810', 'h6nwVLpAKQz_39616', 'g8Xrdbe9fir_21591', 'v7DzfFFEpsD_43080', 'h6nwVLpAKQz_32790']:
             return
 
         print(f"Recording video {episode_name}")
