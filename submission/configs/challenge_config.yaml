@@ -30,6 +30,7 @@ ENVIRONMENT:
 AGENT:
   goal_update_steps: 1    # frequency at which to update the high-level goal during inference
   max_steps: 498          # maximum number of steps before stopping an episode
+  panorama_start: 1       # 1: turn around 360 degrees when starting an episode, 0: don't
 
   SEMANTIC_MAP:
     map_size_cm: 4800        # global map size (in centimetres)
@@ -45,7 +46,6 @@ AGENT:
     collision_threshold: 0.20       # distance under which we consider there's a collision
     obs_denoise_selem_radius: 0     # radius (in cells) of obstacle noise removal structuring element
     obs_dilation_selem_radius: 3    # radius (in cells) of obstacle dilation structuring element
-    goal_dilation_selem_radius: 10  # radius (in cells) of goal dilation structuring element
 
   POLICY:
     type: frontier  # one of "frontier" or "semantic"

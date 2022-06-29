@@ -29,6 +29,10 @@ class EnvWrapper(Env):
         self.device = (torch.device("cpu") if config.NO_GPU else
                        torch.device(f"cuda:{self.sim.gpu_device}"))
         self.max_steps = config.AGENT.max_steps
+        if config.AGENT.panorama_start:
+            self.panorama_start_steps = int(360 / config.ENVIRONMENT.turn_angle)
+        else:
+            self.panorama_start_steps = 0
 
         self.forced_episode_ids = episode_ids if episode_ids else []
         self.episode_idx = 0
@@ -149,7 +153,9 @@ class EnvWrapper(Env):
         self.visualizer.visualize(**planner_inputs, **vis_inputs)
 
         # 2 - Planning
-        if vis_inputs["timestep"] > self.max_steps:
+        if vis_inputs["timestep"] < self.panorama_start_steps:
+            action = HabitatSimActions.TURN_RIGHT
+        elif vis_inputs["timestep"] > self.max_steps:
             action = HabitatSimActions.STOP
         else:
             action = self.planner.plan(**planner_inputs)

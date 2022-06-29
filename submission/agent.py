@@ -34,6 +34,10 @@ class Agent(habitat.Agent):
         self.goal_update_steps = config.AGENT.goal_update_steps
         self.precision = torch.float16 if config.MIXED_PRECISION else torch.float32
         self.num_environments = config.NUM_ENVIRONMENTS
+        if config.AGENT.panorama_start:
+            self.panorama_start_steps = int(360 / config.ENVIRONMENT.turn_angle)
+        else:
+            self.panorama_start_steps = 0
 
         policy = exploration_policies[config.AGENT.POLICY.type]()
         self.module = AgentModule(config, policy)
@@ -186,7 +190,9 @@ class Agent(habitat.Agent):
     @torch.no_grad()
     def act(self, obs: Observations) -> Dict[str, int]:
         """Act end-to-end."""
-        if self.timesteps[0] > self.max_steps:
+        if self.timesteps[0] < self.panorama_start_steps:
+            return HabitatSimActions.TURN_RIGHT
+        elif self.timesteps[0] > self.max_steps:
             return HabitatSimActions.STOP
 
         # t0 = time.time()
