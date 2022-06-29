@@ -190,11 +190,6 @@ class Agent(habitat.Agent):
     @torch.no_grad()
     def act(self, obs: Observations) -> Dict[str, int]:
         """Act end-to-end."""
-        if self.timesteps[0] < self.panorama_start_steps:
-            return HabitatSimActions.TURN_RIGHT
-        elif self.timesteps[0] > self.max_steps:
-            return HabitatSimActions.STOP
-
         # t0 = time.time()
 
         # 1 - Obs preprocessing
@@ -217,7 +212,12 @@ class Agent(habitat.Agent):
         # print(f"[Agent] Semantic mapping and policy time: {t2 - t1:.2f}")
 
         # 3 - Planning
-        action = self.planner.plan(**planner_inputs[0])
+        if self.timesteps[0] < self.panorama_start_steps:
+            action = HabitatSimActions.TURN_RIGHT
+        elif self.timesteps[0] > self.max_steps:
+            action = HabitatSimActions.STOP
+        else:
+            action = self.planner.plan(**planner_inputs[0])
         self.obs_preprocessor.last_actions[0] = action
 
         # t3 = time.time()
