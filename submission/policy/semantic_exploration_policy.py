@@ -50,18 +50,21 @@ class SemanticExplorationPolicy(Policy):
                           found_goal):
         orientation = torch.div(
             global_pose[:, 2] % 360, 5, rounding_mode='trunc').long()
-        print(orientation)
-        # TODO Downscale map_features
         map_features = F.avg_pool2d(map_features, self.training_downscaling)
-        print(map_features.shape)
-        print(next(self.network.parameters()).device)
+        print("input devices:")
+        print(map_features.device)
+        print(orientation.device)
+        print(goal_category.device)
+        print()
         dist = self.dist(self.network(map_features, orientation, goal_category))
-
+        print(dist)
+        print()
         if self.deterministic:
             action = dist.mode()
         else:
             action = dist.sample()
         print(action)
+        print()
 
         # TODO Is flipping necessary?
         # These lines
