@@ -1,3 +1,6 @@
+MIN_DEPTH_REPLACEMENT_VALUE = 10000
+MAX_DEPTH_REPLACEMENT_VALUE = 10001
+
 challenge_goal_name_to_goal_name = {
     "chair": "chair",
     "sofa": "couch",

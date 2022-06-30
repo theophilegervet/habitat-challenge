@@ -12,7 +12,9 @@ import submission.utils.pose_utils as pu
 from submission.utils.constants import (
     frame_color_palette,
     goal_id_to_goal_name,
-    goal_id_to_coco_id
+    goal_id_to_coco_id,
+    MIN_DEPTH_REPLACEMENT_VALUE,
+    MAX_DEPTH_REPLACEMENT_VALUE
 )
 # from .detectron2_segmentation import Detectron2Segmentation
 from .mmdetection_segmentation import MMDetectionSegmentation
@@ -91,8 +93,8 @@ class ObsPreprocessor:
             # thresholded and should not be considered in the point cloud
             # and semantic map - the lines below ensure it's beyond
             # vision_range and does not get considered in the semantic map
-            depth[depth == 0.0] = 1e6
-            depth[depth == 1.0] = 1e6
+            depth[depth == 0.0] = MIN_DEPTH_REPLACEMENT_VALUE
+            depth[depth == 1.0] = MAX_DEPTH_REPLACEMENT_VALUE
 
             # Rescale depth from [0.0, 1.0] to [min_depth, max_depth]
             depth = self.min_depth * 100. + depth * (self.max_depth - self.min_depth) * 100.
