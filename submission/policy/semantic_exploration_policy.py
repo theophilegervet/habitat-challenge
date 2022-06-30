@@ -60,24 +60,12 @@ class SemanticExplorationPolicy(Policy):
             action = dist.mode()
         else:
             action = dist.sample()
-        print("action", action)
 
-        location = (nn.Sigmoid()(action) * (goal_map_size - 1)).long()
-        print("location", location)
+        goal_location = (nn.Sigmoid()(action) * (goal_map_size - 1)).long()
 
         for e in range(batch_size):
             if not found_goal[e]:
-                goal_map[e, location[e, 0], location[e, 1]] = 1
-
-        # TODO Is flipping necessary?
-        # These lines
-        # https://github.com/devendrachaplot/Object-Goal-Navigation/blob/master/main.py#L315
-        # https://github.com/devendrachaplot/Object-Goal-Navigation/blob/master/envs/utils/fmm_planner.py#L71
-        # seem to indicate that the goal action in the pre-trained model is (row, column) - i.e., we index map[goal[0], goal[1]]
-        # while in this repo, this line
-        # https://github.com/facebookresearch/fairo/blob/main/droidlet/lowlevel/locobot/remote/slam_pkg/utils/fmm_planner.py#L29
-        # indicates that the goal action is (column, row) - i.e., we index map[goal[1], goal[0]]
-        # action = action.flip(-1)
+                goal_map[e, goal_location[e, 0], goal_location[e, 1]] = 1
 
         return goal_map
 
