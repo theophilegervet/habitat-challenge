@@ -60,8 +60,6 @@ class Policy(nn.Module, ABC):
 
         found_hint = torch.zeros(batch_size, dtype=torch.bool, device=device)
 
-        print(global_pose)
-
         for e in range(batch_size):
             # if not found_goal[e]:
             category_frame = obs[e, goal_category[e] + 4, :, :]

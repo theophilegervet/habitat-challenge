@@ -95,6 +95,9 @@ class AgentModule(nn.Module):
             init_origins
         )
 
+        print("global_pose", seq_global_pose.flatten(0, 1))
+        print("local_pose", seq_local_pose.flatten(0, 1))
+
         # t1 = time.time()
         # print(f"[Semantic mapping] Total time: {t1 - t0:.2f}")
 
