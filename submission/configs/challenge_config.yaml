@@ -12,6 +12,7 @@ PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
 
 EVAL_VECTORIZED:
   specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
+  specific_category: 0      # "chair": eval only on chair episodes, 0: eval on all episodes
   split: val                # eval split
   num_episodes_per_env: 10   # number of eval episodes per environment
   record_videos: 1          # 1: record videos from printed images, 0: don't
@@ -28,7 +29,6 @@ ENVIRONMENT:
   max_depth: 5.0          # maximum depth for depth sensor (in metres)
 
 AGENT:
-  goal_update_steps: 1    # frequency at which to update the high-level goal during inference
   max_steps: 498          # maximum number of steps before stopping an episode
   panorama_start: 0       # 1: turn around 360 degrees when starting an episode, 0: don't
 
@@ -48,7 +48,8 @@ AGENT:
     obs_dilation_selem_radius: 3    # radius (in cells) of obstacle dilation structuring element
 
   POLICY:
-    type: frontier  # one of "frontier" or "semantic"
+    type: semantic  # one of "frontier" or "semantic"
 
     SEMANTIC:
+      goal_update_steps: 25    # frequency at which to update the high-level goal during inference
       training_downscaling: 2  # ratio of map size in this code over map size used to train the policy
