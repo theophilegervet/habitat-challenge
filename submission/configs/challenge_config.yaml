@@ -30,7 +30,7 @@ ENVIRONMENT:
 AGENT:
   goal_update_steps: 1    # frequency at which to update the high-level goal during inference
   max_steps: 498          # maximum number of steps before stopping an episode
-  panorama_start: 0       # 1: turn around 360 degrees when starting an episode, 0: don't
+  panorama_start: 1       # 1: turn around 360 degrees when starting an episode, 0: don't
 
   SEMANTIC_MAP:
     map_size_cm: 4800        # global map size (in centimetres)
@@ -49,3 +49,6 @@ AGENT:
 
   POLICY:
     type: frontier  # one of "frontier" or "semantic"
+
+    SEMANTIC:
+      training_downscaling: 2  # ratio of map size in this code over map size used to train the policy
