@@ -106,7 +106,7 @@ class Policy(nn.Module, ABC):
             print("frontier_map.shape 2", frontier_map.shape)
             import cv2
             import numpy as np
-            frontier_map = frontier_map.numpy()
+            frontier_map = frontier_map.cpu().numpy()
             cv2.imwrite("frontier_map.png", (frontier_map / frontier_map.max() * 255).astype(np.uint8))
             yaw = local_pose[e, 2].item()
             print("yaw", yaw)
