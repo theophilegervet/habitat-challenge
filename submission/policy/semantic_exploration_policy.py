@@ -51,12 +51,16 @@ class SemanticExplorationPolicy(Policy):
         orientation = torch.div(
             global_pose[:, 2] % 360, 5, rounding_mode='trunc').long()
         map_features = F.avg_pool2d(map_features, self.training_downscaling)
-        print("input devices:")
         print(map_features.device)
         print(orientation.device)
         print(goal_category.device)
+        print(next(self.network.parameters()).device)
+        print(next(self.dist.parameters()).device)
         print()
-        dist = self.dist(self.network(map_features, orientation, goal_category))
+        x = self.network(map_features, orientation, goal_category)
+        print(x.device)
+        print()
+        dist = self.dist(x)
         print(dist)
         print()
         if self.deterministic:
