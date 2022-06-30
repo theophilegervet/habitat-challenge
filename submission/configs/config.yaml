@@ -50,3 +50,6 @@ AGENT:
 
   POLICY:
     type: semantic  # one of "frontier" or "semantic"
+
+    SEMANTIC:
+      training_downscaling: 2  # ratio of map size in this code over map size used to train the policy

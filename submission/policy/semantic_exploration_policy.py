@@ -14,11 +14,14 @@ class SemanticExplorationPolicy(Policy):
     def __init__(self, config):
         super().__init__(config)
 
+        self.training_downscaling = config.AGENT.POLICY.SEMANTIC.training_downscaling
         num_sem_categories = config.ENVIRONMENT.num_sem_categories
+        # TODO Policy was trained with local map size 240 => adapt to it
         local_map_size = (
             config.AGENT.SEMANTIC_MAP.map_size_cm //
             config.AGENT.SEMANTIC_MAP.global_downscaling //
-            config.AGENT.SEMANTIC_MAP.map_resolution
+            config.AGENT.SEMANTIC_MAP.map_resolution //
+            self.training_downscaling
         )
         map_features_shape = (
             config.ENVIRONMENT.num_sem_categories + 8,
@@ -44,9 +47,11 @@ class SemanticExplorationPolicy(Policy):
                           goal_category,
                           goal_map,
                           found_goal):
-        orientation = torch.div(global_pose[:, 2] % 360, 5,
-                                rounding_mode='trunc').long()
+        orientation = torch.div(
+            global_pose[:, 2] % 360, 5, rounding_mode='trunc').long()
         print(orientation)
+        # TODO Downscale map_features
+        print(map_features.shape)
         dist = self.dist(self.network(map_features, orientation, goal_category))
 
         if self.deterministic:
