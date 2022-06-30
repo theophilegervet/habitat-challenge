@@ -39,7 +39,7 @@ class Agent(habitat.Agent):
         else:
             self.panorama_start_steps = 0
 
-        policy = exploration_policies[config.AGENT.POLICY.type]()
+        policy = exploration_policies[config.AGENT.POLICY.type](config)
         self.module = AgentModule(config, policy)
 
         if config.NO_GPU:

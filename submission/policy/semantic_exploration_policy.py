@@ -7,9 +7,13 @@ from .utils.model import Flatten, NNBase
 
 
 class SemanticExplorationPolicy(Policy):
+    """
+    This predicts a high-level goal from map features.
+    """
 
     def __init__(self, config):
-        super().__init__()
+        super().__init__(config)
+
         num_sem_categories = config.ENVIRONMENT.num_sem_categories
         local_map_size = (
             config.AGENT.SEMANTIC_MAP.map_size_cm //
@@ -42,12 +46,14 @@ class SemanticExplorationPolicy(Policy):
                           found_goal):
         orientation = torch.div(global_pose[:, 2] % 360, 5,
                                 rounding_mode='trunc').long()
+        print(orientation)
         dist = self.dist(self.network(map_features, orientation, goal_category))
 
         if self.deterministic:
             action = dist.mode()
         else:
             action = dist.sample()
+        print(action)
 
         # TODO Is flipping necessary?
         # These lines

@@ -10,7 +10,7 @@ class Policy(nn.Module, ABC):
     """
     Policy to select high-level goals.
     """
-    def __init__(self):
+    def __init__(self, config):
         super().__init__()
 
         self.denoise_goal_kernel = nn.Parameter(
