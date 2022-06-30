@@ -51,24 +51,24 @@ class Policy(nn.Module, ABC):
     def look_for_hint_in_frame(self, obs, global_pose, goal_category, goal_map, found_goal):
         """
         If the goal category is not in the semantic map but is in the frame
-        — either because it is below the category prediction threshold or
-        because it is beyond the maximum depth sensed — go towards it.
+        (beyond the maximum depth sensed and projected into the map) go
+        towards it.
         """
         batch_size = obs.shape[0]
         device = obs.device
-        # beyond_max_depth_mask = obs[:, 3, :, :] == MAX_DEPTH_REPLACEMENT_VALUE
+        beyond_max_depth_mask = obs[:, 3, :, :] == MAX_DEPTH_REPLACEMENT_VALUE
 
         found_hint = torch.zeros(batch_size, dtype=torch.bool, device=device)
 
-        # for e in range(batch_size):
-        #     if not found_goal[e]:
-        #         category_frame = obs[e, goal_category[e] + 4, :, :]
-        #
-        #         if (category_frame == 1).sum() > 0:
-        #             print("Object in frame!")
-        #
-        #         if (category_frame[beyond_max_depth_mask[e]] == 1).sum() > 0:
-        #             print("Object in frame beyond max depth!")
+        for e in range(batch_size):
+            if not found_goal[e]:
+                category_frame = obs[e, goal_category[e] + 4, :, :]
+
+                if (category_frame == 1).sum() > 0:
+                    print("Object in frame!")
+
+                if (category_frame[beyond_max_depth_mask[e]] == 1).sum() > 0:
+                    print("Object in frame beyond max depth!")
 
         return goal_map, found_hint
 
@@ -114,6 +114,10 @@ class Policy(nn.Module, ABC):
             if (category_map == 1).sum() > 0:
                 goal_map[e] = category_map == 1
                 found_goal[e] = True
+
+        # TODO If the goal is in the semantic map below the category prediction
+        #  threshold, try going towards it to check whether the detection is
+        #  correct - this could backfire and introduce false positives
 
         return goal_map, found_goal
 
