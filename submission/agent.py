@@ -111,7 +111,6 @@ class Agent(habitat.Agent):
         (
             goal_map,
             found_goal,
-            _,
             self.semantic_map.local_map,
             self.semantic_map.global_map,
             seq_local_pose,

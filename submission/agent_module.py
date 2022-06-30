@@ -1,5 +1,3 @@
-from typing import Tuple, Optional
-from torch import Tensor
 import torch.nn as nn
 import time
 
@@ -16,21 +14,17 @@ class AgentModule(nn.Module):
         self.policy = policy
 
     def forward(self,
-                seq_obs: Optional[Tensor],
-                seq_pose_delta: Optional[Tensor],
-                seq_goal_category: Optional[Tensor],
-                seq_dones: Optional[Tensor],
-                seq_update_global: Optional[Tensor],
-                init_local_map: Optional[Tensor],
-                init_global_map: Optional[Tensor],
-                init_local_pose: Optional[Tensor],
-                init_global_pose: Optional[Tensor],
-                init_lmb: Optional[Tensor],
-                init_origins: Optional[Tensor],
-                seq_map_features: Optional[Tensor] = None,
-                ) -> Tuple[Optional[Tensor], Optional[Tensor], Optional[Tensor],
-                           Optional[Tensor], Optional[Tensor], Optional[Tensor],
-                           Optional[Tensor], Optional[Tensor], Optional[Tensor]]:
+                seq_obs,
+                seq_pose_delta,
+                seq_goal_category,
+                seq_dones,
+                seq_update_global,
+                init_local_map,
+                init_global_map,
+                init_local_pose,
+                init_global_pose,
+                init_lmb,
+                init_origins):
         """Update maps and poses with a sequence of observations, and predict
         high-level goals from map features.
 
@@ -57,16 +51,12 @@ class AgentModule(nn.Module):
              (batch_size, 3)
             init_lmb: initial local map boundaries of shape (batch_size, 4)
             init_origins: initial local map origins of shape (batch_size, 3)
-            seq_map_features: if supplied, skip semantic map update and predict
-             goal from these map features instead
 
         Returns:
             seq_goal_map: sequence of binary maps encoding goal(s) of shape
              (batch_size, sequence_length, M, M)
             seq_found_goal: binary variables to denote whether we found the object
              goal category of shape (batch_size, sequence_length)
-            seq_regression_logits: if we're using a regression policy, pre-sigmoid
-             (y, x) locations to use in MSE loss of shape
              (batch_size, sequence_length, 2)
             final_local_map: final local map after all updates of shape
              (batch_size, 4 + num_sem_categories, M, M)
@@ -83,37 +73,28 @@ class AgentModule(nn.Module):
         """
         # t0 = time.time()
 
-        if seq_map_features is None:
-            # Update map with observations and generate map features
-            batch_size, sequence_length = seq_obs.shape[:2]
-            (
-                seq_map_features,
-                final_local_map,
-                final_global_map,
-                seq_local_pose,
-                seq_global_pose,
-                seq_lmb,
-                seq_origins,
-            ) = self.semantic_map_module(
-                seq_obs,
-                seq_pose_delta,
-                seq_dones,
-                seq_update_global,
-                init_local_map,
-                init_global_map,
-                init_local_pose,
-                init_global_pose,
-                init_lmb,
-                init_origins
-            )
-        else:
-            batch_size, sequence_length = seq_map_features.shape[:2]
-            final_local_map = None
-            final_global_map = None
-            seq_local_pose = None
-            seq_global_pose = None
-            seq_lmb = None
-            seq_origins = None
+        # Update map with observations and generate map features
+        batch_size, sequence_length = seq_obs.shape[:2]
+        (
+            seq_map_features,
+            final_local_map,
+            final_global_map,
+            seq_local_pose,
+            seq_global_pose,
+            seq_lmb,
+            seq_origins,
+        ) = self.semantic_map_module(
+            seq_obs,
+            seq_pose_delta,
+            seq_dones,
+            seq_update_global,
+            init_local_map,
+            init_global_map,
+            init_local_pose,
+            init_global_pose,
+            init_lmb,
+            init_origins
+        )
 
         # t1 = time.time()
         # print(f"[Semantic mapping] Total time: {t1 - t0:.2f}")
@@ -121,16 +102,15 @@ class AgentModule(nn.Module):
         # Predict high-level goals from map features
         # batched across sequence length x num environments
         map_features = seq_map_features.flatten(0, 1)
+        # TODO Compute orientation
+        orientation = seq_global_pose.flatten(0, 1)
         goal_category = seq_goal_category.flatten(0, 1)
         (
             goal_map,
             found_goal,
-            regression_logits
-        ) = self.policy(map_features, goal_category)
+        ) = self.policy(map_features, orientation, goal_category)
         seq_goal_map = goal_map.view(batch_size, sequence_length, *goal_map.shape[-2:])
         seq_found_goal = found_goal.view(batch_size, sequence_length)
-        seq_regression_logits = (regression_logits.view(batch_size, sequence_length, -1)
-                                 if regression_logits is not None else None)
 
         # t2 = time.time()
         # print(f"[Policy] Total time: {t2 - t1:.2f}")
@@ -138,7 +118,6 @@ class AgentModule(nn.Module):
         return (
             seq_goal_map,
             seq_found_goal,
-            seq_regression_logits,
             final_local_map,
             final_global_map,
             seq_local_pose,
