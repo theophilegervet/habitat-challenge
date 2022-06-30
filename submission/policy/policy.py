@@ -66,9 +66,11 @@ class Policy(nn.Module, ABC):
 
                 if (category_frame == 1).sum() > 0:
                     print("Object in frame!")
+                    print("yaw", global_pose[e, 2].item())
 
                 if (category_frame[beyond_max_depth_mask[e]] == 1).sum() > 0:
                     print("Object in frame beyond max depth!")
+                    print("yaw", global_pose[e, 2].item())
 
         return goal_map, found_hint
 
