@@ -101,12 +101,12 @@ class Agent(habitat.Agent):
                 semantic_map: (M, M) np.ndarray containing local semantic map
                  predictions
         """
-        self.timesteps = [self.timesteps[e] + 1
-                          for e in range(self.num_environments)]
         dones = torch.tensor([False] * self.num_environments)
         update_global = torch.tensor(
             [self.timesteps[e] % self.goal_update_steps == 0
              for e in range(self.num_environments)])
+        self.timesteps = [self.timesteps[e] + 1
+                          for e in range(self.num_environments)]
 
         (
             goal_map,
