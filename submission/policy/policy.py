@@ -110,7 +110,7 @@ class Policy(nn.Module, ABC):
             end_x = start_x + line_length * math.cos(math.radians(-yaw))
             print("yaw", yaw)
             print("(end_y, end_x)", (end_y, end_x))
-            draw_line((start_y, start_x), (end_y, end_x), frontier_map[0])
+            draw_line((start_y, start_x), (end_y, end_x), frontier_map[0], steps=100)
             # TODO Add angle within the frame (if necessary)
 
             import cv2
