@@ -2,10 +2,12 @@ from abc import ABC, abstractmethod
 import torch
 import torch.nn as nn
 import skimage.morphology
+import math
 
 import skimage.morphology
 from .utils.morphology import binary_denoising, binary_dilation
 from submission.utils.constants import MAX_DEPTH_REPLACEMENT_VALUE
+from submission.utils.visualization_utils import draw_line
 
 
 class Policy(nn.Module, ABC):
@@ -73,7 +75,7 @@ class Policy(nn.Module, ABC):
         (beyond the maximum depth sensed and projected into the map) go
         towards it.
         """
-        batch_size = obs.shape[0]
+        batch_size, _, map_size, _ = map_features.shape
         device = obs.device
         beyond_max_depth_mask = obs[:, 3, :, :] == MAX_DEPTH_REPLACEMENT_VALUE
 
@@ -91,6 +93,7 @@ class Policy(nn.Module, ABC):
 
             # Select unexplored area
             frontier_map = (map_features[[e], [1], :, :] == 0).float()
+            print("frontier_map.shape 1", frontier_map.shape)
 
             # Dilate explored area
             frontier_map = 1 - binary_dilation(
@@ -99,12 +102,20 @@ class Policy(nn.Module, ABC):
             # Select the frontier
             frontier_map = binary_dilation(
                 frontier_map, self.select_border_kernel) - frontier_map
-            print("frontier_map.shape", frontier_map.shape)
+
+            print("frontier_map.shape 2", frontier_map.shape)
+            yaw = local_pose[e, 2].item()
+            print("yaw", yaw)
 
             # Select the intersection between the frontier and the
             # direction of the object beyond the maximum depth sensed
-            yaw = local_pose[e, 2].item()
-            print("yaw", yaw)
+            # TODO Start from here
+            start_y = start_x = line_length = map_size // 2
+            end_y = start_y + line_length * math.sin(math.radians(-yaw))
+            end_x = start_x + line_length * math.cos(math.radians(-yaw))
+            print("(end_y, end_x)", (end_y, end_x))
+            #draw_line((start_y, start_x), (end_y, end_x), frontier_map[e])
+            # TODO Add angle within the frame (if necessary)
 
         return goal_map, found_hint
 
