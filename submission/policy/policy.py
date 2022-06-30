@@ -92,7 +92,7 @@ class Policy(nn.Module, ABC):
                 print("Object in frame beyond max depth!")
 
             # Select unexplored area
-            frontier_map = (map_features[[e], [1], :, :] == 0).float()
+            frontier_map = (map_features[e, [1], :, :] == 0).float()
             print("frontier_map.shape 1", frontier_map.shape)
 
             # Dilate explored area
@@ -104,6 +104,10 @@ class Policy(nn.Module, ABC):
                 frontier_map, self.select_border_kernel) - frontier_map
 
             print("frontier_map.shape 2", frontier_map.shape)
+            import cv2
+            import numpy as np
+            frontier_map = frontier_map.numpy()
+            cv2.imwrite("frontier_map.png", (frontier_map / frontier_map.max() * 255).astype(np.uint8))
             yaw = local_pose[e, 2].item()
             print("yaw", yaw)
 
@@ -114,7 +118,7 @@ class Policy(nn.Module, ABC):
             end_y = start_y + line_length * math.sin(math.radians(-yaw))
             end_x = start_x + line_length * math.cos(math.radians(-yaw))
             print("(end_y, end_x)", (end_y, end_x))
-            #draw_line((start_y, start_x), (end_y, end_x), frontier_map[e])
+            # draw_line((start_y, start_x), (end_y, end_x), frontier_map[e])
             # TODO Add angle within the frame (if necessary)
 
         return goal_map, found_hint
