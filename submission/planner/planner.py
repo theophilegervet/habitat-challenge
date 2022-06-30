@@ -169,7 +169,7 @@ class Planner:
             # TODO Increase goal dilation?
 
         # Short-term goal -> deterministic local policy
-        if stop:
+        if stop and found_goal:
             action = HabitatSimActions.STOP
         else:
             stg_x, stg_y = short_term_goal
