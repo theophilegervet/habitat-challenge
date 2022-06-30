@@ -103,6 +103,7 @@ class AgentModule(nn.Module):
         # batched across sequence length x num environments
         map_features = seq_map_features.flatten(0, 1)
         # TODO Compute orientation
+        print(seq_global_pose)
         orientation = seq_global_pose.flatten(0, 1)
         goal_category = seq_goal_category.flatten(0, 1)
         (
