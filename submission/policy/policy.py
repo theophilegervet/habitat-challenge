@@ -93,7 +93,6 @@ class Policy(nn.Module, ABC):
 
             # Select unexplored area
             frontier_map = (map_features[e, [1], :, :] == 0).float()
-            print("frontier_map.shape 1", frontier_map.shape)
 
             # Dilate explored area
             frontier_map = 1 - binary_dilation(
@@ -103,23 +102,22 @@ class Policy(nn.Module, ABC):
             frontier_map = binary_dilation(
                 frontier_map, self.select_border_kernel) - frontier_map
 
-            print("frontier_map.shape 2", frontier_map.shape)
-            import cv2
-            import numpy as np
-            frontier_map = frontier_map[0].cpu().numpy()
-            cv2.imwrite("frontier_map.png", (frontier_map / frontier_map.max() * 255).astype(np.uint8))
-            yaw = local_pose[e, 2].item()
-            print("yaw", yaw)
-
             # Select the intersection between the frontier and the
             # direction of the object beyond the maximum depth sensed
-            # TODO Start from here
+            yaw = local_pose[e, 2].item()
             start_y = start_x = line_length = map_size // 2
             end_y = start_y + line_length * math.sin(math.radians(-yaw))
             end_x = start_x + line_length * math.cos(math.radians(-yaw))
             print("(end_y, end_x)", (end_y, end_x))
-            # draw_line((start_y, start_x), (end_y, end_x), frontier_map[e])
+            draw_line((start_y, start_x), (end_y, end_x), frontier_map[0])
             # TODO Add angle within the frame (if necessary)
+
+            import cv2
+            import numpy as np
+            frontier_map = frontier_map[0].cpu().numpy()
+            cv2.imwrite("frontier_map.png",
+                        (frontier_map / frontier_map.max() * 255).astype(
+                            np.uint8))
 
         return goal_map, found_hint
 
