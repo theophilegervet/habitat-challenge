@@ -30,12 +30,18 @@ class SemanticExplorationPolicy(Policy):
         )
         self.dist = DiagGaussian(self.network.output_size, num_outputs)
 
+        state_dict = torch.load("submission/policy/semantic_exploration_policy.pth",
+                                map_location="cpu")
+        self.load_state_dict(state_dict, strict=False)
+
     def explore_otherwise(self,
                           map_features,
-                          orientation,
+                          global_pose,
                           goal_category,
                           goal_map,
                           found_goal):
+        orientation = torch.div(global_pose[:, 2] % 360, 5,
+                                rounding_mode='trunc').long()
         dist = self.dist(self.network(map_features, orientation, goal_category))
 
         if self.deterministic:
@@ -53,7 +59,9 @@ class SemanticExplorationPolicy(Policy):
         # indicates that the goal action is (column, row) - i.e., we index map[goal[1], goal[0]]
         action = action.flip(-1)
 
-        return action
+        # TODO Use action to set goal in map
+
+        return goal_map
 
 
 class Goal_Oriented_Semantic_Policy(NNBase):

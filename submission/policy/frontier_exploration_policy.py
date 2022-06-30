@@ -29,7 +29,7 @@ class FrontierExplorationPolicy(Policy):
 
     def explore_otherwise(self,
                           map_features,
-                          orientation,
+                          global_pose,
                           goal_category,
                           goal_map,
                           found_goal):

@@ -20,12 +20,12 @@ class Policy(nn.Module, ABC):
             requires_grad=False
         )
 
-    def forward(self, map_features, orientation, goal_category):
+    def forward(self, map_features, global_pose, goal_category):
         """
         Arguments:
             map_features: semantic map features of shape
              (batch_size, channels, M, M)
-            orientation: discretized agent yaw
+            global_pose: global agent pose
             goal_category: semantic goal category
 
         Returns:
@@ -35,7 +35,7 @@ class Policy(nn.Module, ABC):
         """
         goal_map, found_goal = self.reach_goal_if_found(map_features, goal_category)
         goal_map = self.explore_otherwise(
-            map_features, orientation, goal_category, goal_map, found_goal)
+            map_features, global_pose, goal_category, goal_map, found_goal)
         return goal_map, found_goal
 
     def reach_goal_if_found(self, map_features, goal_category):
@@ -85,7 +85,7 @@ class Policy(nn.Module, ABC):
     @abstractmethod
     def explore_otherwise(self,
                           map_features,
-                          orientation,
+                          global_pose,
                           goal_category,
                           goal_map,
                           found_goal):
