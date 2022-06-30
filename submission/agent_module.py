@@ -95,22 +95,19 @@ class AgentModule(nn.Module):
             init_origins
         )
 
-        print("global_pose", seq_global_pose.flatten(0, 1))
-        print("local_pose", seq_local_pose.flatten(0, 1))
-
         # t1 = time.time()
         # print(f"[Semantic mapping] Total time: {t1 - t0:.2f}")
 
         # Predict high-level goals from map features
         # batched across sequence length x num environments
         map_features = seq_map_features.flatten(0, 1)
-        global_pose = seq_global_pose.flatten(0, 1)
+        local_pose = seq_local_pose.flatten(0, 1)
         goal_category = seq_goal_category.flatten(0, 1)
         obs = seq_obs.flatten(0, 1)
         (
             goal_map,
             found_goal,
-        ) = self.policy(map_features, global_pose, goal_category, obs)
+        ) = self.policy(map_features, local_pose, goal_category, obs)
         seq_goal_map = goal_map.view(batch_size, sequence_length, *goal_map.shape[-2:])
         seq_found_goal = found_goal.view(batch_size, sequence_length)
 

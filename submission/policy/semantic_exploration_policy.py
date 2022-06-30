@@ -49,7 +49,7 @@ class SemanticExplorationPolicy(Policy):
 
     def explore_otherwise(self,
                           map_features,
-                          global_pose,
+                          local_pose,
                           goal_category,
                           goal_map,
                           found_goal,
@@ -57,7 +57,7 @@ class SemanticExplorationPolicy(Policy):
         batch_size, goal_map_size, _ = goal_map.shape
 
         orientation = torch.div(
-            global_pose[:, 2] % 360, 5, rounding_mode='trunc').long()
+            local_pose[:, 2] % 360, 5, rounding_mode='trunc').long()
         map_features = F.avg_pool2d(map_features, self.training_downscaling)
 
         dist = self.dist(self.network(map_features, orientation, goal_category))

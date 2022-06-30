@@ -1,7 +1,3 @@
-import torch
-import torch.nn as nn
-import skimage.morphology
-
 from .policy import Policy
 from .utils.morphology import binary_dilation
 
@@ -14,26 +10,13 @@ class FrontierExplorationPolicy(Policy):
     def __init__(self, config):
         super().__init__(config)
 
-        self.dilate_explored_kernel = nn.Parameter(
-            torch.from_numpy(
-                skimage.morphology.disk(10)
-            ).unsqueeze(0).unsqueeze(0).float(),
-            requires_grad=False
-        )
-        self.select_border_kernel = nn.Parameter(
-            torch.from_numpy(
-                skimage.morphology.disk(1)
-            ).unsqueeze(0).unsqueeze(0).float(),
-            requires_grad=False
-        )
-
     @property
     def goal_update_steps(self):
         return 1
 
     def explore_otherwise(self,
                           map_features,
-                          global_pose,
+                          local_pose,
                           goal_category,
                           goal_map,
                           found_goal,

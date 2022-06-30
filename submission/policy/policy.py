@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 import torch
 import torch.nn as nn
+import skimage.morphology
 
 import skimage.morphology
-from .utils.morphology import binary_denoising
+from .utils.morphology import binary_denoising, binary_dilation
 from submission.utils.constants import MAX_DEPTH_REPLACEMENT_VALUE
 
 
@@ -20,18 +21,30 @@ class Policy(nn.Module, ABC):
             ).unsqueeze(0).unsqueeze(0).float(),
             requires_grad=False
         )
+        self.dilate_explored_kernel = nn.Parameter(
+            torch.from_numpy(
+                skimage.morphology.disk(10)
+            ).unsqueeze(0).unsqueeze(0).float(),
+            requires_grad=False
+        )
+        self.select_border_kernel = nn.Parameter(
+            torch.from_numpy(
+                skimage.morphology.disk(1)
+            ).unsqueeze(0).unsqueeze(0).float(),
+            requires_grad=False
+        )
 
     @property
     @abstractmethod
     def goal_update_steps(self):
         pass
 
-    def forward(self, map_features, global_pose, goal_category, obs):
+    def forward(self, map_features, local_pose, goal_category, obs):
         """
         Arguments:
             map_features: semantic map features of shape
              (batch_size, 8 + num_sem_categories, M, M)
-            global_pose: global agent pose
+            local_pose: agent pose in local map
             goal_category: semantic goal category
             obs: frame containing (RGB, depth, segmentation) of shape
              (batch_size, 3 + 1 + num_sem_categories, frame_height, frame_width)
@@ -43,12 +56,18 @@ class Policy(nn.Module, ABC):
         """
         goal_map, found_goal = self.reach_goal_if_in_map(map_features, goal_category)
         goal_map, found_hint = self.look_for_hint_in_frame(
-            obs, global_pose, goal_category, goal_map, found_goal)
+            map_features, local_pose, goal_category, goal_map, found_goal, obs)
         goal_map = self.explore_otherwise(
-            map_features, global_pose, goal_category, goal_map, found_goal, found_hint)
+            map_features, local_pose, goal_category, goal_map, found_goal, found_hint)
         return goal_map, found_goal
 
-    def look_for_hint_in_frame(self, obs, global_pose, goal_category, goal_map, found_goal):
+    def look_for_hint_in_frame(self,
+                               map_features,
+                               local_pose,
+                               goal_category,
+                               goal_map,
+                               found_goal,
+                               obs):
         """
         If the goal category is not in the semantic map but is in the frame
         (beyond the maximum depth sensed and projected into the map) go
@@ -69,6 +88,23 @@ class Policy(nn.Module, ABC):
 
             if (category_frame[beyond_max_depth_mask[e]] == 1).sum() > 0:
                 print("Object in frame beyond max depth!")
+
+            # Select unexplored area
+            frontier_map = (map_features[[e], [1], :, :] == 0).float()
+
+            # Dilate explored area
+            frontier_map = 1 - binary_dilation(
+                1 - frontier_map, self.dilate_explored_kernel)
+
+            # Select the frontier
+            frontier_map = binary_dilation(
+                frontier_map, self.select_border_kernel) - frontier_map
+            print("frontier_map.shape", frontier_map.shape)
+
+            # Select the intersection between the frontier and the
+            # direction of the object beyond the maximum depth sensed
+            yaw = local_pose[e, 2].item()
+            print("yaw", yaw)
 
         return goal_map, found_hint
 
@@ -124,7 +160,7 @@ class Policy(nn.Module, ABC):
     @abstractmethod
     def explore_otherwise(self,
                           map_features,
-                          global_pose,
+                          local_pose,
                           goal_category,
                           goal_map,
                           found_goal,
