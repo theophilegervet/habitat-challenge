@@ -20,6 +20,11 @@ class Policy(nn.Module, ABC):
             requires_grad=False
         )
 
+    @property
+    @abstractmethod
+    def goal_update_steps(self):
+        pass
+
     def forward(self, map_features, global_pose, goal_category):
         """
         Arguments:

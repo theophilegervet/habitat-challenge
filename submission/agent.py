@@ -31,7 +31,6 @@ class Agent(habitat.Agent):
 
     def __init__(self, config: Config, rank: int, ddp: bool = False):
         self.max_steps = config.AGENT.max_steps
-        self.goal_update_steps = config.AGENT.goal_update_steps
         self.precision = torch.float16 if config.MIXED_PRECISION else torch.float32
         self.num_environments = config.NUM_ENVIRONMENTS
         if config.AGENT.panorama_start:
@@ -102,8 +101,9 @@ class Agent(habitat.Agent):
                  predictions
         """
         dones = torch.tensor([False] * self.num_environments)
+        # TODO update_global should be computed in the AgentModule
         update_global = torch.tensor(
-            [self.timesteps[e] % self.goal_update_steps == 0
+            [self.timesteps[e] % self.module.module.policy.goal_update_steps == 0
              for e in range(self.num_environments)])
         self.timesteps = [self.timesteps[e] + 1
                           for e in range(self.num_environments)]

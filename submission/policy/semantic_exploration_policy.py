@@ -15,6 +15,7 @@ class SemanticExplorationPolicy(Policy):
     def __init__(self, config):
         super().__init__(config)
 
+        self._goal_update_steps = config.AGENT.POLICY.SEMANTIC.goal_update_steps
         self.training_downscaling = config.AGENT.POLICY.SEMANTIC.training_downscaling
         self.map_resolution = config.AGENT.SEMANTIC_MAP.map_resolution
         num_sem_categories = config.ENVIRONMENT.num_sem_categories
@@ -41,6 +42,10 @@ class SemanticExplorationPolicy(Policy):
         state_dict = torch.load("submission/policy/semantic_exploration_policy.pth",
                                 map_location="cpu")
         self.load_state_dict(state_dict, strict=False)
+
+    @property
+    def goal_update_steps(self):
+        return self._goal_update_steps
 
     def explore_otherwise(self,
                           map_features,

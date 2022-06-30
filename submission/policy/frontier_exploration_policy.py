@@ -27,6 +27,10 @@ class FrontierExplorationPolicy(Policy):
             requires_grad=False
         )
 
+    @property
+    def goal_update_steps(self):
+        return 1
+
     def explore_otherwise(self,
                           map_features,
                           global_pose,

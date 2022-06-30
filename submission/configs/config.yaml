@@ -29,7 +29,6 @@ ENVIRONMENT:
   max_depth: 5.0          # maximum depth for depth sensor (in metres)
 
 AGENT:
-  goal_update_steps: 25   # frequency at which to update the high-level goal during inference
   max_steps: 498          # maximum number of steps before stopping an episode
   panorama_start: 0       # 1: turn around 360 degrees when starting an episode, 0: don't
 
@@ -49,7 +48,8 @@ AGENT:
     obs_dilation_selem_radius: 3    # radius (in cells) of obstacle dilation structuring element
 
   POLICY:
-    type: semantic  # one of "frontier" or "semantic"
+    type: frontier  # one of "frontier" or "semantic"
 
     SEMANTIC:
+      goal_update_steps: 25    # frequency at which to update the high-level goal during inference
       training_downscaling: 2  # ratio of map size in this code over map size used to train the policy
