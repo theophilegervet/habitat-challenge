@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from .policy import Policy
 from .utils.distributions import DiagGaussian
@@ -51,6 +52,7 @@ class SemanticExplorationPolicy(Policy):
             global_pose[:, 2] % 360, 5, rounding_mode='trunc').long()
         print(orientation)
         # TODO Downscale map_features
+        map_features = F.avg_pool2d(map_features, self.training_downscaling)
         print(map_features.shape)
         dist = self.dist(self.network(map_features, orientation, goal_category))
 
