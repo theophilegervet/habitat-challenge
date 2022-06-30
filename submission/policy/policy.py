@@ -105,20 +105,23 @@ class Policy(nn.Module, ABC):
             # Select the intersection between the frontier and the
             # direction of the object beyond the maximum depth sensed
             yaw = local_pose[e, 2].item()
+            direction_map = torch.zeros(map_size, map_size)
             start_y = start_x = line_length = map_size // 2
             end_y = start_y + line_length * math.sin(math.radians(-yaw))
             end_x = start_x + line_length * math.cos(math.radians(-yaw))
+            draw_line((start_y, start_x), (end_y, end_x), direction_map, steps=100)
+            direction_map = direction_map.to(frontier_map.device)
+            x = frontier_map.squeeze(0) * direction_map
+
+            # TODO Add angle within the frame (if necessary)
             print("yaw", yaw)
             print("(end_y, end_x)", (end_y, end_x))
-            draw_line((start_y, start_x), (end_y, end_x), frontier_map[0], steps=100)
-            # TODO Add angle within the frame (if necessary)
 
             import cv2
             import numpy as np
-            frontier_map = frontier_map[0].cpu().numpy()
-            cv2.imwrite("frontier_map.png",
-                        (frontier_map / frontier_map.max() * 255).astype(
-                            np.uint8))
+            cv2.imwrite("vis/frontier_map.png", (frontier_map[0].cpu().numpy() * 255).astype(np.uint8))
+            cv2.imwrite("vis/direction_map.png", (direction_map.cpu().numpy() * 255).astype(np.uint8))
+            cv2.imwrite("vis/goal_map.png", (x.cpu().numpy() * 255).astype(np.uint8))
 
         return goal_map, found_hint
 
