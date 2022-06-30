@@ -61,16 +61,16 @@ class Policy(nn.Module, ABC):
         found_hint = torch.zeros(batch_size, dtype=torch.bool, device=device)
 
         for e in range(batch_size):
-            if not found_goal[e]:
-                category_frame = obs[e, goal_category[e] + 4, :, :]
+            # if not found_goal[e]:
+            category_frame = obs[e, goal_category[e] + 4, :, :]
 
-                if (category_frame == 1).sum() > 0:
-                    print("Object in frame!")
-                    print("yaw", global_pose[e, 2].item())
+            if (category_frame == 1).sum() > 0:
+                print("Object in frame!")
+                print("yaw", global_pose[e, 2].item())
 
-                if (category_frame[beyond_max_depth_mask[e]] == 1).sum() > 0:
-                    print("Object in frame beyond max depth!")
-                    print("yaw", global_pose[e, 2].item())
+            if (category_frame[beyond_max_depth_mask[e]] == 1).sum() > 0:
+                print("Object in frame beyond max depth!")
+                print("yaw", global_pose[e, 2].item())
 
         return goal_map, found_hint
 
