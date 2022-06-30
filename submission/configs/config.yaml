@@ -49,4 +49,4 @@ AGENT:
     obs_dilation_selem_radius: 3    # radius (in cells) of obstacle dilation structuring element
 
   POLICY:
-    type: frontier  # one of "frontier" or "semantic"
+    type: semantic  # one of "frontier" or "semantic"
