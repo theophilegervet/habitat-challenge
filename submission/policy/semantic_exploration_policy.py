@@ -16,12 +16,12 @@ class SemanticExplorationPolicy(Policy):
         super().__init__(config)
 
         self.training_downscaling = config.AGENT.POLICY.SEMANTIC.training_downscaling
+        self.map_resolution = config.AGENT.SEMANTIC_MAP.map_resolution
         num_sem_categories = config.ENVIRONMENT.num_sem_categories
-        # TODO Policy was trained with local map size 240 => adapt to it
         local_map_size = (
             config.AGENT.SEMANTIC_MAP.map_size_cm //
             config.AGENT.SEMANTIC_MAP.global_downscaling //
-            config.AGENT.SEMANTIC_MAP.map_resolution //
+            self.map_resolution //
             self.training_downscaling
         )
         map_features_shape = (
@@ -48,27 +48,26 @@ class SemanticExplorationPolicy(Policy):
                           goal_category,
                           goal_map,
                           found_goal):
+        batch_size, goal_map_size, _ = goal_map.shape
+
         orientation = torch.div(
             global_pose[:, 2] % 360, 5, rounding_mode='trunc').long()
         map_features = F.avg_pool2d(map_features, self.training_downscaling)
-        print(map_features.device)
-        print(orientation.device)
-        print(goal_category.device)
-        print([x.device for x in self.network.parameters()])
-        print([x.device for x in self.dist.parameters()])
-        print()
-        x = self.network(map_features, orientation, goal_category)
-        print(x.device)
-        print()
-        dist = self.dist(x)
-        print(dist)
-        print()
+
+        dist = self.dist(self.network(map_features, orientation, goal_category))
+
         if self.deterministic:
             action = dist.mode()
         else:
             action = dist.sample()
-        print(action)
-        print()
+        print("action", action)
+
+        location = (nn.Sigmoid()(action) * (goal_map_size - 1)).long()
+        print("location", location)
+
+        for e in range(batch_size):
+            if not found_goal[e]:
+                goal_map[e, location[e]] = 1
 
         # TODO Is flipping necessary?
         # These lines
@@ -78,9 +77,7 @@ class SemanticExplorationPolicy(Policy):
         # while in this repo, this line
         # https://github.com/facebookresearch/fairo/blob/main/droidlet/lowlevel/locobot/remote/slam_pkg/utils/fmm_planner.py#L29
         # indicates that the goal action is (column, row) - i.e., we index map[goal[1], goal[0]]
-        action = action.flip(-1)
-
-        # TODO Use action to set goal in map
+        # action = action.flip(-1)
 
         return goal_map
 
