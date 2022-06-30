@@ -17,8 +17,8 @@ class SemanticExplorationPolicy(Policy):
         num_sem_categories = config.ENVIRONMENT.num_sem_categories
         local_map_size = (
             config.AGENT.SEMANTIC_MAP.map_size_cm //
-            self.global_downscaling //
-            self.resolution
+            config.AGENT.SEMANTIC_MAP.global_downscaling //
+            config.AGENT.SEMANTIC_MAP.resolution
         )
         map_features_shape = (
             config.ENVIRONMENT.num_sem_categories + 8,
