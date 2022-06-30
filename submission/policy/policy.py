@@ -42,32 +42,33 @@ class Policy(nn.Module, ABC):
              goal category of shape (batch_size,)
         """
         goal_map, found_goal = self.reach_goal_if_in_map(map_features, goal_category)
-        goal_map, found_hint = self.look_for_hint_in_frame(obs, goal_category, goal_map)
+        goal_map, found_hint = self.look_for_hint_in_frame(
+            obs, goal_category, goal_map, found_goal)
         goal_map = self.explore_otherwise(
             map_features, global_pose, goal_category, goal_map, found_goal, found_hint)
         return goal_map, found_goal
 
-    def look_for_hint_in_frame(self, obs, goal_category, goal_map):
+    def look_for_hint_in_frame(self, obs, goal_category, goal_map, found_goal):
         """
         If the goal category is not in the semantic map but is in the frame
-        beyond the maximum depth sensed, go towards it to get it in depth
-        range.
+        — either because it is below the category prediction threshold or
+        because it is beyond the maximum depth sensed — go towards it.
         """
         batch_size = obs.shape[0]
         device = obs.device
         beyond_max_depth_mask = obs[:, 3, :, :] == MAX_DEPTH_REPLACEMENT_VALUE
-        print("beyond_max_depth_mask.shape", beyond_max_depth_mask.shape)
 
         found_hint = torch.zeros(batch_size, dtype=torch.bool, device=device)
 
         for e in range(batch_size):
-            category_frame = obs[e, goal_category[e] + 4, :, :]
+            if not found_goal[e]:
+                category_frame = obs[e, goal_category[e] + 4, :, :]
 
-            if (category_frame == 1).sum() > 0:
-                print("Object in frame!")
+                if (category_frame == 1).sum() > 0:
+                    print("Object in frame!")
 
-            if (category_frame[beyond_max_depth_mask[e]] == 1).sum() > 0:
-                print("Object in frame beyond max depth!")
+                if (category_frame[beyond_max_depth_mask[e]] == 1).sum() > 0:
+                    print("Object in frame beyond max depth!")
 
         return goal_map, found_hint
 
