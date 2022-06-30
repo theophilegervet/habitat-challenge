@@ -29,10 +29,6 @@ class DiagGaussian(nn.Module):
 
     def forward(self, x):
         action_mean = self.fc_mean(x)
-
-        zeros = torch.zeros(action_mean.size())
-        if x.is_cuda:
-            zeros = zeros.cuda()
-
+        zeros = torch.zeros(action_mean.size()).to(x.device)
         action_logstd = self.logstd(zeros)
         return FixedNormal(action_mean, action_logstd.exp())
