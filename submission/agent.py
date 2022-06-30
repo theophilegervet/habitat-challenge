@@ -101,7 +101,8 @@ class Agent(habitat.Agent):
                  predictions
         """
         dones = torch.tensor([False] * self.num_environments)
-        # TODO update_global should be computed in the AgentModule
+        # TODO update_global should be computed in self.module instead of
+        #  accessing self.module.module.policy here
         update_global = torch.tensor(
             [self.timesteps[e] % self.module.module.policy.goal_update_steps == 0
              for e in range(self.num_environments)])
@@ -141,7 +142,7 @@ class Agent(habitat.Agent):
         goal_category = goal_category.cpu()
 
         for e in range(self.num_environments):
-            if update_global[e]:
+            if found_goal[e] or update_global[e]:
                 self.semantic_map.update_global_goal_for_env(e, goal_map[e])
 
         planner_inputs = [
