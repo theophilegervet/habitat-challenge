@@ -5,7 +5,7 @@ SIMULATOR_GPU_IDS: [0, 1] # IDs of GPUs to use for vectorized environments
 NO_GPU: 0                 # 1: ignore IDs above and run on CPU, 0: run on GPUs with IDs above
 NUM_ENVIRONMENTS: 10      # number of environments (per agent process)
 DUMP_LOCATION: data       # path to dump models and log
-EXP_NAME: semantic_exploration  # experiment name
+EXP_NAME: semantic_exploration_every25steps  # experiment name
 MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
 VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
 PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
@@ -29,7 +29,7 @@ ENVIRONMENT:
   max_depth: 5.0          # maximum depth for depth sensor (in metres)
 
 AGENT:
-  goal_update_steps: 1    # frequency at which to update the high-level goal during inference
+  goal_update_steps: 25   # frequency at which to update the high-level goal during inference
   max_steps: 498          # maximum number of steps before stopping an episode
   panorama_start: 0       # 1: turn around 360 degrees when starting an episode, 0: don't
 
