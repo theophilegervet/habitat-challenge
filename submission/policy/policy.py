@@ -109,7 +109,7 @@ class Policy(nn.Module, ABC):
             start_y = start_x = line_length = map_size // 2
             end_y = start_y + line_length * math.sin(math.radians(-yaw))
             end_x = start_x + line_length * math.cos(math.radians(-yaw))
-            draw_line((start_y, start_x), (end_y, end_x), direction_map, steps=100)
+            draw_line((start_y, start_x), (end_y, end_x), direction_map, steps=line_length)
             direction_map = direction_map.to(frontier_map.device)
             x = frontier_map.squeeze(0) * direction_map
 
