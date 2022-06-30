@@ -54,7 +54,7 @@ class SemanticExplorationPolicy(Policy):
         # TODO Downscale map_features
         map_features = F.avg_pool2d(map_features, self.training_downscaling)
         print(map_features.shape)
-        print(self.network.device)
+        print(next(self.network.parameters()).device)
         dist = self.dist(self.network(map_features, orientation, goal_category))
 
         if self.deterministic:
