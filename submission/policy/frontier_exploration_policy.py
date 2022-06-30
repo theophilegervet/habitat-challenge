@@ -36,7 +36,8 @@ class FrontierExplorationPolicy(Policy):
                           global_pose,
                           goal_category,
                           goal_map,
-                          found_goal):
+                          found_goal,
+                          found_hint):
         # Select unexplored area
         frontier_map = (map_features[:, [1], :, :] == 0).float()
 
@@ -50,7 +51,7 @@ class FrontierExplorationPolicy(Policy):
 
         batch_size = map_features.shape[0]
         for e in range(batch_size):
-            if not found_goal[e]:
+            if not found_goal[e] and not found_hint[e]:
                 goal_map[e] = frontier_map[e]
 
         return goal_map

@@ -52,7 +52,8 @@ class SemanticExplorationPolicy(Policy):
                           global_pose,
                           goal_category,
                           goal_map,
-                          found_goal):
+                          found_goal,
+                          found_hint):
         batch_size, goal_map_size, _ = goal_map.shape
 
         orientation = torch.div(
@@ -69,7 +70,7 @@ class SemanticExplorationPolicy(Policy):
         goal_location = (nn.Sigmoid()(action) * (goal_map_size - 1)).long()
 
         for e in range(batch_size):
-            if not found_goal[e]:
+            if not found_goal[e] and not found_hint[e]:
                 goal_map[e, goal_location[e, 0], goal_location[e, 1]] = 1
 
         return goal_map

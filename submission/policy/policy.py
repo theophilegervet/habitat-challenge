@@ -25,25 +25,38 @@ class Policy(nn.Module, ABC):
     def goal_update_steps(self):
         pass
 
-    def forward(self, map_features, global_pose, goal_category):
+    def forward(self, map_features, global_pose, goal_category, obs):
         """
         Arguments:
             map_features: semantic map features of shape
-             (batch_size, channels, M, M)
+             (batch_size, 8 + num_sem_categories, M, M)
             global_pose: global agent pose
             goal_category: semantic goal category
+            obs: frame containing (RGB, depth, segmentation) of shape
+             (batch_size, 3 + 1 + num_sem_categories, frame_height, frame_width)
 
         Returns:
             goal_map: binary map encoding goal(s) of shape (batch_size, M, M)
             found_goal: binary variables to denote whether we found the object
              goal category of shape (batch_size,)
         """
-        goal_map, found_goal = self.reach_goal_if_found(map_features, goal_category)
+        goal_map, found_goal = self.reach_goal_if_in_map(map_features, goal_category)
+        goal_map, found_hint = self.look_for_hint_in_frame(obs, goal_map)
         goal_map = self.explore_otherwise(
-            map_features, global_pose, goal_category, goal_map, found_goal)
+            map_features, global_pose, goal_category, goal_map, found_goal, found_hint)
         return goal_map, found_goal
 
-    def reach_goal_if_found(self, map_features, goal_category):
+    def look_for_hint_in_frame(self, obs, goal_map):
+        batch_size = obs.shape[0]
+        device = obs.device
+
+        found_hint = torch.zeros(batch_size, dtype=torch.bool, device=device)
+
+        # TODO Leverage objects detected further than the max depth threshold
+
+        return goal_map, found_hint
+
+    def reach_goal_if_in_map(self, map_features, goal_category):
         batch_size, _, height, width = map_features.shape
         device = map_features.device
         goal_category_cpu = goal_category.cpu().numpy()
@@ -93,5 +106,6 @@ class Policy(nn.Module, ABC):
                           global_pose,
                           goal_category,
                           goal_map,
-                          found_goal):
+                          found_goal,
+                          found_hint):
         pass

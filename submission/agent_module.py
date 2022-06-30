@@ -30,9 +30,8 @@ class AgentModule(nn.Module):
 
         Arguments:
             seq_obs: sequence of frames containing (RGB, depth, segmentation)
-             of shape (batch_size, sequence_length, channels, frame_height,
-             frame_width) where channels are one (3 + 1 + num_sem_categories)
-             or (3 + 1 + num_sem_categories + vision_features_dim)
+             of shape (batch_size, sequence_length, 3 + 1 + num_sem_categories,
+             frame_height, frame_width)
             seq_pose_delta: sequence of delta in pose since last frame of shape
              (batch_size, sequence_length, 3)
             seq_goal_category: sequence of goal categories of shape
@@ -104,10 +103,11 @@ class AgentModule(nn.Module):
         map_features = seq_map_features.flatten(0, 1)
         global_pose = seq_global_pose.flatten(0, 1)
         goal_category = seq_goal_category.flatten(0, 1)
+        obs = seq_obs.flatten(0, 1)
         (
             goal_map,
             found_goal,
-        ) = self.policy(map_features, global_pose, goal_category)
+        ) = self.policy(map_features, global_pose, goal_category, obs)
         seq_goal_map = goal_map.view(batch_size, sequence_length, *goal_map.shape[-2:])
         seq_found_goal = found_goal.view(batch_size, sequence_length)
 
