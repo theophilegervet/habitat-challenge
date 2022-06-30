@@ -67,7 +67,7 @@ class SemanticExplorationPolicy(Policy):
 
         for e in range(batch_size):
             if not found_goal[e]:
-                goal_map[e, location[e]] = 1
+                goal_map[e, *location[e]] = 1
 
         # TODO Is flipping necessary?
         # These lines
