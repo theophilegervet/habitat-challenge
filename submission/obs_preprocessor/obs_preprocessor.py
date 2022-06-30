@@ -89,16 +89,17 @@ class ObsPreprocessor:
     def preprocess_frame(self, obs: List[Observations]) -> Tuple[Tensor, np.ndarray]:
         """Preprocess frame information in the observation."""
         def preprocess_depth(depth):
+            # Rescale depth from [0.0, 1.0] to [min_depth, max_depth]
+            rescaled_depth = self.min_depth * 100. + depth * (self.max_depth - self.min_depth) * 100.
+
             # Depth at the boundaries of [min_depth, max_depth] has been
             # thresholded and should not be considered in the point cloud
             # and semantic map - the lines below ensure it's beyond
             # vision_range and does not get considered in the semantic map
-            depth[depth == 0.0] = MIN_DEPTH_REPLACEMENT_VALUE
-            depth[depth == 1.0] = MAX_DEPTH_REPLACEMENT_VALUE
+            rescaled_depth[depth == 0.0] = MIN_DEPTH_REPLACEMENT_VALUE
+            rescaled_depth[depth == 1.0] = MAX_DEPTH_REPLACEMENT_VALUE
 
-            # Rescale depth from [0.0, 1.0] to [min_depth, max_depth]
-            depth = self.min_depth * 100. + depth * (self.max_depth - self.min_depth) * 100.
-            return depth
+            return rescaled_depth
 
         def downscale(rgb, depth, semantic):
             h_downscaling = env_frame_height // self.frame_height
