@@ -17,6 +17,7 @@ class Policy(nn.Module, ABC):
     def __init__(self, config):
         super().__init__()
         self.hfov = config.ENVIRONMENT.hfov
+        self.frame_width = config.ENVIRONMENT.frame_width
 
         self.denoise_goal_kernel = nn.Parameter(
             torch.from_numpy(
@@ -113,7 +114,7 @@ class Policy(nn.Module, ABC):
             #  within the frame
             agent_angle = local_pose[e, 2].item()
             median_c = torch.nonzero(category_frame, as_tuple=True)[1].median()
-            frame_angle = median_c * self.hfov - self.hfov / 2
+            frame_angle = median_c / self.frame_width * self.hfov - self.hfov / 2
             print("agent_angle", agent_angle)
             print("mean_c", median_c)
             print("frame_angle", frame_angle)
