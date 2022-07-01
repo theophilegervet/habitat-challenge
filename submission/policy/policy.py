@@ -88,7 +88,9 @@ class Policy(nn.Module, ABC):
             # Only keep going if there's an instance of the goal
             # category in the frame detected beyond the maximum
             # depth sensed
-            if (category_frame[beyond_max_depth_mask[e]] == 1).sum() == 0:
+            # if (category_frame[beyond_max_depth_mask[e]] == 1).sum() == 0:
+            #     continue
+            if (category_frame == 1).sum() == 0:
                 continue
 
             # Select unexplored area
