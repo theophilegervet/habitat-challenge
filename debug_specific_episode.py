@@ -37,8 +37,10 @@ if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
     config.defrost()
     config.NUM_ENVIRONMENTS = 1
-    config.AGENT_GPU_IDS = [1]
-    config.EXP_NAME = "debug_specific_episode"
+    # config.AGENT_GPU_IDS = [1]
+    config.NO_GPU = 1
+    config.EXP_NAME = "debug_semantic"
+    config.AGENT.POLICY.type = "semantic"
     config.PRINT_IMAGES = 1
     config.freeze()
 
@@ -52,11 +54,22 @@ if __name__ == "__main__":
     agent.reset()
     agent.set_vis_dir(scene_id=scene_id, episode_id=episode_id)
 
-    t = 0
-    while not env.episode_over:
-        t += 1
-        print(t)
-        action = agent.act(obs)
-        obs = env.step(action)
+    # t = 0
+    # while not env.episode_over:
+    #     t += 1
+    #     print(t)
+    #     action = agent.act(obs)
+    #     obs = env.step(action)
+    #
+    # print(env.get_metrics())
 
-    print(env.get_metrics())
+    for ep_idx in range(100):
+        print(ep_idx)
+        obs = env.reset()
+        agent.reset()
+        t = 0
+        while not env.episode_over:
+            t += 1
+            print(t)
+            action = agent.act(obs)
+            obs = env.step(action)
