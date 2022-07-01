@@ -109,11 +109,14 @@ class Policy(nn.Module, ABC):
                 frontier_map, self.select_border_kernel) - frontier_map
 
             # Select the intersection between the frontier and the
-            # direction of the object beyond the maximum depth sensed
+            # direction of the object beyond the maximum depth
             agent_angle = local_pose[e, 2]
             median_col = torch.nonzero(category_frame, as_tuple=True)[1].median()
             frame_angle = median_col / self.frame_width * self.hfov - self.hfov / 2
             angle = (agent_angle + frame_angle).item()
+            print(agent_angle)
+            print(frame_angle)
+            print(angle)
             start_y = start_x = line_length = map_size // 2
             end_y = start_y + line_length * math.sin(math.radians(angle))
             end_x = start_x + line_length * math.cos(math.radians(angle))
