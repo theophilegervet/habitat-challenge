@@ -56,12 +56,9 @@ class SemanticExplorationPolicy(Policy):
                           found_hint):
         batch_size, goal_map_size, _ = goal_map.shape
 
-        orientation = torch.div(
-            local_pose[:, 2] % 360, 5, rounding_mode='trunc').long()
+        orientation = torch.div(torch.trunc(local_pose[:, 2]) % 360, 5).long()
         map_features = F.avg_pool2d(map_features, self.training_downscaling)
 
-        print("orientation", orientation)
-        print("goal_category", goal_category)
         dist = self.dist(self.network(map_features, orientation, goal_category))
 
         if self.deterministic:
