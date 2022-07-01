@@ -130,53 +130,58 @@ class Policy(nn.Module, ABC):
         """
         batch_size, _, map_size, _ = map_features.shape
         device = obs.device
-        beyond_max_depth = obs[:, 3, :, :] == MAX_DEPTH_REPLACEMENT_VALUE
+        beyond_max_depth_mask = obs[:, 3, :, :] == MAX_DEPTH_REPLACEMENT_VALUE
 
         found_hint = torch.zeros(batch_size, dtype=torch.bool, device=device)
 
         for e in range(batch_size):
-            if not found_goal[e]:
-                cat_frame = obs[e, goal_category[e] + 4, :, :]
-                cat_frame_beyond_max_depth = cat_frame[beyond_max_depth[e]]
+            # Only look for a hint if we haven't found the goal yet
+            if found_goal[e]:
+                continue
 
-                # Only keep going if there's an instance of the goal category
-                # in the frame detected beyond the maximum depth
-                if (cat_frame_beyond_max_depth == 1).sum() == 0:
-                    continue
+            cat_frame = obs[e, goal_category[e] + 4, :, :]
+            cat_frame_beyond_max_depth = cat_frame * beyond_max_depth_mask[e]
 
-                # Select unexplored area
-                frontier_map = (map_features[e, [1], :, :] == 0).float()
+            # Only keep going if there's an instance of the goal category
+            # in the frame detected beyond the maximum depth
+            if (cat_frame_beyond_max_depth == 1).sum() == 0:
+                continue
 
-                # Dilate explored area
-                frontier_map = 1 - binary_dilation(
-                    1 - frontier_map, self.dilate_explored_kernel)
+            print("Found a hint in the frame beyond the maximum depth!")
 
-                # Select the frontier
-                frontier_map = binary_dilation(
-                    frontier_map, self.select_border_kernel) - frontier_map
+            # Select unexplored area
+            frontier_map = (map_features[e, [1], :, :] == 0).float()
 
-                # Select the intersection between the frontier and the
-                # direction of the object beyond the maximum depth
-                agent_angle = local_pose[e, 2]
-                median_col = torch.nonzero(
-                    cat_frame_beyond_max_depth,
-                    as_tuple=True
-                )[1].median()
-                frame_angle = -(median_col / self.frame_width * self.hfov - self.hfov / 2)
-                angle = (agent_angle + frame_angle).item()
-                start_y = start_x = line_length = map_size // 2
-                end_y = start_y + line_length * math.sin(math.radians(angle))
-                end_x = start_x + line_length * math.cos(math.radians(angle))
-                direction_map = torch.zeros(map_size, map_size)
-                draw_line(
-                    (start_y, start_x),
-                    (end_y, end_x),
-                    direction_map,
-                    steps=line_length
-                )
-                direction_map = direction_map.to(frontier_map.device)
-                goal_map[e] = frontier_map.squeeze(0) * direction_map
-                found_hint[e] = True
+            # Dilate explored area
+            frontier_map = 1 - binary_dilation(
+                1 - frontier_map, self.dilate_explored_kernel)
+
+            # Select the frontier
+            frontier_map = binary_dilation(
+                frontier_map, self.select_border_kernel) - frontier_map
+
+            # Select the intersection between the frontier and the
+            # direction of the object beyond the maximum depth
+            agent_angle = local_pose[e, 2]
+            median_col = torch.nonzero(
+                cat_frame_beyond_max_depth,
+                as_tuple=True
+            )[1].median()
+            frame_angle = -(median_col / self.frame_width * self.hfov - self.hfov / 2)
+            angle = (agent_angle + frame_angle).item()
+            start_y = start_x = line_length = map_size // 2
+            end_y = start_y + line_length * math.sin(math.radians(angle))
+            end_x = start_x + line_length * math.cos(math.radians(angle))
+            direction_map = torch.zeros(map_size, map_size)
+            draw_line(
+                (start_y, start_x),
+                (end_y, end_x),
+                direction_map,
+                steps=line_length
+            )
+            direction_map = direction_map.to(frontier_map.device)
+            goal_map[e] = frontier_map.squeeze(0) * direction_map
+            found_hint[e] = True
 
         return goal_map, found_hint
 
