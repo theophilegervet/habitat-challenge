@@ -16,6 +16,7 @@ class Policy(nn.Module, ABC):
     """
     def __init__(self, config):
         super().__init__()
+        self.hint_in_frame = config.AGENT.POLICY.hint_in_frame
         self.hfov = config.ENVIRONMENT.hfov
         self.frame_width = config.ENVIRONMENT.frame_width
 
@@ -133,6 +134,9 @@ class Policy(nn.Module, ABC):
         beyond_max_depth_mask = obs[:, 3, :, :] == MAX_DEPTH_REPLACEMENT_VALUE
 
         found_hint = torch.zeros(batch_size, dtype=torch.bool, device=device)
+
+        if not self.hint_in_frame:
+            return goal_map, found_hint
 
         for e in range(batch_size):
             # Only look for a hint if we haven't found the goal yet

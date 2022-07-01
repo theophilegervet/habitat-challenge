@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-python eval_vectorized.py AGENT.SEMANTIC_MAP.vision_range 100 EXP_NAME vision_range_100
-python eval_vectorized.py AGENT.SEMANTIC_MAP.vision_range 120 EXP_NAME vision_range_120
-python eval_vectorized.py AGENT.SEMANTIC_MAP.vision_range 80 EXP_NAME vision_range_80
-python eval_vectorized.py AGENT.SEMANTIC_MAP.vision_range 140 EXP_NAME vision_range_140
+python eval_vectorized.py AGENT.POLICY.hint_in_frame 1 EXP_NAME jul1_hint_in_frame
+python eval_vectorized.py AGENT.POLICY.type semantic EXP_NAME jul1_semantic_exploration
+python eval_vectorized.py AGENT.panorama_start 1 EXP_NAME jul1_panorama_start
