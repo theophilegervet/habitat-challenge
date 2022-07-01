@@ -112,7 +112,7 @@ class Policy(nn.Module, ABC):
             # direction of the object beyond the maximum depth
             agent_angle = local_pose[e, 2]
             median_col = torch.nonzero(category_frame, as_tuple=True)[1].median()
-            frame_angle = median_col / self.frame_width * self.hfov - self.hfov / 2
+            frame_angle = -(median_col / self.frame_width * self.hfov - self.hfov / 2)
             angle = (agent_angle + frame_angle).item()
             print(agent_angle)
             print(frame_angle)
