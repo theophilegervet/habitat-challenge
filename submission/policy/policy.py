@@ -110,17 +110,13 @@ class Policy(nn.Module, ABC):
 
             # Select the intersection between the frontier and the
             # direction of the object beyond the maximum depth sensed
-            # TODO Refine the direction with the position of the object
-            #  within the frame
-            agent_angle = local_pose[e, 2].item()
-            median_c = torch.nonzero(category_frame, as_tuple=True)[1].median()
-            frame_angle = median_c / self.frame_width * self.hfov - self.hfov / 2
-            print("agent_angle", agent_angle)
-            print("mean_c", median_c)
-            print("frame_angle", frame_angle)
+            agent_angle = local_pose[e, 2]
+            median_col = torch.nonzero(category_frame, as_tuple=True)[1].median()
+            frame_angle = median_col / self.frame_width * self.hfov - self.hfov / 2
+            angle = (agent_angle + frame_angle).item()
             start_y = start_x = line_length = map_size // 2
-            end_y = start_y + line_length * math.sin(math.radians(agent_angle))
-            end_x = start_x + line_length * math.cos(math.radians(agent_angle))
+            end_y = start_y + line_length * math.sin(math.radians(angle))
+            end_x = start_x + line_length * math.cos(math.radians(angle))
             direction_map = torch.zeros(map_size, map_size)
             draw_line((start_y, start_x), (end_y, end_x), direction_map, steps=line_length)
             direction_map = direction_map.to(frontier_map.device)
