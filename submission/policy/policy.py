@@ -114,6 +114,7 @@ class Policy(nn.Module, ABC):
             draw_line((start_y, start_x), (end_y, end_x), direction_map, steps=line_length)
             direction_map = direction_map.to(frontier_map.device)
             goal_map[e] = frontier_map.squeeze(0) * direction_map
+            found_hint[e] = True
 
             # TODO Add angle within the frame (if necessary)
             print("yaw", yaw)
