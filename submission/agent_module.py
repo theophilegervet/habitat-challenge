@@ -56,7 +56,8 @@ class AgentModule(nn.Module):
              (batch_size, sequence_length, M, M)
             seq_found_goal: binary variables to denote whether we found the object
              goal category of shape (batch_size, sequence_length)
-             (batch_size, sequence_length, 2)
+            seq_found_hint: binary variables to denote whether we found a hint of
+             the object goal category of shape (batch_size, sequence_length)
             final_local_map: final local map after all updates of shape
              (batch_size, 4 + num_sem_categories, M, M)
             final_global_map: final global map after all updates of shape
@@ -107,9 +108,11 @@ class AgentModule(nn.Module):
         (
             goal_map,
             found_goal,
+            found_hint
         ) = self.policy(map_features, local_pose, goal_category, obs)
         seq_goal_map = goal_map.view(batch_size, sequence_length, *goal_map.shape[-2:])
         seq_found_goal = found_goal.view(batch_size, sequence_length)
+        seq_found_hint = found_hint.view(batch_size, sequence_length)
 
         # t2 = time.time()
         # print(f"[Policy] Total time: {t2 - t1:.2f}")
@@ -117,6 +120,7 @@ class AgentModule(nn.Module):
         return (
             seq_goal_map,
             seq_found_goal,
+            seq_found_hint,
             final_local_map,
             final_global_map,
             seq_local_pose,

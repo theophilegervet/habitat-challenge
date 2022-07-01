@@ -55,13 +55,15 @@ class Policy(nn.Module, ABC):
             goal_map: binary map encoding goal(s) of shape (batch_size, M, M)
             found_goal: binary variables to denote whether we found the object
              goal category of shape (batch_size,)
+            found_hint: binary variables to denote whether we found a hint of
+             the object goal category of shape (batch_size,)
         """
         goal_map, found_goal = self.reach_goal_if_in_map(map_features, goal_category)
         goal_map, found_hint = self.look_for_hint_in_frame(
             map_features, local_pose, goal_category, goal_map, found_goal, obs)
         goal_map = self.explore_otherwise(
             map_features, local_pose, goal_category, goal_map, found_goal, found_hint)
-        return goal_map, found_goal
+        return goal_map, found_goal, found_hint
 
     def look_for_hint_in_frame(self,
                                map_features,

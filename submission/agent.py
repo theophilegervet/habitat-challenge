@@ -112,6 +112,7 @@ class Agent(habitat.Agent):
         (
             goal_map,
             found_goal,
+            found_hint,
             self.semantic_map.local_map,
             self.semantic_map.global_map,
             seq_local_pose,
@@ -142,7 +143,7 @@ class Agent(habitat.Agent):
         goal_category = goal_category.cpu()
 
         for e in range(self.num_environments):
-            if found_goal[e] or update_global[e]:
+            if found_goal[e] or found_hint[e] or update_global[e]:
                 self.semantic_map.update_global_goal_for_env(e, goal_map[e])
 
         planner_inputs = [
