@@ -110,8 +110,8 @@ class Policy(nn.Module, ABC):
             # direction of the object beyond the maximum depth sensed
             yaw = local_pose[e, 2].item()
             start_y = start_x = line_length = map_size // 2
-            end_y = start_y + line_length * math.sin(math.radians(-yaw))
-            end_x = start_x + line_length * math.cos(math.radians(-yaw))
+            end_y = start_y + line_length * math.sin(math.radians(yaw))
+            end_x = start_x + line_length * math.cos(math.radians(yaw))
             direction_map = torch.zeros(map_size, map_size)
             draw_line((start_y, start_x), (end_y, end_x), direction_map, steps=line_length)
             direction_map = direction_map.to(frontier_map.device)
