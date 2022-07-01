@@ -13,6 +13,10 @@ class AgentModule(nn.Module):
         self.semantic_map_module = SemanticMapModule(config)
         self.policy = policy
 
+    @property
+    def goal_update_steps(self):
+        return self.policy.goal_update_steps
+
     def forward(self,
                 seq_obs,
                 seq_pose_delta,

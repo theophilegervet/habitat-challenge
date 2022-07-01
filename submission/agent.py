@@ -39,7 +39,7 @@ class Agent(habitat.Agent):
             self.panorama_start_steps = 0
 
         policy = exploration_policies[config.AGENT.POLICY.type](config)
-        self.module = AgentModule(config, policy)
+        self._module = AgentModule(config, policy)
 
         if config.NO_GPU:
             self.device = torch.device("cpu")
@@ -47,14 +47,14 @@ class Agent(habitat.Agent):
         else:
             self.device_id = config.AGENT_GPU_IDS[rank]
             self.device = torch.device(f"cuda:{self.device_id}")
-            self.module = self.module.to(self.device)
+            self._module = self._module.to(self.device)
             if ddp:
                 self.module = DistributedDataParallel(
-                    self.module, device_ids=[self.device_id])
+                    self._module, device_ids=[self.device_id])
             else:
                 # Use DataParallel only as a wrapper to move model inputs to GPU
                 self.module = DataParallel(
-                    self.module, device_ids=[self.device_id])
+                    self._module, device_ids=[self.device_id])
 
         self.obs_preprocessor = ObsPreprocessor(
             config, self.num_environments, self.device)
@@ -62,7 +62,10 @@ class Agent(habitat.Agent):
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
 
+        self.goal_update_steps = self._module.goal_update_steps
+        self.hint_follow_steps = config.AGENT.POLICY.hint_follow_steps
         self.timesteps = None
+        self.timesteps_before_goal_update = None
 
     # ------------------------------------------------------------------
     # Inference methods to interact with vectorized environments
@@ -101,13 +104,10 @@ class Agent(habitat.Agent):
                  predictions
         """
         dones = torch.tensor([False] * self.num_environments)
-        # TODO update_global should be computed in self.module instead of
-        #  accessing self.module.module.policy here
-        update_global = torch.tensor(
-            [self.timesteps[e] % self.module.module.policy.goal_update_steps == 0
-             for e in range(self.num_environments)])
-        self.timesteps = [self.timesteps[e] + 1
-                          for e in range(self.num_environments)]
+        update_global = torch.tensor([
+            self.timesteps_before_goal_update[e] == 0
+            for e in range(self.num_environments)
+        ])
 
         (
             goal_map,
@@ -143,8 +143,22 @@ class Agent(habitat.Agent):
         goal_category = goal_category.cpu()
 
         for e in range(self.num_environments):
-            if found_goal[e] or found_hint[e] or update_global[e]:
+            if found_goal[e]:
                 self.semantic_map.update_global_goal_for_env(e, goal_map[e])
+            elif found_hint[e]:
+                self.semantic_map.update_global_goal_for_env(e, goal_map[e])
+                self.timesteps_before_goal_update[e] = self.hint_follow_steps
+            elif self.timesteps_before_goal_update[e] == 0:
+                self.semantic_map.update_global_goal_for_env(e, goal_map[e])
+                self.timesteps_before_goal_update[e] = self.goal_update_steps
+
+        self.timesteps = [
+            self.timesteps[e] + 1 for e in range(self.num_environments)
+        ]
+        self.timesteps_before_goal_update = [
+            self.timesteps_before_goal_update[e] - 1
+            for e in range(self.num_environments)
+        ]
 
         planner_inputs = [
             {
@@ -170,11 +184,13 @@ class Agent(habitat.Agent):
     def reset_vectorized(self):
         """Initialize agent state."""
         self.timesteps = [0] * self.num_environments
+        self.timesteps_before_goal_update = [0] * self.num_environments
         self.semantic_map.init_map_and_pose()
 
     def reset_vectorized_for_env(self, e: int):
         """Initialize agent state for a specific environment."""
         self.timesteps[e] = 0
+        self.timesteps_before_goal_update[e] = 0
         self.semantic_map.init_map_and_pose_for_env(e)
 
     # ------------------------------------------------------------------
