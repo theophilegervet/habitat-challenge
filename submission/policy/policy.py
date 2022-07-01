@@ -112,10 +112,10 @@ class Policy(nn.Module, ABC):
             # TODO Refine the direction with the position of the object
             #  within the frame
             agent_angle = local_pose[e, 2].item()
-            mean_c = torch.nonzero(category_frame, as_tuple=True)[1].mean()
-            frame_angle = mean_c * self.hfov - self.hfov // 2
+            median_c = torch.nonzero(category_frame, as_tuple=True)[1].median()
+            frame_angle = median_c * self.hfov - self.hfov / 2
             print("agent_angle", agent_angle)
-            print("mean_c", mean_c)
+            print("mean_c", median_c)
             print("frame_angle", frame_angle)
             start_y = start_x = line_length = map_size // 2
             end_y = start_y + line_length * math.sin(math.radians(agent_angle))
