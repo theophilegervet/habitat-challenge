@@ -82,45 +82,45 @@ class Policy(nn.Module, ABC):
         found_hint = torch.zeros(batch_size, dtype=torch.bool, device=device)
 
         for e in range(batch_size):
-            if not found_goal[e]:
-                category_frame = obs[e, goal_category[e] + 4, :, :]
+            # if not found_goal[e]:
+            category_frame = obs[e, goal_category[e] + 4, :, :]
 
-                # Only keep going if there's an instance of the goal
-                # category in the frame detected beyond the maximum
-                # depth sensed
-                if (category_frame[beyond_max_depth_mask[e]] == 1).sum() == 0:
-                    continue
+            # Only keep going if there's an instance of the goal
+            # category in the frame detected beyond the maximum
+            # depth sensed
+            if (category_frame[beyond_max_depth_mask[e]] == 1).sum() == 0:
+                continue
 
-                # Select unexplored area
-                frontier_map = (map_features[e, [1], :, :] == 0).float()
+            # Select unexplored area
+            frontier_map = (map_features[e, [1], :, :] == 0).float()
 
-                # Dilate explored area
-                frontier_map = 1 - binary_dilation(
-                    1 - frontier_map, self.dilate_explored_kernel)
+            # Dilate explored area
+            frontier_map = 1 - binary_dilation(
+                1 - frontier_map, self.dilate_explored_kernel)
 
-                # Select the frontier
-                frontier_map = binary_dilation(
-                    frontier_map, self.select_border_kernel) - frontier_map
+            # Select the frontier
+            frontier_map = binary_dilation(
+                frontier_map, self.select_border_kernel) - frontier_map
 
-                # Select the intersection between the frontier and the
-                # direction of the object beyond the maximum depth sensed
-                yaw = local_pose[e, 2].item()
-                start_y = start_x = line_length = map_size // 2
-                end_y = start_y + line_length * math.sin(math.radians(-yaw))
-                end_x = start_x + line_length * math.cos(math.radians(-yaw))
-                direction_map = torch.zeros(map_size, map_size)
-                draw_line((start_y, start_x), (end_y, end_x), direction_map, steps=line_length)
-                direction_map = direction_map.to(frontier_map.device)
-                goal_map[e] = frontier_map.squeeze(0) * direction_map
+            # Select the intersection between the frontier and the
+            # direction of the object beyond the maximum depth sensed
+            yaw = local_pose[e, 2].item()
+            start_y = start_x = line_length = map_size // 2
+            end_y = start_y + line_length * math.sin(math.radians(-yaw))
+            end_x = start_x + line_length * math.cos(math.radians(-yaw))
+            direction_map = torch.zeros(map_size, map_size)
+            draw_line((start_y, start_x), (end_y, end_x), direction_map, steps=line_length)
+            direction_map = direction_map.to(frontier_map.device)
+            goal_map[e] = frontier_map.squeeze(0) * direction_map
 
-                # TODO Add angle within the frame (if necessary)
-                print("yaw", yaw)
-                print("(end_y, end_x)", (end_y, end_x))
-                import cv2
-                import numpy as np
-                cv2.imwrite("vis/frontier_map.png", (frontier_map[0].cpu().numpy() * 255).astype(np.uint8))
-                cv2.imwrite("vis/direction_map.png", (direction_map.cpu().numpy() * 255).astype(np.uint8))
-                cv2.imwrite("vis/goal_map.png", (goal_map[e].cpu().numpy() * 255).astype(np.uint8))
+            # TODO Add angle within the frame (if necessary)
+            print("yaw", yaw)
+            print("(end_y, end_x)", (end_y, end_x))
+            import cv2
+            import numpy as np
+            cv2.imwrite("vis/frontier_map.png", (frontier_map[0].cpu().numpy() * 255).astype(np.uint8))
+            cv2.imwrite("vis/direction_map.png", (direction_map.cpu().numpy() * 255).astype(np.uint8))
+            cv2.imwrite("vis/goal_map.png", (goal_map[e].cpu().numpy() * 255).astype(np.uint8))
 
         return goal_map, found_hint
 
