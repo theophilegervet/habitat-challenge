@@ -16,6 +16,7 @@ class Policy(nn.Module, ABC):
     """
     def __init__(self, config):
         super().__init__()
+        self.hfov = config.ENVIRONMENT.hfov
 
         self.denoise_goal_kernel = nn.Parameter(
             torch.from_numpy(
@@ -108,24 +109,22 @@ class Policy(nn.Module, ABC):
 
             # Select the intersection between the frontier and the
             # direction of the object beyond the maximum depth sensed
-            yaw = local_pose[e, 2].item()
+            # TODO Refine the direction with the position of the object
+            #  within the frame
+            agent_angle = local_pose[e, 2].item()
+            mean_c = torch.nonzero(category_frame, as_tuple=True)[1].mean()
+            frame_angle = mean_c * self.hfov - self.hfov // 2
+            print("agent_angle", agent_angle)
+            print("mean_c", mean_c)
+            print("frame_angle", frame_angle)
             start_y = start_x = line_length = map_size // 2
-            end_y = start_y + line_length * math.sin(math.radians(yaw))
-            end_x = start_x + line_length * math.cos(math.radians(yaw))
+            end_y = start_y + line_length * math.sin(math.radians(agent_angle))
+            end_x = start_x + line_length * math.cos(math.radians(agent_angle))
             direction_map = torch.zeros(map_size, map_size)
             draw_line((start_y, start_x), (end_y, end_x), direction_map, steps=line_length)
             direction_map = direction_map.to(frontier_map.device)
             goal_map[e] = frontier_map.squeeze(0) * direction_map
             found_hint[e] = True
-
-            # TODO Add angle within the frame (if necessary)
-            print("yaw", yaw)
-            print("(end_y, end_x)", (end_y, end_x))
-            import cv2
-            import numpy as np
-            cv2.imwrite("vis/frontier_map.png", (frontier_map[0].cpu().numpy() * 255).astype(np.uint8))
-            cv2.imwrite("vis/direction_map.png", (direction_map.cpu().numpy() * 255).astype(np.uint8))
-            cv2.imwrite("vis/goal_map.png", (goal_map[e].cpu().numpy() * 255).astype(np.uint8))
 
         return goal_map, found_hint
 
