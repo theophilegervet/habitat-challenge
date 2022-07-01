@@ -106,11 +106,6 @@ class Agent(habitat.Agent):
         update_global = torch.tensor(
             [self.timesteps[e] % self.module.module.policy.goal_update_steps == 0
              for e in range(self.num_environments)])
-        # TODO Temp to debug semantic policy on CPU
-        # update_global = torch.tensor(
-        #     [self.timesteps[
-        #          e] % self.module.policy.goal_update_steps == 0
-        #      for e in range(self.num_environments)])
         self.timesteps = [self.timesteps[e] + 1
                           for e in range(self.num_environments)]
 

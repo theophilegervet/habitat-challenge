@@ -37,8 +37,7 @@ if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
     config.defrost()
     config.NUM_ENVIRONMENTS = 1
-    # config.AGENT_GPU_IDS = [1]
-    config.NO_GPU = 1
+    config.AGENT_GPU_IDS = [1]
     config.EXP_NAME = "debug_semantic"
     config.AGENT.POLICY.type = "semantic"
     config.PRINT_IMAGES = 1
