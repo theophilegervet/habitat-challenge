@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from selectors import EpollSelector
 import torch
 import torch.nn as nn
 import skimage.morphology
@@ -151,7 +152,7 @@ class Policy(nn.Module, ABC):
             if (cat_frame_beyond_max_depth == 1).sum() == 0:
                 continue
 
-            print("Found a hint in the frame beyond the maximum depth!")
+            print("Found a hint in the frame beyond the maximum depth")
 
             # Select unexplored area
             frontier_map = (map_features[e, [1], :, :] == 0).float()
@@ -184,7 +185,14 @@ class Policy(nn.Module, ABC):
                 steps=line_length
             )
             direction_map = direction_map.to(frontier_map.device)
-            goal_map[e] = frontier_map.squeeze(0) * direction_map
+            direction_frontier_map = frontier_map.squeeze(0) * direction_map
+            if direction_frontier_map.sum() > 0:
+                print("Setting the goal to the frontier in the hint's direction")
+                goal_map[e] = direction_frontier_map
+            else:
+                print("Unable to select the frontier in the hint's direction, "
+                      "setting the goal to the entire frontier")
+                goal_map[e] = frontier_map.squeeze(0)
             found_hint[e] = True
 
         return goal_map, found_hint
