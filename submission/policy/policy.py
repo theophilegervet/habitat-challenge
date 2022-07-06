@@ -174,6 +174,9 @@ class Policy(nn.Module, ABC):
             )[1].median()
             frame_angle = -(median_col / self.frame_width * self.hfov - self.hfov / 2)
             angle = (agent_angle + frame_angle).item()
+            # TODO When using learned exploration, the agent is not necessarily
+            #  in the center of the map - (start_y, start_x) should be computed
+            #  from local_pose
             start_y = start_x = line_length = map_size // 2
             end_y = start_y + line_length * math.sin(math.radians(angle))
             end_x = start_x + line_length * math.cos(math.radians(angle))
