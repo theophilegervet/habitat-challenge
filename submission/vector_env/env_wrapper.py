@@ -156,7 +156,7 @@ class EnvWrapper(Env):
         # 2 - Planning
         if planner_inputs["found_goal"] or planner_inputs["found_hint"]:
             self.episode_panorama_start_steps = 0
-        if vis_inputs["timestep"] < self.self.episode_panorama_start_steps:
+        if vis_inputs["timestep"] < self.episode_panorama_start_steps:
             action = HabitatSimActions.TURN_RIGHT
         elif vis_inputs["timestep"] > self.max_steps:
             action = HabitatSimActions.STOP
