@@ -140,6 +140,7 @@ class Agent(habitat.Agent):
 
         goal_map = goal_map.squeeze(1).cpu().numpy()
         found_goal = found_goal.squeeze(1).cpu()
+        found_hint = found_hint.squeeze(1).cpu()
         goal_category = goal_category.cpu()
 
         for e in range(self.num_environments):
@@ -165,6 +166,7 @@ class Agent(habitat.Agent):
                 "obstacle_map": self.semantic_map.get_obstacle_map(e),
                 "goal_map": self.semantic_map.get_goal_map(e),
                 "found_goal": found_goal[e].item(),
+                "found_hint": found_hint[e].item(),
                 "goal_category": goal_category[e].item(),
                 "sensor_pose": self.semantic_map.get_planner_pose_inputs(e)
             }
@@ -229,6 +231,8 @@ class Agent(habitat.Agent):
         # print(f"[Agent] Semantic mapping and policy time: {t2 - t1:.2f}")
 
         # 3 - Planning
+        if planner_inputs[0]["found_goal"] or planner_inputs[0]["found_hint"]:
+            self.panorama_start_steps = 0
         if self.timesteps[0] < self.panorama_start_steps:
             action = HabitatSimActions.TURN_RIGHT
         elif self.timesteps[0] > self.max_steps:

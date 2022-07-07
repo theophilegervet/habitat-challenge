@@ -110,6 +110,7 @@ class Planner:
              sensor_pose: np.ndarray,
              goal_map: np.ndarray,
              found_goal: bool,
+             found_hint: bool,
              goal_category: int) -> int:
         """Plan a low-level action.
 
@@ -119,6 +120,7 @@ class Planner:
              and local map boundaries planning window (gx1, gx2, gy1, gy2)
             goal_map: (M, M) binary array denoting goal location
             found_goal: whether we found the object goal category
+            found_hint: whether we found a hint of the object goal category
             goal_category: semantic goal category ID
 
         Returns:

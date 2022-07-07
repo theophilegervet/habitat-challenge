@@ -153,6 +153,8 @@ class EnvWrapper(Env):
         self.visualizer.visualize(**planner_inputs, **vis_inputs)
 
         # 2 - Planning
+        if planner_inputs["found_goal"] or planner_inputs["found_hint"]:
+            self.panorama_start_steps = 0
         if vis_inputs["timestep"] < self.panorama_start_steps:
             action = HabitatSimActions.TURN_RIGHT
         elif vis_inputs["timestep"] > self.max_steps:
