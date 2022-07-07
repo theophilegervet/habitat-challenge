@@ -205,6 +205,7 @@ class Agent(habitat.Agent):
         self.obs_preprocessor.reset()
         self.planner.reset()
         self.visualizer.reset()
+        self.episode_panorama_start_steps = self.panorama_start_steps
 
     @torch.no_grad()
     def act(self, obs: Observations) -> Dict[str, int]:
@@ -232,8 +233,8 @@ class Agent(habitat.Agent):
 
         # 3 - Planning
         if planner_inputs[0]["found_goal"] or planner_inputs[0]["found_hint"]:
-            self.panorama_start_steps = 0
-        if self.timesteps[0] < self.panorama_start_steps:
+            self.episode_panorama_start_steps = 0
+        if self.timesteps[0] < self.episode_panorama_start_steps:
             action = HabitatSimActions.TURN_RIGHT
         elif self.timesteps[0] > self.max_steps:
             action = HabitatSimActions.STOP
