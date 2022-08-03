@@ -30,7 +30,7 @@ ENVIRONMENT:
 
 AGENT:
   max_steps: 498          # maximum number of steps before stopping an episode
-  panorama_start: 1       # 1: turn around 360 degrees when starting an episode, 0: don't
+  panorama_start: 0       # 1: turn around 360 degrees when starting an episode, 0: don't
 
   SEMANTIC_MAP:
     map_size_cm: 4800        # global map size (in centimetres)
@@ -50,7 +50,7 @@ AGENT:
   POLICY:
     type: frontier             # one of "frontier" or "semantic"
     hint_follow_steps: 15      # how many steps to follow a hint of the object goal category
-    hint_in_frame: 1           # 1: look for hint in frame, 0: don't
+    hint_in_frame: 0           # 1: look for hint in frame, 0: don't
 
     SEMANTIC:
       goal_update_steps: 25    # frequency at which to update the high-level goal during inference
