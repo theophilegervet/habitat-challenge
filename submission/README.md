@@ -30,4 +30,7 @@ docker build . --file Objectnav.Dockerfile -t objectnav_submission
 evalai push objectnav_submission:latest --phase habitat-objectnav-minival-2022-1615 --private
 evalai push objectnav_submission:latest --phase habitat-objectnav-test-standard-2022-1615 --private
 evalai push objectnav_submission:latest --phase habitat-objectnav-test-challenge-2022-1615 --private
+
+# New leaderboard
+evalai push objectnav_submission:latest --phase habitat-objectnav-test-standard-2022-696 --private
 ```
