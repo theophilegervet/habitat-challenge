@@ -68,7 +68,24 @@ class ObsPreprocessor:
     def preprocess(self,
                    obs: List[Observations],
                    ) -> Tuple[Tensor, np.ndarray, Tensor, Tensor, List[str]]:
-        """Preprocess observation."""
+        """
+        Preprocess observations of a single timestep batched across
+        environments.
+
+        Arguments:
+            obs: list of observations of length num_environments
+
+        Returns:
+            obs_preprocessed: frame containing (RGB, depth, segmentation) of
+             shape (num_environments, 3 + 1 + num_sem_categories, frame_height,
+             frame_width)
+            semantic_frame: semantic frame visualization of shape
+             (num_environments, frame_height, frame_width, 3)
+            pose_delta: sensor pose delta (dy, dx, dtheta) since last frame
+             of shape (num_environments, 3)
+            goal: semantic goal category of shape (num_environments,)
+            goal_name: list of semantic goal strings of length num_environments
+        """
         obs_preprocessed, semantic_frame = self.preprocess_frame(obs)
         pose_delta, self.last_poses = self.preprocess_pose(obs, self.last_poses)
         goal, goal_name = self.preprocess_goal(obs)
@@ -78,6 +95,39 @@ class ObsPreprocessor:
             pose_delta,
             goal,
             goal_name
+        )
+
+    def preprocess_sequence(self,
+                            seq_obs: List[Observations]
+                            ) -> Tuple[Tensor, Tensor, Tensor]:
+        """
+        Preprocess observations of a single environment batched across time.
+
+        Arguments:
+            seq_obs: list of observations of length sequence_length
+
+        Returns:
+            seq_obs_preprocessed: frame containing (RGB, depth, segmentation) of
+             shape (sequence_length, 3 + 1 + num_sem_categories, frame_height,
+             frame_width)
+            seq_pose_delta: sensor pose delta (dy, dx, dtheta) since last frame
+             of shape (sequence_length, 3)
+            goal: semantic goal category
+        """
+        assert self.num_environments == 1
+        sequence_length = len(seq_obs)
+        seq_obs_preprocessed, _ = self.preprocess_frame(seq_obs)
+
+        seq_pose_delta = torch.zeros(sequence_length, 3)
+        for t in range(sequence_length):
+            seq_pose_delta[t], self.last_poses = self.preprocess_pose(
+                [seq_obs[t]], self.last_poses)
+
+        goal, _ = self.preprocess_goal(seq_obs[0])
+        return (
+            seq_obs_preprocessed,
+            seq_pose_delta,
+            goal
         )
 
     def preprocess_goal(self, obs: List[Observations]) -> Tuple[Tensor, List[str]]:

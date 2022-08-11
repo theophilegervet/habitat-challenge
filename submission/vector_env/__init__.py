@@ -6,7 +6,7 @@ from habitat import make_dataset
 from habitat.core.dataset import ALL_SCENES_MASK
 from habitat.core.vector_env import VectorEnv
 
-from .env_wrapper import EnvWrapper
+from .eval_env_wrapper import EvalEnvWrapper
 
 
 def _get_env_gpus(config: Config, rank: int) -> List[int]:
@@ -130,8 +130,8 @@ def make_vector_envs_on_specific_episodes(
 
 
 def make_env_fn(config):
-    return EnvWrapper(config)
+    return EvalEnvWrapper(config)
 
 
 def make_env_on_specific_episodes_fn(config, episode_ids):
-    return EnvWrapper(config, episode_ids)
+    return EvalEnvWrapper(config, episode_ids)

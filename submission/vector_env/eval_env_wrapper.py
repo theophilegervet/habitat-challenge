@@ -13,7 +13,13 @@ from submission.visualizer.visualizer import Visualizer
 from submission.utils.constants import challenge_goal_name_to_goal_name
 
 
-class EnvWrapper(Env):
+class EvalEnvWrapper(Env):
+    """
+    This environment wrapper is used for evaluation. It contains stepping
+    the underlying environment, preprocessing observations, and planning
+    given a high-level goal predicted by the policy. It is complemented by
+    a semantic map state, update, and high-level goal policy in the agent.
+    """
 
     def __init__(self,
                  config: Config,

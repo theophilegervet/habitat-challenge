@@ -17,6 +17,21 @@ git clone https://github.com/open-mmlab/mmdetection.git
 pushd mmdetection; pip install -r requirements/build.txt; pip install "git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI"; pip install -v -e .; popd
 ```
 
+## Code Structure
+
+This repository contains modular components that can either be in the agent or environment, depending on what is most compute/communication-efficient for training or evaluation:
+* `obs_preprocessor` preprocesses batches of observations into PyTorch tensors
+* `semantic_map` contains the semantic map state and update
+* `policy` selects high-level exploration/navigation goals
+* `planner` selects low-level actions from high-level goals
+* `visualizer` contains utilities to visualize observations, the semantic map, and goals
+
+&nbsp;                  | `obs_preprocessor` | `semantic_map` | `policy` | `planner` | `visualizer` | agent entry point                                                     | env entry point
+------------------------|--------------------|----------------|----------|-----------|--------------|-----------------------------------------------------------------------|----------------
+Challenge inference     | agent              | agent          | agent    | agent     | agent        | `agent.py Agent.act()`                                                | `habitat.core.env Env.step()`
+Vectorized evaluation   | env                | agent          | agent    | env       | env          | `agent.py Agent.prepare_planner_inputs()`                             | `vector_env/eval_env_wrapper.py EvalEnvWrapper.plan_and_step()`
+Policy training with RL | env                | env            | agent    | env       | -            | `policy/semantic_exploration_policy.py SemanticExplorationPolicy.TODO()` | `vector_env/semexp_policy_training_env_wrapper.py SemexpPolicyTrainingEnvWrapper.step()`
+
 ## Make a Submission
 
 ```

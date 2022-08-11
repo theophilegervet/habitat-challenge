@@ -30,6 +30,11 @@ class Agent(habitat.Agent):
     """
 
     def __init__(self, config: Config, rank: int, ddp: bool = False):
+        """
+        Note: the rank and ddp arguments are not used in the code as-is,
+         we would use them to train this agent with imitation learning and
+         Distributed Data Parallel
+        """
         self.max_steps = config.AGENT.max_steps
         self.precision = torch.float16 if config.MIXED_PRECISION else torch.float32
         self.num_environments = config.NUM_ENVIRONMENTS
@@ -58,7 +63,7 @@ class Agent(habitat.Agent):
 
         self.obs_preprocessor = ObsPreprocessor(
             config, self.num_environments, self.device)
-        self.semantic_map = SemanticMapState(config, rank)
+        self.semantic_map = SemanticMapState(config, self.device)
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
 

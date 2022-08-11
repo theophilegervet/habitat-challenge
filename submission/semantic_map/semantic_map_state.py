@@ -1,6 +1,8 @@
 import torch
 import numpy as np
 
+from habitat import Config
+
 from .common import MapSizeParameters, init_map_and_pose_for_env
 
 
@@ -10,9 +12,8 @@ class SemanticMapState:
     agent's current goal.
     """
 
-    def __init__(self, config, rank):
-        self.device = (torch.device("cpu") if config.NO_GPU else
-                       torch.device(f"cuda:{config.AGENT_GPU_IDS[rank]}"))
+    def __init__(self, config: Config, device: torch.device):
+        self.device = device
         self.precision = torch.float16 if config.MIXED_PRECISION else torch.float32
         self.num_environments = config.NUM_ENVIRONMENTS
         self.num_sem_categories = config.ENVIRONMENT.num_sem_categories
