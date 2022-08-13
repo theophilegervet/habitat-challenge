@@ -19,7 +19,7 @@ from submission.semantic_map.semantic_map_module import SemanticMapModule
 from submission.policy.policy import Policy
 
 
-class SemexpPolicyTrainingEnvWrapper(RLEnv):
+class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
     """
     This environment wrapper is used to train the semantic exploration
     policy with reinforcement learning. It contains stepping the underlying
@@ -32,6 +32,7 @@ class SemexpPolicyTrainingEnvWrapper(RLEnv):
     def __init__(self, config: Config):
         super().__init__(config=config.TASK_CONFIG)
 
+        assert config.NUM_ENVIRONMENTS == 1
         self.device = (torch.device("cpu") if config.NO_GPU else
                        torch.device(f"cuda:{self.habitat_env.sim.gpu_device}"))
         self.max_steps = config.AGENT.max_steps
@@ -40,6 +41,7 @@ class SemexpPolicyTrainingEnvWrapper(RLEnv):
         else:
             self.panorama_start_steps = 0
         self.goal_update_steps = config.AGENT.POLICY.SEMANTIC.goal_update_steps
+        self.intrinsic_rew_coeff = config.RL.TRAIN.intrinstic_rew_coeff
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
@@ -106,8 +108,11 @@ class SemexpPolicyTrainingEnvWrapper(RLEnv):
         })
         return obs
 
-    def step(self, goal_location: Tensor) -> Tuple[Observations, float, bool, dict]:
+    def step(self, action: np.ndarray) -> Tuple[Observations, float, bool, dict]:
+        prev_explored_area = self.semantic_map.global_map[0, 1].sum()
+
         # 1 - Set high-level goal predicted by the policy
+        goal_location = (action * (self.semantic_map.local_h - 1)).astype(int)
         goal_map = np.zeros((
             self.semantic_map.local_h,
             self.semantic_map.local_w
@@ -152,16 +157,22 @@ class SemexpPolicyTrainingEnvWrapper(RLEnv):
             "goal_category": self.goal_category
         })
 
-        # TODO How to compute reward?
+        # Intrinsic reward = increase in explored area (in m^2)
+        curr_explored_area = self.semantic_map.global_map[0, 1].sum()
+        intrinsic_reward = (curr_explored_area - prev_explored_area)
+        intrinsic_reward *= (self.semantic_map.resolution / 100) ** 2
+
         if found_goal:
-            reward = 1
+            goal_reward = 1.
             done = True
         elif self.timestep > self.max_steps:
-            reward = -1
+            goal_reward = 0.
             done = True
         else:
-            reward = 0
+            goal_reward = 0.
             done = False
+
+        reward = goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
 
         return obs, reward, done, {}
 
