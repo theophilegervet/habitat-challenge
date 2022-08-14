@@ -47,9 +47,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.visualizer = Visualizer(config)
         self.obs_preprocessor = ObsPreprocessor(config, 1, self.device)
         self.semantic_map = SemanticMapState(config, self.device)
-        self.semantic_map_module = SemanticMapModule(config)
+        self.semantic_map_module = SemanticMapModule(config).to(self.device)
         # We only use methods of the abstract base class
-        self.policy = FrontierExplorationPolicy(config)
+        self.policy = FrontierExplorationPolicy(config).to(self.device)
 
         self.observation_space = SpaceDict({
             "map_features": Box(
@@ -207,6 +207,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         seq_update_global[-1] = update_global
 
         # Update map with observations and generate map features
+        print("seq_obs_preprocessed.device", seq_obs_preprocessed.device)
+        print("seq_pose_delta.device", seq_pose_delta.device)
+        print("seq_dones.device", seq_dones.device)
         (
             seq_map_features,
             self.semantic_map.local_map,
