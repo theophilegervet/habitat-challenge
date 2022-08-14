@@ -85,6 +85,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         self.obs_preprocessor.reset()
         self.planner.reset()
+        self.visualizer.reset()
         self.semantic_map.init_map_and_pose()
 
         obs = super().reset()
