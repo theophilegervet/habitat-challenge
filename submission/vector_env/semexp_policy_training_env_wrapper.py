@@ -174,8 +174,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             done = False
 
         reward = goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
+        info = {}
 
-        return obs, reward, done, {}
+        return obs, reward, done, info
 
     def _update_map(self,
                     seq_obs: List[Observations],
