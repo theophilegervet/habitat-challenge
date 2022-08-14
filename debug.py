@@ -8,9 +8,8 @@ from submission.vector_env.semexp_policy_training_env_wrapper import SemanticExp
 
 config, config_str = get_config("submission/configs/config.yaml")
 env = SemanticExplorationPolicyTrainingEnvWrapper(config)
-print(env.max_steps)
 
-# obs = env.reset()
-# for _ in range(3):
-#     action = np.array([0.9, 0.9])
-#     obs, reward, done, info = env.step(action)
+obs = env.reset()
+for _ in range(3):
+    action = np.array([0.9, 0.9])
+    obs, reward, done, info = env.step(action)
