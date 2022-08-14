@@ -233,7 +233,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.semantic_map.lmb = seq_lmb[:, -1]
         self.semantic_map.origins = seq_origins[:, -1]
 
-        return seq_map_features[:, -1], seq_local_pose[:, -1], goal_category
+        return (
+            seq_map_features[:, -1].cpu(),
+            seq_local_pose[:, -1],
+            goal_category
+        )
 
     def get_reward_range(self):
         """Required by RLEnv but not used."""
