@@ -33,7 +33,7 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
         orientation = torch.div(
             torch.trunc(input_dict["obs"]["local_pose"][:, 2]) % 360, 5
         ).long()
-        outputs, value = self.policy.network(
+        outputs, value = self.policy_network(
             input_dict["obs"]["map_features"],
             orientation,
             input_dict["obs"]["goal_category"]
