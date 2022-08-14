@@ -7,3 +7,7 @@ config, config_str = get_config("submission/configs/config.yaml")
 env = SemanticExplorationPolicyTrainingEnvWrapper(config)
 
 obs = env.reset()
+print(obs.keys())
+print(obs["local_pose"])
+print(obs["goal_category"])
+print(obs["map_features"].shape)
