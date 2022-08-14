@@ -129,8 +129,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.visualizer.visualize(**vis_inputs)
 
         obs = {
-            "map_features": map_features[0].cpu().numpy(),
-            "local_pose": local_pose[0].cpu().numpy(),
+            "map_features": map_features.cpu().numpy(),
+            "local_pose": local_pose.cpu().numpy(),
             "goal_category": self.goal_category.numpy()
         }
         return obs
@@ -197,8 +197,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.visualizer.visualize(**vis_inputs)
 
         obs = {
-            "map_features": map_features[0].cpu().numpy(),
-            "local_pose": local_pose[0].cpu().numpy(),
+            "map_features": map_features.cpu().numpy(),
+            "local_pose": local_pose.cpu().numpy(),
             "goal_category": self.goal_category.numpy()
         }
 
