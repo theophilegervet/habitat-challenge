@@ -281,9 +281,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.semantic_map.origins = seq_origins[:, -1]
 
         return (
-            seq_map_features[:, -1].cpu(),
+            seq_map_features[0, -1].cpu(),
             seq_semantic_frame[-1],
-            seq_local_pose[:, -1],
+            seq_local_pose[0, -1],
             goal_category,
             goal_name
         )
