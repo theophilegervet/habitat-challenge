@@ -1,8 +1,9 @@
 import torch
 from torch import Tensor
 import numpy as np
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 
+from habitat import Config
 from habitat.core.env import RLEnv
 from habitat.core.simulator import Observations
 from habitat.sims.habitat_simulator.actions import HabitatSimActions
@@ -28,8 +29,13 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
     goal policy to be trained.
     """
 
-    def __init__(self, config: EnvContext):
-        config = config["config"]
+    def __init__(self,
+                 rllib_config: Optional[EnvContext] = None,
+                 config: Optional[Config] = None
+                 ):
+        assert rllib_config is not None or config is not None
+        if config is None:
+            config = rllib_config["config"]
         super().__init__(config=config.TASK_CONFIG)
 
         assert config.NUM_ENVIRONMENTS == 1
