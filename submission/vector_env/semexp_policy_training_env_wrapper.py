@@ -202,7 +202,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         intrinsic_reward *= (self.semantic_map.resolution / 100) ** 2
 
         if found_goal:
-            goal_reward = 1.
+            goal_reward = 1. if self.timestep > 1 else 0.
             done = True
         elif self.timestep > self.max_steps:
             goal_reward = 0.
@@ -213,6 +213,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         reward = goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
         info = {
+            "timestep": self.timestep,
             "goal_reward": goal_reward,
             "unscaled_intrinsic_rew": intrinsic_reward,
             "scaled_intrinsic_rew": intrinsic_reward * self.intrinsic_rew_coeff
