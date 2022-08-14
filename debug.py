@@ -10,6 +10,8 @@ config, config_str = get_config("submission/configs/config.yaml")
 env = SemanticExplorationPolicyTrainingEnvWrapper(config=config)
 
 obs = env.reset()
+print(obs["map_features"].shape)
 for _ in range(3):
     action = np.array([0.9, 0.9])
     obs, reward, done, info = env.step(action)
+    print(obs["map_features"].shape)
