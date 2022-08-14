@@ -93,7 +93,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         self.scene_id = self.current_episode.scene_id.split("/")[-1].split(".")[0]
         self.episode_id = self.current_episode.episode_id
-        self._set_vis_dir(self.scene_id, self.episode_id)
+        self.visualizer.set_vis_dir(self.scene_id, self.episode_id)
 
         for _ in range(self.panorama_start_steps):
             obs, _, _, _ = super().step(HabitatSimActions.TURN_RIGHT)
@@ -287,11 +287,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             goal_category,
             goal_name
         )
-
-    def _set_vis_dir(self, scene_id: str, episode_id: str):
-        """Reset visualization directory."""
-        self.planner.set_vis_dir(scene_id, episode_id)
-        self.visualizer.set_vis_dir(scene_id, episode_id)
 
     def get_reward_range(self):
         """Required by RLEnv but not used."""
