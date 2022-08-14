@@ -5,3 +5,5 @@ from submission.vector_env.semexp_policy_training_env_wrapper import SemanticExp
 config, config_str = get_config("submission/configs/config.yaml")
 # env = RLEnv(config=config.TASK_CONFIG)
 env = SemanticExplorationPolicyTrainingEnvWrapper(config)
+
+obs = env.reset()
