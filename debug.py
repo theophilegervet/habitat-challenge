@@ -11,6 +11,7 @@ env = SemanticExplorationPolicyTrainingEnvWrapper(config)
 
 obs = env.reset()
 obs = env.reset()
+obs = env.reset()
 for _ in range(3):
     action = np.array([0.9, 0.9])
     obs, reward, done, info = env.step(action)
