@@ -59,8 +59,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                 dtype=np.float32
             ),
             "local_pose": Box(
-                low=0,  # TODO Bounds
-                high=1,
+                low=-np.inf,
+                high=np.inf,
                 shape=(3,),
                 dtype=np.float32,
             ),
