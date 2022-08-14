@@ -78,28 +78,32 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.episode_id = None
         self.timestep = None
         self.goal_category = None
+        self.goal_name = None
 
     def reset(self) -> dict:
+        self.timestep = 0
+
         self.obs_preprocessor.reset()
         self.planner.reset()
         self.semantic_map.init_map_and_pose()
 
         obs = super().reset()
         seq_obs = [obs]
-        self.timestep = 0
 
         self.scene_id = self.current_episode.scene_id.split("/")[-1].split(".")[0]
         self.episode_id = self.current_episode.episode_id
+        self._set_vis_dir(self.scene_id, self.episode_id)
 
         for _ in range(self.panorama_start_steps):
             obs, _, _, _ = super().step(HabitatSimActions.TURN_RIGHT)
             seq_obs.append(obs)
-            self.timestep += 1
 
         (
             map_features,
+            _,
             local_pose,
-            self.goal_category
+            self.goal_category,
+            self.goal_name
         ) = self._update_map(seq_obs, update_global=True)
 
         obs = {
@@ -110,9 +114,10 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         return obs
 
     def step(self, action: np.ndarray) -> Tuple[dict, float, bool, dict]:
+        self.timestep += 1
         prev_explored_area = self.semantic_map.global_map[0, 1].sum()
 
-        # 1 - Set high-level goal predicted by the policy
+        # Set high-level goal predicted by the policy
         goal_location = (action * (self.semantic_map.local_h - 1)).astype(int)
         goal_map = np.zeros((
             self.semantic_map.local_h,
@@ -121,28 +126,29 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         goal_map[goal_location[0], goal_location[1]] = 1
         self.semantic_map.update_global_goal_for_env(0, goal_map)
 
+        # For each low-level step
         for t in range(self.goal_update_steps):
-            # 2 - Plan
+            # 1 - Plan
             planner_inputs = {
                 "obstacle_map": self.semantic_map.get_obstacle_map(0),
                 "goal_map": self.semantic_map.get_goal_map(0),
                 "found_goal": False,
                 "found_hint": False,
-                "goal_category": self.goal_category,
+                "goal_category": self.goal_category.item(),
                 "sensor_pose": self.semantic_map.get_planner_pose_inputs(0)
             }
             action = self.planner.plan(**planner_inputs)
 
-            # 3 - Step
+            # 2 - Step
             obs, _, _, _ = super().step(action)
 
-            # 4 - Update map
-            map_features, local_pose, _ = self._update_map(
+            # 3 - Update map
+            map_features, semantic_frame, local_pose, _, _ = self._update_map(
                 [obs],
                 update_global=(t == self.goal_update_steps - 1)
             )
 
-            # 5 - Check whether we found the goal
+            # 4 - Check whether we found the goal
             _, found_goal = self.policy.reach_goal_if_in_map(
                 map_features,
                 self.goal_category
@@ -151,6 +157,22 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
             if found_goal or self.timestep > self.max_steps:
                 break
+
+        # Visualize the final state
+        vis_inputs = {
+            "sensor_pose": self.semantic_map.get_planner_pose_inputs(0),
+            "obstacle_map": self.semantic_map.get_obstacle_map(0),
+            "goal_map": self.semantic_map.get_goal_map(0),
+            "found_goal": False,
+            "found_hint": False,
+            "explored_map": self.semantic_map.get_explored_map(0),
+            "semantic_map": self.semantic_map.get_semantic_map(0),
+            "semantic_frame": semantic_frame,
+            "goal_name": self.goal_name,
+            "goal_category": self.goal_category.item(),
+            "timestep": self.timestep
+        }
+        self.visualizer.visualize(**vis_inputs)
 
         obs = {
             "map_features": map_features,
@@ -185,7 +207,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
     def _update_map(self,
                     seq_obs: List[Observations],
                     update_global: bool,
-                    ) -> Tuple[Tensor, Tensor, Tensor]:
+                    ) -> Tuple[Tensor, np.ndarray, Tensor, Tensor, str]:
         """Update the semantic map with a sequence of observations.
 
         Arguments:
@@ -196,15 +218,19 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         Returns:
             final_map_features: final semantic map features of shape
              (1, 8 + num_sem_categories, M, M)
+            final_semantic_frame: final semantic frame visualization
             final_local_pose: final local pose of shape (1, 3)
-            goal_category: semantic goal category
+            goal_category: semantic goal category ID
+            goal_name: semantic goal category
         """
         # Preprocess observations
         sequence_length = len(seq_obs)
         (
             seq_obs_preprocessed,
+            seq_semantic_frame,
             seq_pose_delta,
             goal_category,
+            goal_name
         ) = self.obs_preprocessor.preprocess_sequence(seq_obs)
 
         seq_dones = torch.tensor([False] * sequence_length)
@@ -240,9 +266,16 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         return (
             seq_map_features[:, -1].cpu(),
+            seq_semantic_frame[-1],
             seq_local_pose[:, -1],
-            goal_category
+            goal_category,
+            goal_name
         )
+
+    def _set_vis_dir(self, scene_id: str, episode_id: str):
+        """Reset visualization directory."""
+        self.planner.set_vis_dir(scene_id, episode_id)
+        self.visualizer.set_vis_dir(scene_id, episode_id)
 
     def get_reward_range(self):
         """Required by RLEnv but not used."""

@@ -8,7 +8,6 @@ config, config_str = get_config("submission/configs/config.yaml")
 env = SemanticExplorationPolicyTrainingEnvWrapper(config)
 
 obs = env.reset()
-print(obs["map_features"].sum())
 action = np.array([0.9, 0.9])
 obs, reward, done, info = env.step(action)
 print(obs.keys())
