@@ -1,4 +1,6 @@
 import numpy as np
+import warnings
+warnings.filterwarnings("ignore")
 
 from submission.utils.config_utils import get_config
 from submission.vector_env.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
