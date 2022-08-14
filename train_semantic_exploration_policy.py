@@ -16,17 +16,15 @@ from submission.vector_env.semexp_policy_training_env_wrapper import SemanticExp
 class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
 
     def __init__(self, obs_space, action_space, num_outputs, model_config, name):
-        print("MODEL_CONFIG_XXX")
-        print(model_config)
         TorchModelV2.__init__(
             self, obs_space, action_space, num_outputs, model_config, name
         )
         nn.Module.__init__(self)
 
         self.policy_network = SemanticExplorationPolicyNetwork(
-            model_config["map_features_shape"],
-            model_config["hidden_size"],
-            model_config["num_sem_categories"]
+            model_config["custom_model_config"]["map_features_shape"],
+            model_config["custom_model_config"]["hidden_size"],
+            model_config["custom_model_config"]["num_sem_categories"]
         )
 
         self.value = None
