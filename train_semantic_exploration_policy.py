@@ -70,8 +70,6 @@ if __name__ == "__main__":
 
     train_config = {
         "env": SemanticExplorationPolicyTrainingEnvWrapper,
-        # TODO If env_config needs to be a dict, we might need to pass it differently
-        #  Maybe serialize it?
         "env_config": {"config": config},
         "num_gpus": 0.5,  # int(os.environ.get("RLLIB_NUM_GPUS", "0"))
         "num_gpus_per_worker": 0.5,
@@ -83,9 +81,16 @@ if __name__ == "__main__":
                 "num_sem_categories": config.ENVIRONMENT.num_sem_categories,
             }
         },
-        "num_workers": config.TRAIN.RL.num_workers,
+        # TODO
+        #  1. Try with zero workers
+        #  2. If fails, try standard example and print GPU usage within env
+        #      env and model
+        "num_workers": 0,  # config.TRAIN.RL.num_workers,
         "framework": "torch",
-        "lr": config.TRAIN.RL.lr
+        "lr": config.TRAIN.RL.lr,
+        "gamma": config.TRAIN.RL.gamma,
+        "rollout_fragment_length": config.TRAIN.RL.batch_size,
+        "train_batch_size": config.TRAIN.RL.batch_size,
     }
 
     ppo_config = ppo.DEFAULT_CONFIG.copy()
