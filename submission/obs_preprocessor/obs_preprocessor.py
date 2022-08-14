@@ -123,7 +123,7 @@ class ObsPreprocessor:
             seq_pose_delta[t], self.last_poses = self.preprocess_pose(
                 [seq_obs[t]], self.last_poses)
 
-        goal, _ = self.preprocess_goal(seq_obs[0])
+        goal, _ = self.preprocess_goal([seq_obs[0]])
         return (
             seq_obs_preprocessed,
             seq_pose_delta,
@@ -131,9 +131,6 @@ class ObsPreprocessor:
         )
 
     def preprocess_goal(self, obs: List[Observations]) -> Tuple[Tensor, List[str]]:
-        print(len(obs))
-        print(obs[0].keys())
-        print(obs[0]["objectgoal"])
         goal = torch.tensor([
             goal_id_to_coco_id[ob["objectgoal"][0]] for ob in obs])
         goal_name = [goal_id_to_goal_name[ob["objectgoal"][0]] for ob in obs]
