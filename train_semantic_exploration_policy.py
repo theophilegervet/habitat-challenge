@@ -51,7 +51,8 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
 if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
 
-    ray.init(local_mode=True)
+    # ray.init(local_mode=True)
+    ray.init()
 
     ModelCatalog.register_custom_model(
         "semantic_exploration_policy",
@@ -84,7 +85,7 @@ if __name__ == "__main__":
                 "num_sem_categories": config.ENVIRONMENT.num_sem_categories,
             }
         },
-        # TODO
+        # TODO Local mode is the reason it fails with 1 worker
         #  1. Try with zero workers
         #  2. If fails, try standard example and print GPU usage within env
         #      env and model
