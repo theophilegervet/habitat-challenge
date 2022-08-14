@@ -16,7 +16,7 @@ from submission.planner.planner import Planner
 from submission.visualizer.visualizer import Visualizer
 from submission.semantic_map.semantic_map_state import SemanticMapState
 from submission.semantic_map.semantic_map_module import SemanticMapModule
-from submission.policy.policy import FrontierExplorationPolicy
+from submission.policy.frontier_exploration_policy import FrontierExplorationPolicy
 
 
 class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
