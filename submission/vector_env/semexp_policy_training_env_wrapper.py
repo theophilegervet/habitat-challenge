@@ -207,9 +207,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         seq_update_global[-1] = update_global
 
         # Update map with observations and generate map features
-        print("seq_obs_preprocessed.device", seq_obs_preprocessed.device)
-        print("seq_pose_delta.device", seq_pose_delta.device)
-        print("seq_dones.device", seq_dones.device)
         (
             seq_map_features,
             self.semantic_map.local_map,
@@ -220,9 +217,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             seq_origins,
         ) = self.semantic_map_module(
             seq_obs_preprocessed.unsqueeze(0),
-            seq_pose_delta.unsqueeze(0),
-            seq_dones.unsqueeze(0),
-            seq_update_global.unsqueeze(0),
+            seq_pose_delta.unsqueeze(0).to(self.device),
+            seq_dones.unsqueeze(0).to(self.device),
+            seq_update_global.unsqueeze(0).to(self.device),
             self.semantic_map.local_map,
             self.semantic_map.global_map,
             self.semantic_map.local_pose,
