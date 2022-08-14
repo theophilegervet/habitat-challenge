@@ -41,7 +41,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         else:
             self.panorama_start_steps = 0
         self.goal_update_steps = config.AGENT.POLICY.SEMANTIC.goal_update_steps
-        self.intrinsic_rew_coeff = config.RL.TRAIN.intrinstic_rew_coeff
+        self.intrinsic_rew_coeff = config.TRAIN.RL.intrinsic_rew_coeff
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
