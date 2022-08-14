@@ -160,7 +160,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         # Intrinsic reward = increase in explored area (in m^2)
         curr_explored_area = self.semantic_map.global_map[0, 1].sum()
-        intrinsic_reward = (curr_explored_area - prev_explored_area)
+        intrinsic_reward = (curr_explored_area - prev_explored_area).item()
         intrinsic_reward *= (self.semantic_map.resolution / 100) ** 2
 
         if found_goal:
