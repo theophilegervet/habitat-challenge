@@ -79,7 +79,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.timestep = None
         self.goal_category = None
 
-    def reset(self) -> Observations:
+    def reset(self) -> dict:
         self.obs_preprocessor.reset()
         self.planner.reset()
         self.semantic_map.init_map_and_pose()
@@ -102,14 +102,14 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             self.goal_category
         ) = self._update_map(seq_obs, update_global=True)
 
-        obs = Observations({
+        obs = {
             "map_features": map_features,
             "local_pose": local_pose,
             "goal_category": self.goal_category
-        })
+        }
         return obs
 
-    def step(self, action: np.ndarray) -> Tuple[Observations, float, bool, dict]:
+    def step(self, action: np.ndarray) -> Tuple[dict, float, bool, dict]:
         prev_explored_area = self.semantic_map.global_map[0, 1].sum()
 
         # 1 - Set high-level goal predicted by the policy
@@ -152,11 +152,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             if found_goal or self.timestep > self.max_steps:
                 break
 
-        obs = Observations({
+        obs = {
             "map_features": map_features,
             "local_pose": local_pose,
             "goal_category": self.goal_category
-        })
+        }
 
         # Intrinsic reward = increase in explored area (in m^2)
         curr_explored_area = self.semantic_map.global_map[0, 1].sum()
