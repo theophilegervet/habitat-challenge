@@ -238,3 +238,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
     def get_reward_range(self):
         """Required by RLEnv but not used."""
         pass
+
+    def get_reward(self, observations: Observations):
+        """Required by RLEnv but not used."""
+        pass
