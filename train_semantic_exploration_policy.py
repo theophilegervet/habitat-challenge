@@ -91,6 +91,7 @@ if __name__ == "__main__":
         "gamma": config.TRAIN.RL.gamma,
         "rollout_fragment_length": config.TRAIN.RL.batch_size,
         "train_batch_size": config.TRAIN.RL.batch_size,
+        "sgd_minibatch_size": config.TRAIN.RL.batch_size,
     }
 
     ppo_config = ppo.DEFAULT_CONFIG.copy()
