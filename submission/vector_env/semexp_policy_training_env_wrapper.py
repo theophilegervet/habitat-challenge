@@ -174,7 +174,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             done = False
 
         reward = goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
-        info = {}
+        info = {
+            "goal_reward": goal_reward,
+            "unscaled_intrinsic_rew": intrinsic_reward,
+            "scaled_intrinsic_rew": intrinsic_reward * self.intrinsic_rew_coeff
+        }
 
         return obs, reward, done, info
 
