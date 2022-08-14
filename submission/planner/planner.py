@@ -37,7 +37,8 @@ class Planner:
              there's a collision
         """
         self.visualize = config.VISUALIZE
-        self.print_images = config.PRINT_IMAGES
+        # self.print_images = config.PRINT_IMAGES
+        self.print_images = False
         self.default_vis_dir = f"{config.DUMP_LOCATION}/images/{config.EXP_NAME}"
         os.makedirs(self.default_vis_dir, exist_ok=True)
 

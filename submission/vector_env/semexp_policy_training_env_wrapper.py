@@ -101,11 +101,26 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         (
             map_features,
-            _,
+            semantic_frame,
             local_pose,
             self.goal_category,
             self.goal_name
         ) = self._update_map(seq_obs, update_global=True)
+
+        vis_inputs = {
+            "sensor_pose": self.semantic_map.get_planner_pose_inputs(0),
+            "obstacle_map": self.semantic_map.get_obstacle_map(0),
+            "goal_map": self.semantic_map.get_goal_map(0),
+            "found_goal": False,
+            "found_hint": False,
+            "explored_map": self.semantic_map.get_explored_map(0),
+            "semantic_map": self.semantic_map.get_semantic_map(0),
+            "semantic_frame": semantic_frame,
+            "goal_name": self.goal_name,
+            "goal_category": self.goal_category.item(),
+            "timestep": self.timestep
+        }
+        self.visualizer.visualize(**vis_inputs)
 
         obs = {
             "map_features": map_features,
