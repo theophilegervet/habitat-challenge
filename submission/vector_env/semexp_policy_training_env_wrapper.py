@@ -165,8 +165,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             )
 
             # 4 - Check whether we found the goal
-            print(map_features.device)
-            print(self.goal_category.device)
             _, found_goal = self.policy.reach_goal_if_in_map(
                 map_features,
                 self.goal_category
