@@ -246,3 +246,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
     def get_done(self, observations: Observations):
         """Required by RLEnv but not used."""
         pass
+
+    def get_info(self, observations: Observations):
+        """Required by RLEnv but not used."""
+        pass
