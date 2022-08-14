@@ -3,13 +3,12 @@ from torch import Tensor
 import numpy as np
 from typing import Tuple, List
 
-from habitat import Config
 from habitat.core.env import RLEnv
 from habitat.core.simulator import Observations
 from habitat.sims.habitat_simulator.actions import HabitatSimActions
-
 from gym.spaces import Dict as SpaceDict
 from gym.spaces import Box, Discrete
+from ray.rllib.env.env_context import EnvContext
 
 from submission.obs_preprocessor.obs_preprocessor import ObsPreprocessor
 from submission.planner.planner import Planner
@@ -29,7 +28,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
     goal policy to be trained.
     """
 
-    def __init__(self, config: Config):
+    def __init__(self, config: EnvContext):
+        config = config["config"]
         super().__init__(config=config.TASK_CONFIG)
 
         assert config.NUM_ENVIRONMENTS == 1
