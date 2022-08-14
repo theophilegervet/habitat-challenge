@@ -87,6 +87,7 @@ if __name__ == "__main__":
         #      env and model
         "num_workers": 0,  # config.TRAIN.RL.num_workers,
         "framework": "torch",
+        "disable_env_checking": True,
         "lr": config.TRAIN.RL.lr,
         "gamma": config.TRAIN.RL.gamma,
         "rollout_fragment_length": config.TRAIN.RL.batch_size,
