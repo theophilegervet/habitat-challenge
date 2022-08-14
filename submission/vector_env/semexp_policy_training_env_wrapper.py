@@ -283,7 +283,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         return (
             seq_map_features[:, -1].cpu(),
             seq_semantic_frame[-1],
-            seq_local_pose[:, -1],
+            seq_local_pose[:, -1].cpu(),
             goal_category,
             goal_name
         )

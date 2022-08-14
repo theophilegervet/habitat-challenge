@@ -15,6 +15,7 @@ print(obs["map_features"].min(), obs["map_features"].max())
 print(obs["local_pose"].shape)
 print(obs["local_pose"])
 print(obs["goal_category"].shape)
+print(obs["goal_category"])
 print()
 for _ in range(3):
     action = np.array([0.9, 0.9])
@@ -25,3 +26,4 @@ for _ in range(3):
     print(obs["local_pose"].shape)
     print(obs["local_pose"])
     print(obs["goal_category"].shape)
+    print(obs["goal_category"])
