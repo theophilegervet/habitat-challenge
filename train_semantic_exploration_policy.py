@@ -16,6 +16,8 @@ from submission.vector_env.semexp_policy_training_env_wrapper import SemanticExp
 class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
 
     def __init__(self, obs_space, action_space, num_outputs, model_config, name):
+        print("MODEL_CONFIG_XXX")
+        print(model_config)
         TorchModelV2.__init__(
             self, obs_space, action_space, num_outputs, model_config, name
         )
