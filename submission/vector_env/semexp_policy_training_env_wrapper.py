@@ -59,8 +59,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         self.observation_space = SpaceDict({
             "map_features": Box(
-                low=0.,
-                high=1.,
+                low=-np.inf,
+                high=np.inf,
                 shape=(self.semantic_map.local_h, self.semantic_map.local_w),
                 dtype=np.float32
             ),
