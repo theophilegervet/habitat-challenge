@@ -16,7 +16,7 @@ from submission.planner.planner import Planner
 from submission.visualizer.visualizer import Visualizer
 from submission.semantic_map.semantic_map_state import SemanticMapState
 from submission.semantic_map.semantic_map_module import SemanticMapModule
-from submission.policy.policy import Policy
+from submission.policy.policy import FrontierExplorationPolicy
 
 
 class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
@@ -48,7 +48,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.obs_preprocessor = ObsPreprocessor(config, 1, self.device)
         self.semantic_map = SemanticMapState(config, self.device)
         self.semantic_map_module = SemanticMapModule(config)
-        self.policy = Policy(config)
+        # We only use methods of the abstract base class
+        self.policy = FrontierExplorationPolicy(config)
 
         self.observation_space = SpaceDict({
             "map_features": Box(
