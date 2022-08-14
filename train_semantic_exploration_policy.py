@@ -73,7 +73,8 @@ if __name__ == "__main__":
         # TODO If env_config needs to be a dict, we might need to pass it differently
         #  Maybe serialize it?
         "env_config": {"config": config},
-        "num_gpus": int(os.environ.get("RLLIB_NUM_GPUS", "0")),
+        "num_gpus": 1,  # int(os.environ.get("RLLIB_NUM_GPUS", "0"))
+        "num_gpus_per_worker": 1,
         "model": {
             "custom_model": "semantic_exploration_policy",
             "custom_model_config": {
