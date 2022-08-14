@@ -11,7 +11,9 @@ env = SemanticExplorationPolicyTrainingEnvWrapper(config=config)
 
 obs = env.reset()
 print(obs["map_features"].shape)
+print(obs["local_pose"].shape)
+print(obs["goal_category"].shape)
 for _ in range(3):
     action = np.array([0.9, 0.9])
     obs, reward, done, info = env.step(action)
-    print(obs["map_features"].shape)
+    print(reward)
