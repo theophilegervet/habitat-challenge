@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
     ppo_config = ppo.DEFAULT_CONFIG.copy()
     ppo_config.update(train_config)
-    trainer = ppo.PPO(
+    trainer = ppo.PPOTrainer(
         config=ppo_config,
         env=SemanticExplorationPolicyTrainingEnvWrapper
     )
