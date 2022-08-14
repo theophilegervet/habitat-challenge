@@ -123,8 +123,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.visualizer.visualize(**vis_inputs)
 
         obs = {
-            "map_features": map_features[0],
-            "local_pose": local_pose[0],
+            "map_features": map_features[0].cpu(),
+            "local_pose": local_pose[0].cpu(),
             "goal_category": self.goal_category
         }
         return obs
@@ -193,8 +193,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.visualizer.visualize(**vis_inputs)
 
         obs = {
-            "map_features": map_features[0],
-            "local_pose": local_pose[0],
+            "map_features": map_features[0].cpu(),
+            "local_pose": local_pose[0].cpu(),
             "goal_category": self.goal_category
         }
 
@@ -283,9 +283,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.semantic_map.origins = seq_origins[:, -1]
 
         return (
-            seq_map_features[:, -1].cpu(),
+            seq_map_features[:, -1],
             seq_semantic_frame[-1],
-            seq_local_pose[:, -1].cpu(),
+            seq_local_pose[:, -1],
             goal_category,
             goal_name
         )
