@@ -1,6 +1,8 @@
 import os
 import torch
 import torch.nn as nn
+import warnings
+warnings.filterwarnings("ignore")
 
 import ray
 from ray.rllib.agents import ppo
@@ -30,9 +32,6 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
         self.value = None
 
     def forward(self, input_dict, state, seq_lens):
-        print(input_dict["obs"]["map_features"].shape)
-        print(input_dict["obs"]["goal_category"].shape)
-        print(input_dict["obs"]["local_pose"].shape)
         orientation = torch.div(
             torch.trunc(input_dict["obs"]["local_pose"][:, 2]) % 360, 5
         ).long()
