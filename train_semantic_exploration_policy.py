@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import torch
 import torch.nn as nn
 import warnings
@@ -38,6 +40,11 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
             print(type(v))
             print(v.shape)
         print()
+        for k, v in input_dict["obs"].items():
+            if type(v) == np.ndarray:
+                input_dict["obs"][k] = torch.from_numpy(v).to(
+                    self.policy_network.device
+                )
         orientation = torch.div(
             torch.trunc(input_dict["obs"]["local_pose"][:, 2]) % 360, 5
         ).long()
