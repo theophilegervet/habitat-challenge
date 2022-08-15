@@ -70,7 +70,7 @@ class LogRewardDetailsCallback(DefaultCallbacks):
 if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
 
-    ray.init(log_to_driver=False)
+    ray.init()#log_to_driver=False)
 
     ModelCatalog.register_custom_model(
         "semantic_exploration_policy",
