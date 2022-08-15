@@ -116,20 +116,20 @@ if __name__ == "__main__":
     }
 
     # Debugging
-    # ppo_config = ppo.DEFAULT_CONFIG.copy()
-    # ppo_config.update(train_config)
-    # trainer = ppo.PPOTrainer(
-    #     config=ppo_config,
-    #     env=SemanticExplorationPolicyTrainingEnvWrapper
-    # )
-    # while True:
-    #     result = trainer.train()
-    #     print(pretty_print(result))
-
-    tuner = tuner.Tuner(
-        "PPO",
-        param_space=train_config,
+    ppo_config = ppo.DEFAULT_CONFIG.copy()
+    ppo_config.update(train_config)
+    trainer = ppo.PPOTrainer(
+        config=ppo_config,
+        env=SemanticExplorationPolicyTrainingEnvWrapper
     )
-    results = tuner.fit()
+    while True:
+        result = trainer.train()
+        print(pretty_print(result))
+
+    # tuner = tuner.Tuner(
+    #     "PPO",
+    #     param_space=train_config,
+    # )
+    # results = tuner.fit()
 
     ray.shutdown()
