@@ -72,7 +72,7 @@ class LogRewardDetailsCallback(DefaultCallbacks):
 if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
 
-    ray.init()#log_to_driver=False)
+    ray.init(log_to_driver=False)
 
     ModelCatalog.register_custom_model(
         "semantic_exploration_policy",
@@ -118,20 +118,20 @@ if __name__ == "__main__":
     }
 
     # Debugging
-    ppo_config = ppo.DEFAULT_CONFIG.copy()
-    ppo_config.update(train_config)
-    trainer = ppo.PPOTrainer(
-        config=ppo_config,
-        env=SemanticExplorationPolicyTrainingEnvWrapper
-    )
-    while True:
-        result = trainer.train()
-        print(pretty_print(result))
-
-    # tuner = tuner.Tuner(
-    #     "PPO",
-    #     param_space=train_config,
+    # ppo_config = ppo.DEFAULT_CONFIG.copy()
+    # ppo_config.update(train_config)
+    # trainer = ppo.PPOTrainer(
+    #     config=ppo_config,
+    #     env=SemanticExplorationPolicyTrainingEnvWrapper
     # )
-    # results = tuner.fit()
+    # while True:
+    #     result = trainer.train()
+    #     print(pretty_print(result))
+
+    tuner = tuner.Tuner(
+        "PPO",
+        param_space=train_config,
+    )
+    results = tuner.fit()
 
     ray.shutdown()
