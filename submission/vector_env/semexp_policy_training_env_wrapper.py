@@ -183,7 +183,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             )
             found_goal = found_goal.item()
 
-            if found_goal or self.timestep > self.max_steps:
+            if found_goal:
                 break
 
         # Visualize the final state
@@ -212,18 +212,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         curr_explored_area = self.semantic_map.global_map[0, 1].sum()
         intrinsic_reward = (curr_explored_area - prev_explored_area).item()
         intrinsic_reward *= (self.semantic_map.resolution / 100) ** 2
-
-        if found_goal:
-            goal_reward = 1. if self.timestep > 1 else 0.
-            done = True
-        elif self.timestep > self.max_steps:
-            goal_reward = 0.
-            done = True
-        else:
-            goal_reward = 0.
-            done = False
-
+        goal_reward = 1. if (found_goal and self.timestep > 1) else 0.
         reward = goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
+
+        done = found_goal or self.timestep == self.max_steps - 1
+
         info = {
             "timestep": self.timestep,
             "goal_reward": goal_reward,
