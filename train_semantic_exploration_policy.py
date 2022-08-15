@@ -32,6 +32,12 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
         self.value = None
 
     def forward(self, input_dict, state, seq_lens):
+        print("XXX")
+        for k, v in input_dict["obs"]:
+            print(k)
+            print(v.type)
+            print(v.shape)
+        print()
         orientation = torch.div(
             torch.trunc(input_dict["obs"]["local_pose"][:, 2]) % 360, 5
         ).long()
