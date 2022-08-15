@@ -20,6 +20,8 @@ EVAL_VECTORIZED:
 
 TRAIN:
   RL:
+    num_gpus: 0.5               # number of GPUs for driver process training the policy model
+    num_gpus_per_worker: 0.5    # number of GPUs per worker collecting environment rollouts
     stop_timesteps: 1000000     # number of timesteps to train for
     lr: 0.001                   # learning rate
     gamma: 0.95                 # discount factor of the MDP

@@ -6,6 +6,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import ray
+from ray import air, tune
 from ray.rllib.agents import ppo
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
@@ -81,8 +82,8 @@ if __name__ == "__main__":
     train_config = {
         "env": SemanticExplorationPolicyTrainingEnvWrapper,
         "env_config": {"config": config},
-        "num_gpus": 0.5,  # int(os.environ.get("RLLIB_NUM_GPUS", "0"))
-        "num_gpus_per_worker": 0.5,
+        "num_gpus": config.TRAIN.RL.num_gpus,
+        "num_gpus_per_worker": config.TRAIN.RL.num_gpus_per_worker,
         "model": {
             "custom_model": "semantic_exploration_policy",
             "custom_model_config": {
@@ -91,10 +92,6 @@ if __name__ == "__main__":
                 "num_sem_categories": config.ENVIRONMENT.num_sem_categories,
             }
         },
-        # TODO Local mode is the reason it fails with 1 worker
-        #  1. Try with zero workers
-        #  2. If fails, try standard example and print GPU usage within env
-        #      env and model
         "num_workers": config.TRAIN.RL.num_workers,
         "framework": "torch",
         "disable_env_checking": True,
@@ -106,17 +103,24 @@ if __name__ == "__main__":
         "sgd_minibatch_size": config.TRAIN.RL.batch_size,
     }
 
-    ppo_config = ppo.DEFAULT_CONFIG.copy()
-    ppo_config.update(train_config)
-    trainer = ppo.PPOTrainer(
-        config=ppo_config,
-        env=SemanticExplorationPolicyTrainingEnvWrapper
-    )
+    # Debugging
+    # ppo_config = ppo.DEFAULT_CONFIG.copy()
+    # ppo_config.update(train_config)
+    # trainer = ppo.PPOTrainer(
+    #     config=ppo_config,
+    #     env=SemanticExplorationPolicyTrainingEnvWrapper
+    # )
+    # while True:
+    #     result = trainer.train()
+    #     print(pretty_print(result))
 
-    while True:
-        result = trainer.train()
-        print(pretty_print(result))
-        if result["timesteps_total"] >= config.TRAIN.RL.stop_timesteps:
-            break
+    tuner = tune.Tuner(
+        "PPO",
+        param_space=train_config,
+        run_config=air.RunConfig(
+            stop={"timesteps_total": config.TRAIN.RL.stop_timesteps}
+        )
+    )
+    results = tuner.fit()
 
     ray.shutdown()
