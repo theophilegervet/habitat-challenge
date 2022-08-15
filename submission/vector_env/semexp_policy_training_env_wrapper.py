@@ -42,7 +42,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.device = (torch.device("cpu") if config.NO_GPU else
                        torch.device(f"cuda:{self.habitat_env.sim.gpu_device}"))
         self.goal_update_steps = config.AGENT.POLICY.SEMANTIC.goal_update_steps
-        self.max_steps = 500 // self.goal_update_steps
+        self.max_steps = 500 // self.goal_update_steps - 1
         if config.AGENT.panorama_start:
             self.panorama_start_steps = int(360 / config.ENVIRONMENT.turn_angle)
         else:
@@ -209,6 +209,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         }
 
         # Intrinsic reward = increase in explored area (in m^2)
+        # Goal reward = binary found goal or not
         curr_explored_area = self.semantic_map.global_map[0, 1].sum()
         intrinsic_reward = (curr_explored_area - prev_explored_area).item()
         intrinsic_reward *= (self.semantic_map.resolution / 100) ** 2
@@ -219,7 +220,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         info = {
             "timestep": self.timestep,
-            "goal_reward": goal_reward,
+            "goal_rew": goal_reward,
             "unscaled_intrinsic_rew": intrinsic_reward,
             "scaled_intrinsic_rew": intrinsic_reward * self.intrinsic_rew_coeff
         }

@@ -11,6 +11,8 @@ from ray.rllib.agents import ppo
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 from ray.tune.logger import pretty_print
+from ray.rllib.algorithms.callbacks import DefaultCallbacks
+from ray.rllib.evaluation import Episode
 
 from submission.utils.config_utils import get_config
 from submission.policy.semantic_exploration_policy_rllib import SemanticExplorationPolicyNetwork
@@ -56,6 +58,14 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
         return self.value
 
 
+class LogRewardDetailsCallback(DefaultCallbacks):
+    def on_episode_step(self, *, worker, base_env, policies,
+                        episode: Episode, env_index, **kwargs):
+        info = episode.last_info_for()
+        for k in ["goal_rew", "unscaled_intrinsic_rew", "scaled_intrinsic_rew"]:
+            episode.custom_metrics[k] += info[k]
+
+
 if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
 
@@ -81,6 +91,7 @@ if __name__ == "__main__":
 
     train_config = {
         "env": SemanticExplorationPolicyTrainingEnvWrapper,
+        "callbacks": LogRewardDetailsCallback,
         "env_config": {"config": config},
         "num_gpus": config.TRAIN.RL.num_gpus,
         "num_gpus_per_worker": config.TRAIN.RL.num_gpus_per_worker,
