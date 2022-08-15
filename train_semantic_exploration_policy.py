@@ -1,5 +1,4 @@
 import os
-
 import numpy as np
 import torch
 import torch.nn as nn
@@ -35,24 +34,21 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
         self.value = None
 
     def forward(self, input_dict, state, seq_lens):
-        print("XXX")
-        for k, v in input_dict["obs"].items():
-            print(k)
-            print(type(v))
-            print(v.shape)
-        print()
         for k, v in input_dict["obs"].items():
             if type(v) == np.ndarray:
                 input_dict["obs"][k] = torch.from_numpy(v).to(self.dummy.device)
+
         orientation = torch.div(
             torch.trunc(input_dict["obs"]["local_pose"][:, 2]) % 360, 5
         ).long()
+
         outputs, value = self.policy_network(
             input_dict["obs"]["map_features"],
             orientation,
             input_dict["obs"]["goal_category"]
         )
         self.value = value
+
         return outputs, []
 
     def value_function(self):
