@@ -84,6 +84,7 @@ if __name__ == "__main__":
         "env_config": {"config": config},
         "num_gpus": config.TRAIN.RL.num_gpus,
         "num_gpus_per_worker": config.TRAIN.RL.num_gpus_per_worker,
+        "output": "data/ray_output",
         "model": {
             "custom_model": "semantic_exploration_policy",
             "custom_model_config": {
@@ -117,9 +118,6 @@ if __name__ == "__main__":
     tuner = tuner.Tuner(
         "PPO",
         param_space=train_config,
-        # run_config=air.RunConfig(
-        #     stop={"timesteps_total": config.TRAIN.RL.stop_timesteps}
-        # )
     )
     results = tuner.fit()
 
