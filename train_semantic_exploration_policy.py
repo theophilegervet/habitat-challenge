@@ -96,7 +96,7 @@ if __name__ == "__main__":
         #  1. Try with zero workers
         #  2. If fails, try standard example and print GPU usage within env
         #      env and model
-        "num_workers": 0,  # config.TRAIN.RL.num_workers,
+        "num_workers": 1,  # config.TRAIN.RL.num_workers,
         "framework": "torch",
         "disable_env_checking": True,
         "_disable_preprocessor_api": True,
