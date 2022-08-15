@@ -62,11 +62,11 @@ class LogRewardDetailsCallback(DefaultCallbacks):
     def on_episode_step(self, *, worker, base_env, policies,
                         episode: Episode, env_index, **kwargs):
         info = episode.last_info_for()
-        try:
-            for k in ["goal_rew", "unscaled_intrinsic_rew", "scaled_intrinsic_rew"]:
+        for k in ["goal_rew", "unscaled_intrinsic_rew", "scaled_intrinsic_rew"]:
+            if k not in episode.custom_metrics:
+                episode.custom_metrics[k] = info[k]
+            else:
                 episode.custom_metrics[k] += info[k]
-        except:
-            print("on_episode_step info.keys()", info.keys())
 
 
 if __name__ == "__main__":
