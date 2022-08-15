@@ -58,8 +58,7 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
 if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config.yaml")
 
-    # ray.init(local_mode=True)
-    ray.init()
+    ray.init(log_to_driver=False)
 
     ModelCatalog.register_custom_model(
         "semantic_exploration_policy",
