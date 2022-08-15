@@ -107,10 +107,10 @@ if __name__ == "__main__":
         env=SemanticExplorationPolicyTrainingEnvWrapper
     )
 
-    # while True:
-    #     result = trainer.train()
-    #     print(pretty_print(result))
-    #     if result["timesteps_total"] >= config.TRAIN.RL.stop_timesteps:
-    #         break
+    while True:
+        result = trainer.train()
+        print(pretty_print(result))
+        if result["timesteps_total"] >= config.TRAIN.RL.stop_timesteps:
+            break
 
     ray.shutdown()
