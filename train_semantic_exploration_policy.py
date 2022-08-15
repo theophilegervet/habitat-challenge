@@ -35,7 +35,7 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
         print("XXX")
         for k, v in input_dict["obs"].items():
             print(k)
-            print(v.type)
+            print(type(v))
             print(v.shape)
         print()
         orientation = torch.div(
