@@ -30,6 +30,7 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
             model_config["custom_model_config"]["hidden_size"],
             model_config["custom_model_config"]["num_sem_categories"]
         )
+        self.dummy = nn.Parameter(torch.empty(0))
 
         self.value = None
 
@@ -42,7 +43,7 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
         print()
         for k, v in input_dict["obs"].items():
             if type(v) == np.ndarray:
-                input_dict["obs"][k] = torch.from_numpy(v)
+                input_dict["obs"][k] = torch.from_numpy(v).to(self.dummy.device)
         orientation = torch.div(
             torch.trunc(input_dict["obs"]["local_pose"][:, 2]) % 360, 5
         ).long()
