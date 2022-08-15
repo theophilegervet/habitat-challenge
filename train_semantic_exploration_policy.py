@@ -33,7 +33,7 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
 
     def forward(self, input_dict, state, seq_lens):
         print("XXX")
-        for k, v in input_dict["obs"]:
+        for k, v in input_dict["obs"].items():
             print(k)
             print(v.type)
             print(v.shape)
