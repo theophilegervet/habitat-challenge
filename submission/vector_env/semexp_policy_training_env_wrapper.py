@@ -135,7 +135,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         obs = {
             "map_features": map_features[0].cpu().numpy(),
             "local_pose": local_pose[0].cpu().numpy(),
-            "goal_category": self.goal_category.numpy()
+            "goal_category": self.goal_category.item()
         }
         return obs
 
@@ -203,7 +203,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         obs = {
             "map_features": map_features[0].cpu().numpy(),
             "local_pose": local_pose[0].cpu().numpy(),
-            "goal_category": self.goal_category.numpy()
+            "goal_category": self.goal_category.item()
         }
 
         # Intrinsic reward = increase in explored area (in m^2)
