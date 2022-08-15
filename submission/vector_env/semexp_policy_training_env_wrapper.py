@@ -87,6 +87,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.scene_id = None
         self.episode_id = None
         self.timestep = None
+        self.goal_category_tensor = None
         self.goal_category = None
         self.goal_name = None
 
@@ -113,9 +114,10 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             map_features,
             semantic_frame,
             local_pose,
-            self.goal_category,
+            self.goal_category_tensor,
             self.goal_name
         ) = self._update_map(seq_obs, update_global=True)
+        self.goal_category = self.goal_category_tensor.item()
 
         vis_inputs = {
             "sensor_pose": self.semantic_map.get_planner_pose_inputs(0),
@@ -127,7 +129,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "semantic_map": self.semantic_map.get_semantic_map(0),
             "semantic_frame": semantic_frame,
             "goal_name": self.goal_name,
-            "goal_category": self.goal_category.item(),
+            "goal_category": self.goal_category,
             "timestep": self.timestep
         }
         self.visualizer.visualize(**vis_inputs)
@@ -135,7 +137,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         obs = {
             "map_features": map_features[0].cpu().numpy(),
             "local_pose": local_pose[0].cpu().numpy(),
-            "goal_category": self.goal_category.item()
+            "goal_category": self.goal_category
         }
         return obs
 
@@ -160,7 +162,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                 "goal_map": self.semantic_map.get_goal_map(0),
                 "found_goal": False,
                 "found_hint": False,
-                "goal_category": self.goal_category.item(),
+                "goal_category": self.goal_category,
                 "sensor_pose": self.semantic_map.get_planner_pose_inputs(0)
             }
             action = self.planner.plan(**planner_inputs)
@@ -177,7 +179,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             # 4 - Check whether we found the goal
             _, found_goal = self.policy.reach_goal_if_in_map(
                 map_features,
-                self.goal_category
+                self.goal_category_tensor
             )
             found_goal = found_goal.item()
 
@@ -195,7 +197,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "semantic_map": self.semantic_map.get_semantic_map(0),
             "semantic_frame": semantic_frame,
             "goal_name": self.goal_name,
-            "goal_category": self.goal_category.item(),
+            "goal_category": self.goal_category,
             "timestep": self.timestep
         }
         self.visualizer.visualize(**vis_inputs)
@@ -203,7 +205,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         obs = {
             "map_features": map_features[0].cpu().numpy(),
             "local_pose": local_pose[0].cpu().numpy(),
-            "goal_category": self.goal_category.item()
+            "goal_category": self.goal_category
         }
 
         # Intrinsic reward = increase in explored area (in m^2)
