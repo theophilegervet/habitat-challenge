@@ -15,6 +15,11 @@ python -m pip install git+https://github.com/facebookresearch/detectron2.git
 pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.11.0/index.html
 git clone https://github.com/open-mmlab/mmdetection.git
 pushd mmdetection; pip install -r requirements/build.txt; pip install "git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI"; pip install -v -e .; popd
+
+# Ray
+pip install -U "ray[tune]"
+pip install -U "ray[rllib]"
+conda install protobuf
 ```
 
 ## Code Structure
