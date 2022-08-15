@@ -61,7 +61,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "map_features": Box(
                 low=0.,
                 high=1.,
-                shape=(self.semantic_map.local_h, self.semantic_map.local_w),
+                shape=(
+                    8 + self.semantic_map.num_sem_categories,
+                    self.semantic_map.local_h,
+                    self.semantic_map.local_w
+                ),
                 dtype=np.float32
             ),
             "local_pose": Box(
