@@ -19,6 +19,7 @@ pushd mmdetection; pip install -r requirements/build.txt; pip install "git+https
 # Ray
 pip install -U "ray[tune]"
 pip install -U "ray[rllib]"
+pip install -U "ray[air]"
 conda install protobuf
 ```
 
