@@ -17,8 +17,8 @@ git clone https://github.com/open-mmlab/mmdetection.git
 pushd mmdetection; pip install -r requirements/build.txt; pip install "git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI"; pip install -v -e .; popd
 
 # Ray
-pip install -U "ray[tune]"
-pip install -U "ray[rllib]"
+pip install ray["rllib"]==2.0.0rc0
+pip install ray["tune"]==2.0.0rc0
 conda install protobuf
 ```
 

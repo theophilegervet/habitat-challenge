@@ -6,13 +6,14 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import ray
-from ray.tune import tuner
-from ray.rllib.agents import ppo
+from ray.rllib.algorithms import ppo, ddppo
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
-from ray.tune.logger import pretty_print
 from ray.rllib.agents.callbacks import DefaultCallbacks
 from ray.rllib.evaluation import Episode
+from ray.tune import tuner
+from ray.tune.logger import pretty_print
+from ray.air.config import RunConfig
 
 from submission.utils.config_utils import get_config
 from submission.policy.semantic_exploration_policy_rllib import SemanticExplorationPolicyNetwork
@@ -94,10 +95,8 @@ if __name__ == "__main__":
 
     train_config = {
         "env": SemanticExplorationPolicyTrainingEnvWrapper,
-        "callbacks": LogRewardDetailsCallback,
         "env_config": {"config": config},
-        "num_gpus": config.TRAIN.RL.num_gpus,
-        "num_gpus_per_worker": config.TRAIN.RL.num_gpus_per_worker,
+        "callbacks": LogRewardDetailsCallback,
         "model": {
             "custom_model": "semantic_exploration_policy",
             "custom_model_config": {
@@ -106,32 +105,67 @@ if __name__ == "__main__":
                 "num_sem_categories": config.ENVIRONMENT.num_sem_categories,
             }
         },
-        "num_workers": config.TRAIN.RL.num_workers,
+        "gamma": config.TRAIN.RL.gamma,
+        "lr": config.TRAIN.RL.lr,
+        "entropy_coeff": config.TRAIN.RL.entropy_coeff,
+        "clip_param": config.TRAIN.RL.clip_param,
         "framework": "torch",
         "disable_env_checking": True,
         "_disable_preprocessor_api": True,
-        "lr": config.TRAIN.RL.lr,
-        "gamma": config.TRAIN.RL.gamma,
-        "rollout_fragment_length": config.TRAIN.RL.batch_size,
-        "train_batch_size": config.TRAIN.RL.batch_size,
-        "sgd_minibatch_size": config.TRAIN.RL.batch_size,
     }
 
-    # Debugging
-    # ppo_config = ppo.DEFAULT_CONFIG.copy()
-    # ppo_config.update(train_config)
-    # trainer = ppo.PPOTrainer(
-    #     config=ppo_config,
-    #     env=SemanticExplorationPolicyTrainingEnvWrapper
-    # )
-    # while True:
-    #     result = trainer.train()
-    #     print(pretty_print(result))
+    if config.TRAIN.RL.algorithm == "PPO":
+        train_config.update({
+            "num_workers": config.TRAIN.RL.PPO.num_workers,
+            "num_gpus": config.TRAIN.RL.PPO.num_gpus,
+            "num_gpus_per_worker": config.TRAIN.RL.PPO.num_gpus_per_worker,
+            "num_sgd_iter": config.TRAIN.RL.PPO.sgd_steps_per_batch,
+            "sgd_minibatch_size": config.TRAIN.RL.PPO.minibatch_size,
+            "train_batch_size": (config.TRAIN.RL.PPO.sgd_steps_per_batch *
+                                 config.TRAIN.RL.PPO.minibatch_size),
+            "rollout_fragment_length": (config.TRAIN.RL.PPO.sgd_steps_per_batch *
+                                        config.TRAIN.RL.PPO.minibatch_size //
+                                        config.TRAIN.RL.PPO.num_workers)
+        })
+    elif config.TRAIN.RL.algorithm == "DDPPO":
+        train_config.update({
+            "num_workers": config.TRAIN.RL.DDPPO.num_workers,
+            "num_envs_per_worker": config.TRAIN.RL.DDPPO.num_envs_per_worker,
+            "remote_worker_envs": True,
+            "num_gpus_per_worker": config.TRAIN.RL.DDPPO.num_gpus_per_worker,
+            "remote_env_batch_wait_ms": config.TRAIN.RL.DDPPO.remote_env_batch_wait_ms,
+            "num_sgd_iter": config.TRAIN.RL.DDPPO.sgd_steps_per_batch,
+            "sgd_minibatch_size": config.TRAIN.RL.DDPPO.minibatch_size,
+            "rollout_fragment_length": (config.TRAIN.RL.DDPPO.sgd_steps_per_batch *
+                                        config.TRAIN.RL.DDPPO.minibatch_size //
+                                        config.TRAIN.RL.DDPPO.num_envs_per_worker)
+        })
 
+    # Debugging
+    if config.TRAIN.RL.algorithm == "PPO":
+        ppo_config = ppo.DEFAULT_CONFIG.copy()
+        ppo_config.update(train_config)
+        trainer = ppo.PPO(
+            config=ppo_config,
+            env=SemanticExplorationPolicyTrainingEnvWrapper
+        )
+    elif config.TRAIN.RL.algorithm == "DDPPO":
+        ddppo_config = ddppo.DEFAULT_CONFIG.copy()
+        ddppo_config.update(train_config)
+        trainer = ddppo.DDPPO(
+            config=ddppo_config,
+            env=SemanticExplorationPolicyTrainingEnvWrapper
+        )
+    while True:
+        result = trainer.train()
+        print(pretty_print(result))
+
+    # Real training
     tuner = tuner.Tuner(
-        "PPO",
+        config.TRAIN.RL.algorithm,
         param_space=train_config,
+        run_config=RunConfig(name=config.TRAIN.RL.exp_name)
     )
-    results = tuner.fit()
+    tuner.fit()
 
     ray.shutdown()

@@ -78,4 +78,6 @@ def get_config(path: str, opts: Optional[list] = None) -> Tuple[Config, str]:
     assert config.ENVIRONMENT.max_depth == depth_sensor.MAX_DEPTH
     assert config.ENVIRONMENT.turn_angle == config.TASK_CONFIG.SIMULATOR.TURN_ANGLE
 
+    assert config.TRAIN.RL.algorithm in ["PPO", "DDPPO"]
+
     return config, config_str
