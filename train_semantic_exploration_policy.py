@@ -161,6 +161,7 @@ if __name__ == "__main__":
     #     print(pretty_print(result))
 
     # Real training
+    print(config.TRAIN.RL.algorithm)
     tuner = tuner.Tuner(
         config.TRAIN.RL.algorithm,
         param_space=train_config,
