@@ -6,8 +6,9 @@ import glob
 
 from habitat.config import Config
 from habitat.core.dataset import Dataset
-from habitat.tasks.nav.object_nav_task import ObjectGoalNavEpisode
 from habitat.core.registry import registry
+from habitat.tasks.nav.object_nav_task import ObjectGoalNavEpisode, ObjectGoal
+
 from submission.utils.constants import (
     challenge_goal_name_to_goal_name,
     goal_id_to_goal_name
@@ -53,6 +54,7 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
         for episode in json.loads(json_str)["episodes"]:
             episode = ObjectGoalNavEpisode(**episode)
             episode.scene_id = os.path.join(scenes_dir, episode.scene_id)
+            episode.goals = [ObjectGoal(**goal) for goal in episode.goals]
             print()
             print(type(episode.goals[0]))
             print(episode.goals[0])
