@@ -39,7 +39,7 @@ def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
         start_position=start_position,
         start_rotation=start_rotation,
         object_category=object_category,
-        goals=[ObjectGoal()]
+        goals=[ObjectGoal(position=[])]
     )
 
 
