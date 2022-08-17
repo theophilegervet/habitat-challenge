@@ -21,6 +21,7 @@ from ray.air.config import RunConfig
 from submission.utils.config_utils import get_config
 from submission.policy.semantic_exploration_policy_rllib import SemanticExplorationPolicyNetwork
 from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
+from train.semexp_policy_training_dataset import SemanticExplorationPolicyTrainingDataset
 
 
 class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
