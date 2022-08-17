@@ -1,13 +1,17 @@
 import gzip
 import json
 import os
-from typing import List
+from typing import List, Dict
 import glob
 
 from habitat.config import Config
 from habitat.core.dataset import Dataset
 from habitat.tasks.nav.object_nav_task import ObjectGoalNavEpisode
 from habitat.core.registry import registry
+from submission.utils.constants import (
+    challenge_goal_name_to_goal_name,
+    goal_id_to_goal_name
+)
 
 
 @registry.register_dataset(name="SemexpPolicyTraining")
@@ -17,9 +21,18 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
     the agent at a random location in the scene.
     """
     episodes: List[ObjectGoalNavEpisode]
+    category_to_task_category_id: Dict[str, int]
 
     def __init__(self, config: Config, dataset_generation: bool = False):
         self.episodes = []
+
+        goal_name_to_challenge_goal_name = {
+            v: k for k, v in challenge_goal_name_to_goal_name.items()
+        }
+        self.category_to_task_category_id = {
+            goal_id: goal_name_to_challenge_goal_name[goal_name]
+            for goal_id, goal_name in goal_id_to_goal_name.items()
+        }
 
         if dataset_generation:
             return
