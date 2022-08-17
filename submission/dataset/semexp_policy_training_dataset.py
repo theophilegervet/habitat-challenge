@@ -18,7 +18,7 @@ from submission.utils.constants import (
 class SemanticExplorationPolicyTrainingDataset(Dataset):
     """
     Simple dataset used to train the semantic exploration policy spawning
-    the agent at a random location in the scene.
+    the agent at a random location in the scene with a random object goal.
     """
     episodes: List[ObjectGoalNavEpisode]
     category_to_task_category_id: Dict[str, int]
