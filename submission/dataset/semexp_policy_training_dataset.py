@@ -30,7 +30,7 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
             v: k for k, v in challenge_goal_name_to_goal_name.items()
         }
         self.category_to_task_category_id = {
-            goal_id: goal_name_to_challenge_goal_name[goal_name]
+            goal_name_to_challenge_goal_name[goal_name]: goal_id
             for goal_id, goal_name in goal_id_to_goal_name.items()
         }
 
