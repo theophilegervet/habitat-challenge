@@ -6,8 +6,7 @@ from pathlib import Path
 import warnings
 warnings.filterwarnings("ignore")
 import sys
-print(str(Path(__file__).resolve().parent))
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import ray
 from ray.rllib.algorithms import ppo, ddppo
