@@ -165,11 +165,13 @@ if __name__ == "__main__":
     #     print(pretty_print(result))
 
     # Training
-    tuner = tuner.Tuner(
-        config.TRAIN.RL.algorithm,
-        param_space=train_config,
-        run_config=RunConfig(name=config.TRAIN.RL.exp_name)
-    )
-    tuner.fit()
+    from habitat.core.env import Env
+    env = Env(config.TASK_CONFIG)
+    # tuner = tuner.Tuner(
+    #     config.TRAIN.RL.algorithm,
+    #     param_space=train_config,
+    #     run_config=RunConfig(name=config.TRAIN.RL.exp_name)
+    # )
+    # tuner.fit()
 
     ray.shutdown()
