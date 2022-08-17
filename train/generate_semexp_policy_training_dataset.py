@@ -10,9 +10,10 @@ import quaternion
 import random
 
 import habitat
-from habitat.core.dataset import Episode
+from habitat.tasks.nav.object_nav_task import ObjectGoalNavEpisode
 
 from submission.dataset.semexp_policy_training_dataset import SemanticExplorationPolicyTrainingDataset
+from submission.utils.constants import challenge_goal_name_to_goal_name
 
 
 SCENES_ROOT_PATH = (
@@ -25,19 +26,21 @@ DATASET_ROOT_PATH = (
 )
 
 
-def generate_episode(sim, episode_count: int) -> Episode:
+def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
     start_position = sim.sample_navigable_point()
     start_yaw = random.random() * np.pi
     start_rotation = quaternion.from_euler_angles(0, start_yaw, 0)
-    return Episode(
+    object_category = random.choice(list(challenge_goal_name_to_goal_name.keys()))
+    return ObjectGoalNavEpisode(
         episode_id=str(episode_count),
         scene_id=sim.habitat_config.SCENE,
         start_position=start_position,
         start_rotation=start_rotation,
+        object_category=object_category
     )
 
 
-def generate_scene_episodes(scene_path: str, num_episodes: int = 10):
+def generate_scene_episodes(scene_path: str, num_episodes: int = 2):
     # 1K scenes * 5K episodes per scene = 5M episodes
     if "train" in scene_path:
         split = "train"
