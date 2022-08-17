@@ -119,7 +119,7 @@ if __name__ == "__main__":
 
     if config.TRAIN.RL.algorithm == "PPO":
         train_config.update({
-            "num_workers": 0,  # TODO config.TRAIN.RL.PPO.num_workers,
+            "num_workers": config.TRAIN.RL.PPO.num_workers,
             "num_gpus": config.TRAIN.RL.PPO.num_gpus,
             "num_gpus_per_worker": config.TRAIN.RL.PPO.num_gpus_per_worker,
             "num_sgd_iter": config.TRAIN.RL.PPO.sgd_steps_per_batch,
