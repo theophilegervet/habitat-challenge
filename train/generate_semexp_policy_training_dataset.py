@@ -8,6 +8,8 @@ import tqdm
 import numpy as np
 import quaternion
 import random
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import habitat
 from habitat.tasks.nav.object_nav_task import ObjectGoalNavEpisode
