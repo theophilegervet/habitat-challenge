@@ -47,8 +47,8 @@ def generate_scene_episodes(scene_path: str, num_episodes: int = 10):
         raise ValueError
 
     config = habitat.get_config(str(
-        Path(__file__).resolve().parent /
-        "semexp_policy_training_env_config.yaml"
+        Path(__file__).resolve().parent.parent /
+        "submission/dataset/semexp_policy_training_env_config.yaml"
     ))
     config.defrost()
     config.SIMULATOR.SCENE = scene_path
