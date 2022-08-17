@@ -30,7 +30,7 @@ DATASET_ROOT_PATH = (
 
 def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
     start_position = sim.sample_navigable_point()
-    start_yaw = random.random() * np.pi
+    start_yaw = random.random() * 2 * np.pi
     start_rotation = quaternion.from_euler_angles(0, start_yaw, 0)
     object_category = random.choice(list(challenge_goal_name_to_goal_name.keys()))
     return ObjectGoalNavEpisode(

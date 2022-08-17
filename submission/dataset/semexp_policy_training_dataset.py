@@ -53,4 +53,8 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
         for episode in json.loads(json_str)["episodes"]:
             episode = ObjectGoalNavEpisode(**episode)
             episode.scene_id = os.path.join(scenes_dir, episode.scene_id)
+            print()
+            print(type(episode.goals[0]))
+            print(episode.goals[0])
+            print()
             self.episodes.append(episode)
