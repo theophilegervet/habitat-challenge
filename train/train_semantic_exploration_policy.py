@@ -2,8 +2,11 @@ import os
 import numpy as np
 import torch
 import torch.nn as nn
+from pathlib import Path
 import warnings
 warnings.filterwarnings("ignore")
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import ray
 from ray.rllib.algorithms import ppo, ddppo
