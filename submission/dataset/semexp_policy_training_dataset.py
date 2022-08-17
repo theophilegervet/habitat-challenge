@@ -55,8 +55,4 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
             episode = ObjectGoalNavEpisode(**episode)
             episode.scene_id = os.path.join(scenes_dir, episode.scene_id)
             episode.goals = [ObjectGoal(**goal) for goal in episode.goals]
-            print()
-            print(type(episode.goals[0]))
-            print(episode.goals[0])
-            print()
             self.episodes.append(episode)
