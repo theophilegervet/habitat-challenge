@@ -38,7 +38,8 @@ def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
         scene_id=sim.habitat_config.SCENE,
         start_position=start_position,
         start_rotation=start_rotation,
-        object_category=object_category
+        object_category=object_category,
+        goals=[]
     )
 
 
