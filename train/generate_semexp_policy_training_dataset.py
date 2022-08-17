@@ -12,7 +12,7 @@ import random
 import habitat
 from habitat.core.dataset import Episode
 
-from semexp_policy_training_dataset import SemanticExplorationPolicyTrainingDataset
+from submission.dataset.semexp_policy_training_dataset import SemanticExplorationPolicyTrainingDataset
 
 
 SCENES_ROOT_PATH = (

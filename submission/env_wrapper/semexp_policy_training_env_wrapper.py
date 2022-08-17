@@ -17,6 +17,8 @@ from submission.visualizer.visualizer import Visualizer
 from submission.semantic_map.semantic_map_state import SemanticMapState
 from submission.semantic_map.semantic_map_module import SemanticMapModule
 from submission.policy.frontier_exploration_policy import FrontierExplorationPolicy
+# Import to register dataset in environment processes
+from submission.dataset.semexp_policy_training_dataset import SemanticExplorationPolicyTrainingDataset
 
 
 class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
