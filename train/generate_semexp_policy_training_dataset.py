@@ -12,7 +12,7 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import habitat
-from habitat.tasks.nav.object_nav_task import ObjectGoalNavEpisode
+from habitat.tasks.nav.object_nav_task import ObjectGoalNavEpisode, ObjectGoal
 
 from submission.dataset.semexp_policy_training_dataset import SemanticExplorationPolicyTrainingDataset
 from submission.utils.constants import challenge_goal_name_to_goal_name
@@ -39,7 +39,7 @@ def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
         start_position=start_position,
         start_rotation=start_rotation,
         object_category=object_category,
-        goals=[]
+        goals=[ObjectGoal()]
     )
 
 

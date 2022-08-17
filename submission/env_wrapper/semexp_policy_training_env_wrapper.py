@@ -102,7 +102,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.semantic_map.init_map_and_pose()
 
         obs = super().reset()
-        print(obs.keys())  # TODO
         seq_obs = [obs]
 
         self.scene_id = self.current_episode.scene_id.split("/")[-1].split(".")[0]
