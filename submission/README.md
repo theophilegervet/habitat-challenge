@@ -31,11 +31,11 @@ This repository contains modular components that can either be in the agent or e
 * `planner` selects low-level actions from high-level goals
 * `visualizer` contains utilities to visualize observations, the semantic map, and goals
 
-&nbsp;                  | `obs_preprocessor` | `semantic_map` | `policy` | `planner` | `visualizer` | agent entry point                                                     | env entry point
-------------------------|--------------------|----------------|----------|-----------|--------------|-----------------------------------------------------------------------|----------------
-Challenge inference     | agent              | agent          | agent    | agent     | agent        | `agent.py Agent.act()`                                                | `habitat.core.env Env.step()`
-Vectorized evaluation   | env                | agent          | agent    | env       | env          | `agent.py Agent.prepare_planner_inputs()`                             | `vector_env/eval_env_wrapper.py EvalEnvWrapper.plan_and_step()`
-Policy training with RL | env                | env            | agent    | env       | -            | `policy/semantic_exploration_policy.py SemanticExplorationPolicy.TODO()` | `vector_env/semexp_policy_training_env_wrapper.py SemexpPolicyTrainingEnvWrapper.step()`
+&nbsp;                  | `obs_preprocessor` | `semantic_map` | `policy` | `planner` | `visualizer` | agent entry point                                                                  | env entry point
+------------------------|--------------------|----------------|----------|-----------|--------------|------------------------------------------------------------------------------------|----------------
+Challenge inference     | agent              | agent          | agent    | agent     | agent        | `agent.py Agent.act()`                                                             | `habitat.core.env Env.step()`
+Vectorized evaluation   | env                | agent          | agent    | env       | env          | `agent.py Agent.prepare_planner_inputs()`                                          | `env_wrapper/eval_env_wrapper.py EvalEnvWrapper.plan_and_step()`
+Policy training with RL | env                | env            | agent    | env       | env          | `policy/semantic_exploration_policy.py SemanticExplorationPolicyNetwork.forward()` | `env_wrapper/semexp_policy_training_env_wrapper.py SemanticExplorationPolicyTrainingEnvWrapper.step()`
 
 ## Make a Submission
 
