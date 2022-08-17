@@ -5,7 +5,8 @@ from typing import List
 import glob
 
 from habitat.config import Config
-from habitat.core.dataset import Dataset, Episode
+from habitat.core.dataset import Dataset
+from habitat.tasks.nav.object_nav_task import ObjectGoalNavEpisode
 from habitat.core.registry import registry
 
 
@@ -15,7 +16,7 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
     Simple dataset used to train the semantic exploration policy spawning
     the agent at a random location in the scene.
     """
-    episodes: List[Episode]
+    episodes: List[ObjectGoalNavEpisode]
 
     def __init__(self, config: Config, dataset_generation: bool = False):
         self.episodes = []
@@ -37,6 +38,6 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
 
     def from_json(self, json_str: str, scenes_dir: str):
         for episode in json.loads(json_str)["episodes"]:
-            episode = Episode(**episode)
+            episode = ObjectGoalNavEpisode(**episode)
             episode.scene_id = os.path.join(scenes_dir, episode.scene_id)
             self.episodes.append(episode)
