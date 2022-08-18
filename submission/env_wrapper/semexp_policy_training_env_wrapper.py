@@ -204,11 +204,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         }
         self.visualizer.visualize(**vis_inputs)
 
-        print()
-        print("ENV:")
-        print(map_features[0].device)
-        print()
-
         obs = {
             "map_features": map_features[0].cpu().numpy(),
             "local_pose": local_pose[0].cpu().numpy(),

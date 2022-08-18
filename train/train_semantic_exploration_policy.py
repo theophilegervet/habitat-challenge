@@ -49,12 +49,6 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
             torch.trunc(input_dict["obs"]["local_pose"][:, 2]) % 360, 5
         ).long()
 
-        print()
-        print("MODEL:")
-        print(input_dict["obs"]["map_features"].shape)
-        print(input_dict["obs"]["map_features"].device)
-        print()
-
         outputs, value = self.policy_network(
             input_dict["obs"]["map_features"],
             orientation,
