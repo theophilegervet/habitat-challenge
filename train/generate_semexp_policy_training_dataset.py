@@ -44,39 +44,43 @@ def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
 
 
 def generate_scene_episodes(scene_path: str, num_episodes: int = 5000):
-    # 1K scenes * 5K episodes per scene = 5M episodes
-    if "train" in scene_path:
-        split = "train"
-    elif "val" in scene_path:
-        split = "val"
-    else:
-        raise ValueError
+    try:
+        # 1K scenes * 5K episodes per scene = 5M episodes
+        if "train" in scene_path:
+            split = "train"
+        elif "val" in scene_path:
+            split = "val"
+        else:
+            raise ValueError
 
-    config = habitat.get_config(str(
-        Path(__file__).resolve().parent.parent /
-        "submission/dataset/semexp_policy_training_env_config.yaml"
-    ))
-    config.defrost()
-    config.SIMULATOR.SCENE = scene_path
-    config.DATASET.SPLIT = split
-    config.freeze()
+        config = habitat.get_config(str(
+            Path(__file__).resolve().parent.parent /
+            "submission/dataset/semexp_policy_training_env_config.yaml"
+        ))
+        config.defrost()
+        config.SIMULATOR.SCENE = scene_path
+        config.DATASET.SPLIT = split
+        config.freeze()
 
-    sim = habitat.sims.make_sim("Sim-v0", config=config.SIMULATOR)
+        sim = habitat.sims.make_sim("Sim-v0", config=config.SIMULATOR)
 
-    # Create dataset and episodes
-    dataset = SemanticExplorationPolicyTrainingDataset(
-        config.DATASET, dataset_generation=True)
-    for episode_count in range(num_episodes):
-        dataset.episodes.append(generate_episode(sim, episode_count))
-    for ep in dataset.episodes:
-        ep.scene_id = ep.scene_id.split("scene_datasets/")[-1]
+        # Create dataset and episodes
+        dataset = SemanticExplorationPolicyTrainingDataset(
+            config.DATASET, dataset_generation=True)
+        for episode_count in range(num_episodes):
+            dataset.episodes.append(generate_episode(sim, episode_count))
+        for ep in dataset.episodes:
+            ep.scene_id = ep.scene_id.split("scene_datasets/")[-1]
 
-    # Store episodes with one file per scene
-    scene_key = scene_path.split("/")[-1].split(".")[0]
-    out_path = f"{DATASET_ROOT_PATH}/FULL/{split}/scenes/{scene_key}.json.gz"
-    os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    with gzip.open(out_path, "wt") as f:
-        f.write(dataset.to_json())
+        # Store episodes with one file per scene
+        scene_key = scene_path.split("/")[-1].split(".")[0]
+        out_path = f"{DATASET_ROOT_PATH}/FULL/{split}/scenes/{scene_key}.json.gz"
+        os.makedirs(os.path.dirname(out_path), exist_ok=True)
+        with gzip.open(out_path, "wt") as f:
+            f.write(dataset.to_json())
+
+    except:
+        pass
 
 
 # Dataset is stored in per-scene files, generate empty split files
