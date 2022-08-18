@@ -23,7 +23,7 @@ TRAIN:
   RL:
     exp_name: exp1              # experiment name
     algorithm: PPO              # one of "PPO" or "DDPPO"
-    gamma: 0.95                 # discount factor of the MDP
+    gamma: 0.9                  # discount factor of the MDP
     intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
     lr: 0.00005                 # learning rate
     entropy_coeff: 0.001        # entropy regularization scaling
