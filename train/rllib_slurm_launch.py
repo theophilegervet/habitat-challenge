@@ -3,8 +3,9 @@
 #   --exp-name train_semexp \
 #   --command "python train/train_semantic_exploration_policy.py" \
 #   --load-env "conda activate habitat-challenge" \
-#   --num-nodes 4 \
-#   --num-gpus 8
+#   --num-nodes 1 \
+#   --num-gpus 8 \
+#   --partition learnfair
 
 import os
 import argparse

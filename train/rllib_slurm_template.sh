@@ -6,6 +6,7 @@ ${PARTITION_OPTION}
 #SBATCH --job-name=${JOB_NAME}
 #SBATCH --output=slurm_logs/${JOB_NAME}-%j.out
 #SBATCH --error=slurm_logs/${JOB_NAME}-%j.err
+#SBATCH --time=3-00:00:00
 ${GIVEN_NODE}
 ### This script works for any number of nodes, Ray will find and manage all resources
 #SBATCH --nodes=${NUM_NODES}
