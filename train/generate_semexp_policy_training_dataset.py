@@ -88,15 +88,11 @@ for split in ["val", "train"]:
         json.dump(dict(episodes=[]), f)
 
 # Generate per-scene files
-for split in ["val"]:
-    scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
-
-    done_scene_keys = set([path.split("/")[-1].split(".")[0]
-                           for path in glob.glob(f"{DATASET_ROOT_PATH}/FULL/{split}/scenes/*")])
-    todo_scenes = [scene for scene in scenes
-                   if scene.split("/")[-1].split(".")[0] not in done_scene_keys]
-    # with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-    #     for _ in pool.imap_unordered(generate_scene_episodes, scenes):
-    #         pbar.update()
-    for scene in tqdm.tqdm(todo_scenes):
-        generate_scene_episodes(scene)
+# for split in ["val"]:
+#     scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+#
+#     # with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+#     #     for _ in pool.imap_unordered(generate_scene_episodes, scenes):
+#     #         pbar.update()
+#     for scene in tqdm.tqdm(scenes):
+#         generate_scene_episodes(scene)
