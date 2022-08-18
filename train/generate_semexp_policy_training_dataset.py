@@ -96,10 +96,9 @@ for split in ["train"]:
 
     done_scene_keys = set([path.split("/")[-1].split(".")[0]
                            for path in glob.glob(f"{DATASET_ROOT_PATH}/FULL/{split}/scenes/*")])
-    print(len(done_scene_keys))
-    # todo_scenes = [scene for scene in scenes
-    #                if scene.split("/")[-1].split(".")[0] not in done_scene_keys]
-    # print(todo_scenes)
+    todo_scenes = [scene for scene in scenes
+                   if scene.split("/")[-1].split(".")[0] not in done_scene_keys]
+    print(len(todo_scenes))
     # with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
     #     for _ in pool.imap_unordered(generate_scene_episodes, scenes):
     #         pbar.update()
