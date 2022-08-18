@@ -2,7 +2,6 @@ scikit-image
 scikit-fmm
 torchvision
 GPUtil
-# TODO Ray
 
 # In order to use X11 forwarding properly
 # pyqt5==5.15.2
