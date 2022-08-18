@@ -89,8 +89,8 @@ for split in ["val", "train"]:
 # Generate per-scene files
 for split in ["val", "train"]:
     scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
-    # with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-    #     for _ in pool.imap_unordered(generate_scene_episodes, scenes):
-    #         pbar.update()
-    for scene in tqdm.tqdm(scenes):
-        generate_scene_episodes(scene)
+    with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+        for _ in pool.imap_unordered(generate_scene_episodes, scenes):
+            pbar.update()
+    # for scene in tqdm.tqdm(scenes):
+    #     generate_scene_episodes(scene)
