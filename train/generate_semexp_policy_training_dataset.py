@@ -95,7 +95,7 @@ for split in ["train"]:
     scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
 
     done_scene_keys = set([path.split("/")[-1].split(".")[0]
-                           for path in f"{DATASET_ROOT_PATH}/FULL/{split}/scenes/*"])
+                           for path in glob.glob(f"{DATASET_ROOT_PATH}/FULL/{split}/scenes/*")])
     print(done_scene_keys)
     # todo_scenes = [scene for scene in scenes
     #                if scene.split("/")[-1].split(".")[0] not in done_scene_keys]
