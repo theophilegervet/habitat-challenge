@@ -1,4 +1,3 @@
-# slurm-launch.py
 # Usage:
 # python train/rllib_slurm_launch.py \
 #   --exp-name train_semexp \
@@ -7,6 +6,7 @@
 #   --num-nodes 4 \
 #   --num-gpus 8
 
+import os
 import argparse
 import subprocess
 import sys
@@ -81,7 +81,7 @@ if __name__ == "__main__":
         "#SBATCH --partition={}".format(args.partition) if args.partition else ""
     )
 
-    # ===== Modified the template script =====
+    # ===== Modify the template script =====
     with open(template_file, "r") as f:
         text = f.read()
     text = text.replace(JOB_NAME, job_name)
@@ -97,17 +97,18 @@ if __name__ == "__main__":
         "RUNNABLE!",
     )
 
-    # ===== Save the script =====
+    # ===== Save the template script =====
     script_file = "{}.sh".format(job_name)
     with open(script_file, "w") as f:
         f.write(text)
 
     # ===== Submit the job =====
     print("Starting to submit job!")
+    os.makedirs("slurm_logs", exist_ok=True)
     subprocess.Popen(["sbatch", script_file])
     print(
-        "Job submitted! Script file is at: <{}>. Log file is at: <{}>".format(
-            script_file, "{}.log".format(job_name)
+        "Job submitted! Script file is at: <{}>. Log files are at: <{}>".format(
+            script_file, "slurm_logs/{}.err/out".format(job_name)
         )
     )
     sys.exit(0)
