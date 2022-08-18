@@ -1,10 +1,10 @@
 # slurm-launch.py
 # Usage:
-# python slurm-launch.py \
+# python train/rllib_slurm_launch.py \
 #   --exp-name train_semexp \
 #   --command "python train/train_semantic_exploration_policy.py" \
 #   --load-env "conda activate habitat-challenge" \
-#   --num_nodes 4 \
+#   --num-nodes 4 \
 #   --num-gpus 8
 
 import argparse
@@ -14,7 +14,7 @@ import time
 
 from pathlib import Path
 
-template_file = Path(__file__) / "rllib_slurm_template.sh"
+template_file = Path(__file__).resolve().parent / "rllib_slurm_template.sh"
 JOB_NAME = "${JOB_NAME}"
 NUM_NODES = "${NUM_NODES}"
 NUM_GPUS_PER_NODE = "${NUM_GPUS_PER_NODE}"
