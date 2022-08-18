@@ -96,7 +96,7 @@ for split in ["train"]:
 
     done_scene_keys = set([path.split("/")[-1].split(".")[0]
                            for path in glob.glob(f"{DATASET_ROOT_PATH}/FULL/{split}/scenes/*")])
-    print(done_scene_keys)
+    print(len(done_scene_keys))
     # todo_scenes = [scene for scene in scenes
     #                if scene.split("/")[-1].split(".")[0] not in done_scene_keys]
     # print(todo_scenes)
