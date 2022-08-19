@@ -55,7 +55,7 @@ def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
     )
 
 
-def generate_scene_episodes(scene_path: str, num_episodes: int = 100):
+def generate_scene_episodes(scene_path: str, num_episodes: int = 5000):
     # 800 train scenes * 5K episodes per scene = 4M train episodes
     # 100 val scenes * 100 episodes per scene = 1K eval episodes
     if "train" in scene_path:
@@ -100,7 +100,7 @@ for split in ["val", "train"]:
         json.dump(dict(episodes=[]), f)
 
 # Generate per-scene files
-for split in ["val"]:
+for split in ["train"]:
     scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
 
     with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
