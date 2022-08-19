@@ -42,7 +42,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             config = rllib_config["config"]
 
             # Select scenes
-            dataset = make_dataset(config.TASK_CONFIG.DATASET.TYPE)
+            dataset = SemanticExplorationPolicyTrainingDataset(config.DATASET)
             scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
             if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
                 scenes = dataset.get_scenes_to_load(config.TASK_CONFIG.DATASET)
