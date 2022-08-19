@@ -2,7 +2,6 @@ import torch
 from torch import Tensor
 import numpy as np
 from typing import Tuple, List, Optional
-import quaternion
 
 from habitat import Config
 from habitat.core.env import RLEnv
@@ -94,38 +93,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.goal_category = None
         self.goal_name = None
 
-    def _reset(self) -> Observations:
-        obs = super().reset()
-
-        # state = self.habitat_env.sim.get_agent_state()
-        # rotation = quaternion.as_float_array(state.rotation)
-        # rotation = quaternion.quaternion(rotation[1], 0., rotation[3], 0.)
-        # print()
-        # print("state.rotation", state.rotation)
-        # print("rotation", rotation)
-        # print("self.habitat_env.current_episode.start_rotation", self.habitat_env.current_episode.start_rotation)
-        # print()
-        # obs.update(self.habitat_env.sim.get_observations_at(state.position, rotation))
-
-        return obs
-
-    def _step(self, action: int) -> Observations:
-        obs, _, _, _ = super().step(action)
-
-        # state = self.habitat_env.sim.get_agent_state()
-        # rotation = quaternion.as_float_array(state.rotation)
-        # rotation = quaternion.quaternion(rotation[1], 0., rotation[3], 0.)
-        # print()
-        # print("state.rotation", state.rotation)
-        # print("rotation", rotation)
-        # print("self.habitat_env.current_episode.start_rotation",
-        #       self.habitat_env.current_episode.start_rotation)
-        # print()
-        # obs.update(
-        #     self.habitat_env.sim.get_observations_at(state.position, rotation))
-
-        return obs
-
     def reset(self) -> dict:
         self.timestep = 0
 
@@ -134,7 +101,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.visualizer.reset()
         self.semantic_map.init_map_and_pose()
 
-        obs = self._reset()
+        obs = super().reset()
         seq_obs = [obs]
 
         self.scene_id = self.current_episode.scene_id.split("/")[-1].split(".")[0]
@@ -142,7 +109,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.visualizer.set_vis_dir(self.scene_id, self.episode_id)
 
         for _ in range(self.panorama_start_steps):
-            obs = self._step(HabitatSimActions.TURN_RIGHT)
+            obs, _, _, _ = super().step(HabitatSimActions.TURN_RIGHT)
             seq_obs.append(obs)
 
         (
@@ -213,7 +180,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             action = self.planner.plan(**planner_inputs)
 
             # 2 - Step
-            obs = self._step(action)
+            obs, _, _, _ = super().step(action)
 
             # 3 - Update map
             map_features, semantic_frame, local_pose, _, _ = self._update_map(

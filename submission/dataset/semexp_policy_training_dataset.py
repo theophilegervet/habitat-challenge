@@ -3,7 +3,6 @@ import json
 import os
 from typing import List, Dict
 import glob
-import quaternion
 
 from habitat.config import Config
 from habitat.core.dataset import Dataset
