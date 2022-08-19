@@ -144,6 +144,8 @@ if __name__ == "__main__":
                                         config.TRAIN.RL.DDPPO.num_envs_per_worker)
         })
 
+    print(config_str)
+
     # Debugging
     # if config.TRAIN.RL.algorithm == "PPO":
     #     ppo_config = ppo.DEFAULT_CONFIG.copy()
