@@ -35,7 +35,7 @@ def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
     start_rotation = quaternion.from_euler_angles(0, start_yaw, 0)
 
     obs = sim.get_observations_at(start_position, start_rotation)
-    cv2.imwrite(f"starting_positions/{sim.habitat_config.SCENE}_{episode_count}.png", obs["rgb"])
+    cv2.imwrite(f"/private/home/theop123/habitat-challenge/starting_positions/{sim.habitat_config.SCENE}_{episode_count}.png", obs["rgb"])
 
     object_category = random.choice(list(challenge_goal_name_to_goal_name.keys()))
     return ObjectGoalNavEpisode(
