@@ -29,14 +29,22 @@ DATASET_ROOT_PATH = (
 
 
 def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
+    # Position
     start_position = sim.pathfinder.get_random_navigable_point()
     attempt = 1
     while sim.pathfinder.distance_to_closest_obstacle(start_position) < 1.0 and attempt < 50:
         start_position = sim.pathfinder.get_random_navigable_point()
         attempt += 1
+
+    # Rotation
     start_yaw = random.random() * 2 * np.pi
     start_rotation = quaternion.from_euler_angles(0, start_yaw, 0)
+    start_rotation = quaternion.as_float_array(start_rotation)
+    start_rotation = [0., start_rotation[0], 0., start_rotation[2]]
+
+    # Object goal
     object_category = random.choice(list(challenge_goal_name_to_goal_name.keys()))
+
     return ObjectGoalNavEpisode(
         episode_id=str(episode_count),
         scene_id=sim.habitat_config.SCENE,

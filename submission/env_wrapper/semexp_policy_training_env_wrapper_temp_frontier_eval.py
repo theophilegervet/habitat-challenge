@@ -96,33 +96,33 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
     def _reset(self) -> Observations:
         obs = super().reset()
-        state = self.habitat_env.sim.get_agent_state()
 
-        rotation = quaternion.as_float_array(state.rotation)
-        rotation = quaternion.quaternion(rotation[1], 0., rotation[3], 0.)
-        print()
-        print("state.rotation", state.rotation)
-        print("rotation", rotation)
-        print("self.habitat_env.current_episode.start_rotation", self.habitat_env.current_episode.start_rotation)
-        print()
-        obs.update(self.habitat_env.sim.get_observations_at(state.position, rotation))
+        # state = self.habitat_env.sim.get_agent_state()
+        # rotation = quaternion.as_float_array(state.rotation)
+        # rotation = quaternion.quaternion(rotation[1], 0., rotation[3], 0.)
+        # print()
+        # print("state.rotation", state.rotation)
+        # print("rotation", rotation)
+        # print("self.habitat_env.current_episode.start_rotation", self.habitat_env.current_episode.start_rotation)
+        # print()
+        # obs.update(self.habitat_env.sim.get_observations_at(state.position, rotation))
 
         return obs
 
     def _step(self, action: int) -> Observations:
         obs, _, _, _ = super().step(action)
-        state = self.habitat_env.sim.get_agent_state()
 
-        rotation = quaternion.as_float_array(state.rotation)
-        rotation = quaternion.quaternion(rotation[1], 0., rotation[3], 0.)
-        print()
-        print("state.rotation", state.rotation)
-        print("rotation", rotation)
-        print("self.habitat_env.current_episode.start_rotation",
-              self.habitat_env.current_episode.start_rotation)
-        print()
-        obs.update(
-            self.habitat_env.sim.get_observations_at(state.position, rotation))
+        # state = self.habitat_env.sim.get_agent_state()
+        # rotation = quaternion.as_float_array(state.rotation)
+        # rotation = quaternion.quaternion(rotation[1], 0., rotation[3], 0.)
+        # print()
+        # print("state.rotation", state.rotation)
+        # print("rotation", rotation)
+        # print("self.habitat_env.current_episode.start_rotation",
+        #       self.habitat_env.current_episode.start_rotation)
+        # print()
+        # obs.update(
+        #     self.habitat_env.sim.get_observations_at(state.position, rotation))
 
         return obs
 
