@@ -36,7 +36,7 @@ def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
 
     obs = sim.get_observations_at(start_position, start_rotation)
     print("XXXXX")
-    print(obs.shape)
+    print(obs["rgb"].shape)
     cv2.imwrite(f"/private/home/theop123/habitat-challenge/starting_positions/{sim.habitat_config.SCENE}_{episode_count}.png", obs["rgb"])
 
     object_category = random.choice(list(challenge_goal_name_to_goal_name.keys()))
