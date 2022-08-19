@@ -145,30 +145,30 @@ if __name__ == "__main__":
         })
 
     # Debugging
-    if config.TRAIN.RL.algorithm == "PPO":
-        ppo_config = ppo.DEFAULT_CONFIG.copy()
-        ppo_config.update(train_config)
-        trainer = ppo.PPO(
-            config=ppo_config,
-            env=SemanticExplorationPolicyTrainingEnvWrapper
-        )
-    elif config.TRAIN.RL.algorithm == "DDPPO":
-        ddppo_config = ddppo.DEFAULT_CONFIG.copy()
-        ddppo_config.update(train_config)
-        trainer = ddppo.DDPPO(
-            config=ddppo_config,
-            env=SemanticExplorationPolicyTrainingEnvWrapper
-        )
-    while True:
-        result = trainer.train()
-        print(pretty_print(result))
+    # if config.TRAIN.RL.algorithm == "PPO":
+    #     ppo_config = ppo.DEFAULT_CONFIG.copy()
+    #     ppo_config.update(train_config)
+    #     trainer = ppo.PPO(
+    #         config=ppo_config,
+    #         env=SemanticExplorationPolicyTrainingEnvWrapper
+    #     )
+    # elif config.TRAIN.RL.algorithm == "DDPPO":
+    #     ddppo_config = ddppo.DEFAULT_CONFIG.copy()
+    #     ddppo_config.update(train_config)
+    #     trainer = ddppo.DDPPO(
+    #         config=ddppo_config,
+    #         env=SemanticExplorationPolicyTrainingEnvWrapper
+    #     )
+    # while True:
+    #     result = trainer.train()
+    #     print(pretty_print(result))
 
     # Training
-    # tuner = tuner.Tuner(
-    #     config.TRAIN.RL.algorithm,
-    #     param_space=train_config,
-    #     run_config=RunConfig(name=config.TRAIN.RL.exp_name)
-    # )
-    # tuner.fit()
+    tuner = tuner.Tuner(
+        config.TRAIN.RL.algorithm,
+        param_space=train_config,
+        run_config=RunConfig(name=config.TRAIN.RL.exp_name)
+    )
+    tuner.fit()
 
     ray.shutdown()
