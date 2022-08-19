@@ -40,6 +40,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         if config is None:
             config = rllib_config["config"]
+            config.defrost()
 
             # Select scenes
             dataset = SemanticExplorationPolicyTrainingDataset(
@@ -61,6 +62,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
             # Set random seed
             config.TASK_CONFIG.SEED = rllib_config.worker_index
+
+            config.freeze()
 
         super().__init__(config=config.TASK_CONFIG)
 
