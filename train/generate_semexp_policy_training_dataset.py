@@ -109,8 +109,8 @@ for split in ["train"]:
                    if scene.split("/")[-1].split(".")[0] not in done_scene_keys]
     print(len(todo_scenes))
 
-    # with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-    #     for _ in pool.imap_unordered(generate_scene_episodes, scenes):
-    #         pbar.update()
+    with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(todo_scenes)) as pbar:
+        for _ in pool.imap_unordered(generate_scene_episodes, todo_scenes):
+            pbar.update()
     # for scene in tqdm.tqdm(scenes):
     #     generate_scene_episodes(scene)
