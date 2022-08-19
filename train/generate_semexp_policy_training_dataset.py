@@ -33,9 +33,9 @@ DATASET_ROOT_PATH = (
 def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
     start_position = sim.pathfinder.get_random_navigable_point()
     attempt = 1
-    while sim.pathfinder.distance_to_closest_obstacle(start_position) < 1.0 and attempt < 50:
-        start_position = sim.pathfinder.get_random_navigable_point()
-        attempt += 1
+    # while sim.pathfinder.distance_to_closest_obstacle(start_position) < 1.0 and attempt < 50:
+    #     start_position = sim.pathfinder.get_random_navigable_point()
+    #     attempt += 1
     start_yaw = random.random() * 2 * np.pi
     start_rotation = quaternion.from_euler_angles(0, start_yaw, 0)
 
