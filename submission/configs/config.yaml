@@ -6,7 +6,7 @@ SIMULATOR_GPU_IDS: [0, 1] # IDs of GPUs to use for vectorized environments
 NO_GPU: 0                 # 1: ignore IDs above and run on CPU, 0: run on GPUs with IDs above
 NUM_ENVIRONMENTS: 1       # number of environments (per agent process)
 DUMP_LOCATION: data       # path to dump models and log
-EXP_NAME: 1node_ppo       # experiment name
+EXP_NAME: 1node_ppo_debug       # experiment name
 MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
 VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
 PRINT_IMAGES: 1           # 1: save visualization as images, 0: no image saving
@@ -21,7 +21,7 @@ EVAL_VECTORIZED:
 
 TRAIN:
   RL:
-    exp_name: 1node_ppo         # experiment name
+    exp_name: 1node_ppo_debug         # experiment name
     algorithm: PPO              # one of "PPO" or "DDPPO"
     gamma: 0.9                  # discount factor of the MDP
     intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
