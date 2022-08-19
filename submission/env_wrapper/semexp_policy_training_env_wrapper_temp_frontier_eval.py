@@ -3,10 +3,11 @@ from torch import Tensor
 import numpy as np
 from typing import Tuple, List, Optional
 
-from habitat import Config
+from habitat import Config, make_dataset
 from habitat.core.env import RLEnv
 from habitat.core.simulator import Observations
 from habitat.sims.habitat_simulator.actions import HabitatSimActions
+from habitat.core.dataset import ALL_SCENES_MASK
 from gym.spaces import Dict as SpaceDict
 from gym.spaces import Box, Discrete
 from ray.rllib.env.env_context import EnvContext
@@ -36,8 +37,25 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                  config: Optional[Config] = None
                  ):
         assert rllib_config is not None or config is not None
+
         if config is None:
             config = rllib_config["config"]
+
+            # Select scenes
+            dataset = make_dataset(config.TASK_CONFIG.DATASET.TYPE)
+            scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
+            if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
+                scenes = dataset.get_scenes_to_load(config.TASK_CONFIG.DATASET)
+            scene_splits = [[] for _ in range(rllib_config.num_workers)]
+            for idx, scene in enumerate(scenes):
+                scene_splits[idx % len(scene_splits)].append(scene)
+            assert sum(map(len, scene_splits)) == len(scenes)
+            config.TASK_CONFIG.DATASET.CONTENT_SCENES = [
+                scene_splits[rllib_config.worker_index]]
+
+            # Set random seed
+            config.TASK_CONFIG.SEED = rllib_config.worker_index
+
         super().__init__(config=config.TASK_CONFIG)
 
         assert config.NUM_ENVIRONMENTS == 1
