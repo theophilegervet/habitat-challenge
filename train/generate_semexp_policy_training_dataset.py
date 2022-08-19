@@ -98,7 +98,7 @@ for split in ["val", "train"]:
         json.dump(dict(episodes=[]), f)
 
 # Generate per-scene files
-for split in ["train"]:
+for split in ["val"]:
     scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
     scenes = [s for s in scenes if "QHhQZWdMpGJ" in s]
 
