@@ -49,18 +49,13 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
                 scenes = [dataset.scene_from_scene_path(scene_id)
                           for scene_id in dataset.scene_ids]
-            print("scenes::::", scenes)
             del dataset
             scene_splits = [[] for _ in range(rllib_config.num_workers)]
             for idx, scene in enumerate(scenes):
                 scene_splits[idx % len(scene_splits)].append(scene)
             assert sum(map(len, scene_splits)) == len(scenes)
-            print("len(scene_splits)", len(scene_splits))
-            print("rllib_config.worker_index", rllib_config.worker_index)
             config.TASK_CONFIG.DATASET.CONTENT_SCENES = [
                 scene_splits[rllib_config.worker_index - 1]]
-            print("scene_splits[rllib_config.worker_index]::::",
-                  scene_splits[rllib_config.worker_index - 1])
 
             # Set random seed
             config.TASK_CONFIG.SEED = rllib_config.worker_index
