@@ -68,6 +68,7 @@ class SemanticMapState:
         init_map_and_pose_for_env(
             e, self.local_map, self.global_map, self.local_pose, self.global_pose,
             self.lmb, self.origins, self.map_size_parameters)
+        self.goal_map[e] *= 0.
 
     def update_global_goal_for_env(self, e: int, goal_map: np.ndarray):
         """Update global goal for a specific environment with the goal action chosen

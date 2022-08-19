@@ -33,9 +33,9 @@ DATASET_ROOT_PATH = (
 def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
     start_position = sim.pathfinder.get_random_navigable_point()
     attempt = 1
-    # while sim.pathfinder.distance_to_closest_obstacle(start_position) < 1.0 and attempt < 50:
-    #     start_position = sim.pathfinder.get_random_navigable_point()
-    #     attempt += 1
+    while sim.pathfinder.distance_to_closest_obstacle(start_position) < 1.0 and attempt < 50:
+        start_position = sim.pathfinder.get_random_navigable_point()
+        attempt += 1
     start_yaw = random.random() * 2 * np.pi
     start_rotation = quaternion.from_euler_angles(0, start_yaw, 0)
 
@@ -100,6 +100,7 @@ for split in ["val", "train"]:
 # Generate per-scene files
 for split in ["train"]:
     scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+    scenes = [s for s in scenes if "QHhQZWdMpGJ" in s]
 
     # with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
     #     for _ in pool.imap_unordered(generate_scene_episodes, scenes):

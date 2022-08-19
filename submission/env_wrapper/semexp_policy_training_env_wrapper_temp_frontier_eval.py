@@ -123,6 +123,23 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.last_map_features = map_features
         self.last_local_pose = local_pose
 
+        found_goal = torch.zeros((1,)).to(self.device)
+        found_hint = torch.zeros((1,)).to(self.device)
+        goal_map = torch.zeros((
+            1,
+            self.semantic_map.local_h,
+            self.semantic_map.local_w
+        )).to(self.device)
+        goal_map = self.policy.explore_otherwise(
+            self.last_map_features,
+            self.last_local_pose,
+            self.goal_category_tensor,
+            goal_map,
+            found_goal,
+            found_hint,
+        )
+        self.semantic_map.update_global_goal_for_env(0, goal_map[0].cpu())
+
         vis_inputs = {
             "sensor_pose": self.semantic_map.get_planner_pose_inputs(0),
             "obstacle_map": self.semantic_map.get_obstacle_map(0),
