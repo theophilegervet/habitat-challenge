@@ -46,6 +46,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
             if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
                 scenes = dataset.get_scenes_to_load(config.TASK_CONFIG.DATASET)
+            del dataset
             scene_splits = [[] for _ in range(rllib_config.num_workers)]
             for idx, scene in enumerate(scenes):
                 scene_splits[idx % len(scene_splits)].append(scene)
