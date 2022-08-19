@@ -76,7 +76,7 @@ class LogRewardDetailsCallback(DefaultCallbacks):
 if __name__ == "__main__":
     config, config_str = get_config("submission/configs/config_temp_frontier_eval.yaml")
 
-    ray.init(log_to_driver=True)
+    ray.init()
 
     ModelCatalog.register_custom_model(
         "semantic_exploration_policy",
