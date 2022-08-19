@@ -98,7 +98,7 @@ for split in ["val", "train"]:
         json.dump(dict(episodes=[]), f)
 
 # Generate per-scene files
-for split in ["val"]:
+for split in ["train"]:
     scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
 
     # with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
