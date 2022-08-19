@@ -99,7 +99,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         state = self.habitat_env.sim.get_agent_state()
 
         rotation = quaternion.as_float_array(state.rotation)
-        rotation = quaternion.quaternion([rotation[1], 0., rotation[3], 0.])
+        rotation = quaternion.quaternion(rotation[1], 0., rotation[3], 0.)
         print()
         print("state.rotation", state.rotation)
         print("rotation", rotation)
