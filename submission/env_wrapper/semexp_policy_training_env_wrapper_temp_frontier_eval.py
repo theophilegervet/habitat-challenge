@@ -96,6 +96,10 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
     def _reset(self) -> Observations:
         obs = super().reset()
         state = self.habitat_env.sim.get_agent_state()
+        print()
+        print("state.rotation", state.rotation)
+        print("self.habitat_env.current_episode.start_rotation", self.habitat_env.current_episode.start_rotation)
+        print()
         obs.update(self.habitat_env.sim.get_observations_at(
             state.position, state.rotation))
         return obs
