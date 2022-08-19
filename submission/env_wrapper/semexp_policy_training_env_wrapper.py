@@ -44,7 +44,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.device = (torch.device("cpu") if config.NO_GPU else
                        torch.device(f"cuda:{self.habitat_env.sim.gpu_device}"))
         self.goal_update_steps = config.AGENT.POLICY.SEMANTIC.goal_update_steps
-        self.max_steps = 500 // self.goal_update_steps - 1
+        self.max_steps = 500 // self.goal_update_steps
         if config.AGENT.panorama_start:
             self.panorama_start_steps = int(360 / config.ENVIRONMENT.turn_angle)
         else:
