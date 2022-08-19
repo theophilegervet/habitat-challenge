@@ -8,8 +8,6 @@ import tqdm
 import numpy as np
 import quaternion
 import random
-import cv2
-import matplotlib.pyplot as plt
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -38,10 +36,6 @@ def generate_episode(sim, episode_count: int) -> ObjectGoalNavEpisode:
         attempt += 1
     start_yaw = random.random() * 2 * np.pi
     start_rotation = quaternion.from_euler_angles(0, start_yaw, 0)
-
-    obs = sim.get_observations_at(start_position, start_rotation)
-    plt.imsave(f"/private/home/theop123/habitat-challenge/starting_positions/{sim.habitat_config.SCENE.split('/')[-1].split('.')[0]}_{episode_count}.png", obs["rgb"])
-
     object_category = random.choice(list(challenge_goal_name_to_goal_name.keys()))
     return ObjectGoalNavEpisode(
         episode_id=str(episode_count),
@@ -100,10 +94,9 @@ for split in ["val", "train"]:
 # Generate per-scene files
 for split in ["val"]:
     scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
-    scenes = [s for s in scenes if "QHhQZWdMpGJ" in s]
 
-    # with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-    #     for _ in pool.imap_unordered(generate_scene_episodes, scenes):
-    #         pbar.update()
-    for scene in tqdm.tqdm(scenes):
-        generate_scene_episodes(scene, 5)
+    with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+        for _ in pool.imap_unordered(generate_scene_episodes, scenes):
+            pbar.update()
+    # for scene in tqdm.tqdm(scenes):
+    #     generate_scene_episodes(scene)
