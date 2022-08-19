@@ -40,10 +40,8 @@ TRAIN:
       # num_gpus: 1                 # number of GPUs for driver process training the policy model
       # num_gpus_per_worker: 0.25   # number of GPUs per worker collecting environment rollouts
 
-      # sgd_steps_per_batch: 30     # number of SGD steps per batch
-      sgd_steps_per_batch: 1     # number of SGD steps per batch
-      # minibatch_size: 128         # minibatch size for each SGD step (effective batch size = sgd_steps_per_batch * minibatch_size)
-      minibatch_size: 9
+      sgd_steps_per_batch: 30     # number of SGD steps per batch
+      minibatch_size: 128         # minibatch size for each SGD step (effective batch size = sgd_steps_per_batch * minibatch_size)
 
     DDPPO:
       num_workers: 1
