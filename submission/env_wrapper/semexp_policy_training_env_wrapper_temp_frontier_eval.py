@@ -123,7 +123,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.visualizer.set_vis_dir(self.scene_id, self.episode_id)
 
         for _ in range(self.panorama_start_steps):
-            obs, _, _, _ = self._step(HabitatSimActions.TURN_RIGHT)
+            obs = self._step(HabitatSimActions.TURN_RIGHT)
             seq_obs.append(obs)
 
         (
@@ -194,7 +194,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             action = self.planner.plan(**planner_inputs)
 
             # 2 - Step
-            obs, _, _, _ = self._step(action)
+            obs = self._step(action)
 
             # 3 - Update map
             map_features, semantic_frame, local_pose, _, _ = self._update_map(
