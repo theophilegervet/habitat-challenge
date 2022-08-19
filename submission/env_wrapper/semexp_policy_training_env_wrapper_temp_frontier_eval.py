@@ -3,7 +3,7 @@ from torch import Tensor
 import numpy as np
 from typing import Tuple, List, Optional
 
-from habitat import Config, make_dataset
+from habitat import Config
 from habitat.core.env import RLEnv
 from habitat.core.simulator import Observations
 from habitat.sims.habitat_simulator.actions import HabitatSimActions
@@ -42,7 +42,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             config = rllib_config["config"]
 
             # Select scenes
-            dataset = SemanticExplorationPolicyTrainingDataset(config.DATASET)
+            dataset = SemanticExplorationPolicyTrainingDataset(
+                config.TASK_CONFIG.DATASET)
             scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
             if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
                 scenes = dataset.get_scenes_to_load(config.TASK_CONFIG.DATASET)
