@@ -121,7 +121,9 @@ if __name__ == "__main__":
         train_config.update({
             "num_workers": config.TRAIN.RL.PPO.num_workers,
             "num_gpus": config.TRAIN.RL.PPO.num_gpus,
+            "num_cpus_for_driver": 9,
             "num_gpus_per_worker": config.TRAIN.RL.PPO.num_gpus_per_worker,
+            "num_cpus_per_worker": 3,
             "num_sgd_iter": config.TRAIN.RL.PPO.sgd_steps_per_batch,
             "sgd_minibatch_size": config.TRAIN.RL.PPO.minibatch_size,
             "train_batch_size": (config.TRAIN.RL.PPO.sgd_steps_per_batch *
