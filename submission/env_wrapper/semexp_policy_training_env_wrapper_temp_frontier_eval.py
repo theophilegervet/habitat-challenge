@@ -93,6 +93,20 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.goal_category = None
         self.goal_name = None
 
+    def _reset(self) -> Observations:
+        obs = super().reset()
+        state = self.habitat_env.sim.get_agent_state()
+        obs.update(self.habitat_env.sim.get_observations_at(
+            state.position, state.rotation))
+        return obs
+
+    def _step(self, action: int) -> Observations:
+        obs, _, _, _ = super().step(action)
+        state = self.habitat_env.sim.get_agent_state()
+        obs.update(self.habitat_env.sim.get_observations_at(
+            state.position, state.rotation))
+        return obs
+
     def reset(self) -> dict:
         self.timestep = 0
 
@@ -101,7 +115,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.visualizer.reset()
         self.semantic_map.init_map_and_pose()
 
-        obs = super().reset()
+        obs = self._reset()
         seq_obs = [obs]
 
         self.scene_id = self.current_episode.scene_id.split("/")[-1].split(".")[0]
@@ -109,7 +123,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.visualizer.set_vis_dir(self.scene_id, self.episode_id)
 
         for _ in range(self.panorama_start_steps):
-            obs, _, _, _ = super().step(HabitatSimActions.TURN_RIGHT)
+            obs, _, _, _ = self._step(HabitatSimActions.TURN_RIGHT)
             seq_obs.append(obs)
 
         (
@@ -180,13 +194,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             action = self.planner.plan(**planner_inputs)
 
             # 2 - Step
-            obs, _, _, _ = super().step(action)
-            state = self.habitat_env.sim.get_agent_state()
-            obs.update(self.habitat_env.sim.get_observations_at(state.position, state.rotation))
-            print()
-            print(self.habitat_env.sim.get_agent_state())
-            print(obs.keys())
-            print()
+            obs, _, _, _ = self._step(action)
 
             # 3 - Update map
             map_features, semantic_frame, local_pose, _, _ = self._update_map(
