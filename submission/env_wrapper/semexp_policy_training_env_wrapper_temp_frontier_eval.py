@@ -185,6 +185,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             obs = self.habitat_env.sim.get_observations_at(state.position, state.rotation)
             print()
             print(self.habitat_env.sim.get_agent_state())
+            print(obs.keys())
             print()
 
             # 3 - Update map
