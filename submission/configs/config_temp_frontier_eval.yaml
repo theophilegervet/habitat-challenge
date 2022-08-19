@@ -1,0 +1,92 @@
+# BASE_TASK_CONFIG_PATH: challenge_objectnav2022.local.rgbd.yaml
+BASE_TASK_CONFIG_PATH: submission/dataset/semexp_policy_training_env_config_temp_frontier_eval.yaml
+
+AGENT_GPU_IDS: [0]        # IDs of GPUs to use for agent with DistributedDataParallel — each GPU corresponds to one agent process
+SIMULATOR_GPU_IDS: [0, 1] # IDs of GPUs to use for vectorized environments
+NO_GPU: 0                 # 1: ignore IDs above and run on CPU, 0: run on GPUs with IDs above
+NUM_ENVIRONMENTS: 1       # number of environments (per agent process)
+DUMP_LOCATION: data       # path to dump models and log
+EXP_NAME: test            # experiment name
+MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
+VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
+PRINT_IMAGES: 1           # 1: save visualization as images, 0: no image saving
+
+EVAL_VECTORIZED:
+  specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
+  specific_category: 0      # "chair": eval only on chair episodes, 0: eval on all episodes
+  split: val                # eval split
+  num_episodes_per_env: 100 # number of eval episodes per environment
+  record_videos: 0          # 1: record videos from printed images, 0: don't
+  record_planner_videos: 0  # 1: record planner videos (if record videos), 0: don't
+
+TRAIN:
+  RL:
+    exp_name: exp1              # experiment name
+    algorithm: PPO              # one of "PPO" or "DDPPO"
+    gamma: 0.9                  # discount factor of the MDP
+    intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
+    lr: 0.00005                 # learning rate
+    entropy_coeff: 0.001        # entropy regularization scaling
+    clip_param: 0.2             # how far the new policy can go from the old policy while improving the objective
+
+    PPO:
+      # 2 x 32GB GPUs
+      # num_workers: 7              # number of parallel workers
+      # num_gpus: 0.25              # number of GPUs for driver process training the policy model
+      # num_gpus_per_worker: 0.25   # number of GPUs per worker collecting environment rollouts
+
+      # 8 x 32GB GPUs
+      num_workers: 28             # number of parallel workers
+      num_gpus: 1                 # number of GPUs for driver process training the policy model
+      num_gpus_per_worker: 0.25   # number of GPUs per worker collecting environment rollouts
+
+      # sgd_steps_per_batch: 30     # number of SGD steps per batch
+      sgd_steps_per_batch: 1     # number of SGD steps per batch
+      # minibatch_size: 128         # minibatch size for each SGD step (effective batch size = sgd_steps_per_batch * minibatch_size)
+      minibatch_size: 28
+
+    DDPPO:
+      num_workers: 1
+      num_envs_per_worker: 1      # number of parallel environments per worker
+      num_gpus_per_worker: 1
+      remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
+      sgd_steps_per_batch: 10     # number of SGD steps per batch per worker
+      minibatch_size: 48          # minibatch size for each SGD step per worker (effective batch size = sgd_steps_per_batch * minibatch_size * num_workers)
+
+ENVIRONMENT:
+  num_sem_categories: 16  # number of semantic segmentation categories
+  turn_angle: 30.0        # agent turn angle (in degrees)
+  frame_height: 480       # first-person frame height (in pixels)
+  frame_width: 640        # first-person frame width (in pixels)
+  camera_height: 0.88     # camera sensor height (in metres)
+  hfov: 79.0              # horizontal field of view (in degrees)
+  min_depth: 0.5          # minimum depth for depth sensor (in metres)
+  max_depth: 5.0          # maximum depth for depth sensor (in metres)
+
+AGENT:
+  max_steps: 498          # maximum number of steps before stopping an episode
+  panorama_start: 1       # 1: turn around 360 degrees when starting an episode, 0: don't
+
+  SEMANTIC_MAP:
+    map_size_cm: 4800        # global map size (in centimetres)
+    map_resolution: 5        # size of map bins (in centimeters)
+    vision_range: 100        # diameter of local map region visible by the agent (in cells)
+    global_downscaling: 2    # ratio of global over local map
+    du_scale: 4              # frame downscaling before projecting to point cloud
+    cat_pred_threshold: 5.0  # number of depth points to be in bin to classify it as a certain semantic category
+    exp_pred_threshold: 1.0  # number of depth points to be in bin to consider it as explored
+    map_pred_threshold: 1.0  # number of depth points to be in bin to consider it as obstacle
+
+  PLANNER:
+    collision_threshold: 0.20       # distance under which we consider there's a collision
+    obs_denoise_selem_radius: 0     # radius (in cells) of obstacle noise removal structuring element
+    obs_dilation_selem_radius: 3    # radius (in cells) of obstacle dilation structuring element
+
+  POLICY:
+    type: frontier             # one of "frontier" or "semantic"
+    hint_follow_steps: 15      # how many steps to follow a hint of the object goal category
+    hint_in_frame: 1           # 1: look for hint in frame, 0: don't
+
+    SEMANTIC:
+      goal_update_steps: 25    # frequency at which to update the high-level goal during inference
+      training_downscaling: 2  # ratio of map size in this code over map size used to train the policy

@@ -74,9 +74,7 @@ class LogRewardDetailsCallback(DefaultCallbacks):
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/config.yaml")
-    config.defrost()
-    config.BASE_TASK_CONFIG_PATH = "submission/dataset/semexp_policy_training_env_config_temp_frontier_eval.yaml"
+    config, config_str = get_config("submission/configs/config_temp_frontier_eval.yaml")
 
     ray.init(log_to_driver=True)
 
