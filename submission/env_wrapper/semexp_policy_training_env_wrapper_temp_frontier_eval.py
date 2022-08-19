@@ -181,6 +181,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
             # 2 - Step
             obs, _, _, _ = super().step(action)
+            print()
+            print(self.habitat_env.sim.get_agent_state())
+            print()
 
             # 3 - Update map
             map_features, semantic_frame, local_pose, _, _ = self._update_map(
