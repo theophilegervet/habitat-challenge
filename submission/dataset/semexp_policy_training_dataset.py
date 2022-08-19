@@ -55,6 +55,5 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
         for episode in json.loads(json_str)["episodes"]:
             episode = ObjectGoalNavEpisode(**episode)
             episode.scene_id = os.path.join(scenes_dir, episode.scene_id)
-            episode.start_rotation = quaternion.quaternion(*episode.start_rotation)
             episode.goals = [ObjectGoal(**goal) for goal in episode.goals]
             self.episodes.append(episode)
