@@ -21,7 +21,7 @@ EVAL_VECTORIZED:
 
 TRAIN:
   RL:
-    exp_name: exp1              # experiment name
+    exp_name: frontier_eval     # experiment name
     algorithm: PPO              # one of "PPO" or "DDPPO"
     gamma: 0.9                  # discount factor of the MDP
     intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
@@ -31,9 +31,9 @@ TRAIN:
 
     PPO:
       # 2 x 32GB GPUs
-      num_workers: 9              # number of parallel workers
-      num_gpus: 0.2               # number of GPUs for driver process training the policy model
-      num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
+      num_workers: 7              # number of parallel workers
+      num_gpus: 0.25              # number of GPUs for driver process training the policy model
+      num_gpus_per_worker: 0.25   # number of GPUs per worker collecting environment rollouts
 
       # 8 x 32GB GPUs
       # num_workers: 28             # number of parallel workers
