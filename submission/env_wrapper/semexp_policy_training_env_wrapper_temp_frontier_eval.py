@@ -181,6 +181,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
             # 2 - Step
             obs, _, _, _ = super().step(action)
+            state = self.habitat_env.sim.get_agent_state()
+            obs = self.habitat_env.sim.get_observations_at(state.position, state.rotation)
             print()
             print(self.habitat_env.sim.get_agent_state())
             print()
