@@ -36,9 +36,14 @@ TRAIN:
       # num_gpus_per_worker: 0.33   # number of GPUs per worker collecting environment rollouts
 
       # 8 x 32GB GPUs
-      num_workers: 21            # number of parallel workers
+      # num_workers: 21            # number of parallel workers
+      # num_gpus: 1                # number of GPUs for driver process training the policy model
+      # num_gpus_per_worker: 0.33  # number of GPUs per worker collecting environment rollouts
+
+      # Debug
+      num_workers: 7             # number of parallel workers
       num_gpus: 1                # number of GPUs for driver process training the policy model
-      num_gpus_per_worker: 0.33  # number of GPUs per worker collecting environment rollouts
+      num_gpus_per_worker: 1     # number of GPUs per worker collecting environment rollouts
 
       sgd_steps_per_batch: 30     # number of SGD steps per batch
       minibatch_size: 128         # minibatch size for each SGD step (effective batch size = sgd_steps_per_batch * minibatch_size)
