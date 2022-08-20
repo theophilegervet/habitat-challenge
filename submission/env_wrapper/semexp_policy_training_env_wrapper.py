@@ -51,6 +51,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
             scenes = [dataset.scene_from_scene_path(scene_id)
                       for scene_id in dataset.scene_ids]
+        print(scenes)
         del dataset
 
         if config is None:
