@@ -46,7 +46,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             config.defrost()
 
             # Select scenes
-            if config.TASK_CONFIG.DATASET.TYPE =="SemexpPolicyTraining":
+            if config.TASK_CONFIG.DATASET.TYPE == "SemexpPolicyTraining":
                 dataset = SemanticExplorationPolicyTrainingDataset(
                     config.TASK_CONFIG.DATASET)
             else:
