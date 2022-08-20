@@ -51,6 +51,7 @@ TRAIN:
       num_workers: 2
       num_envs_per_worker: 1      # number of parallel environments per worker
       num_gpus_per_worker: 1
+      remote_worker_envs: False   # if True and num_envs_per_worker > 1, spawn worker envs as remote processes
       remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
 
       # sgd_steps_per_batch: 10     # number of SGD steps per batch per worker
