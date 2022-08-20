@@ -1,5 +1,6 @@
 import torch
 from torch import Tensor
+import torch.nn.functional as F
 import numpy as np
 from typing import Tuple, List, Optional
 
@@ -74,6 +75,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         else:
             self.panorama_start_steps = 0
         self.intrinsic_rew_coeff = config.TRAIN.RL.intrinsic_rew_coeff
+        self.inference_downscaling = config.AGENT.POLICY.SEMANTIC.inference_downscaling
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
@@ -89,8 +91,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                 high=1.,
                 shape=(
                     8 + self.semantic_map.num_sem_categories,
-                    self.semantic_map.local_h,
-                    self.semantic_map.local_w
+                    self.semantic_map.local_h // self.inference_downscaling,
+                    self.semantic_map.local_w // self.inference_downscaling
                 ),
                 dtype=np.float32
             ),
@@ -160,6 +162,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         }
         self.visualizer.visualize(**vis_inputs)
 
+        map_features = F.avg_pool2d(map_features, self.inference_downscaling)
         obs = {
             "map_features": map_features[0].cpu().numpy(),
             "local_pose": local_pose[0].cpu().numpy(),
@@ -228,6 +231,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         }
         self.visualizer.visualize(**vis_inputs)
 
+        map_features = F.avg_pool2d(map_features, self.inference_downscaling)
         obs = {
             "map_features": map_features[0].cpu().numpy(),
             "local_pose": local_pose[0].cpu().numpy(),

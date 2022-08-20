@@ -126,7 +126,6 @@ if __name__ == "__main__":
             "num_cpus_for_driver": config.TRAIN.RL.PPO.num_cpus_for_driver,
             "num_gpus_per_worker": config.TRAIN.RL.PPO.num_gpus_per_worker,
             "num_cpus_per_worker": config.TRAIN.RL.PPO.num_cpus_per_worker,
-
             # Batching
             #   train_batch_size: total batch size
             #   sgd_minibatch_size: SGD minibatch size (chunk train_batch_size

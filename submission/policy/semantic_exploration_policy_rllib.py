@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from .policy import Policy
 from .utils.model import Flatten, NNBase
@@ -14,12 +15,14 @@ class SemanticExplorationPolicy(Policy):
         super().__init__(config)
 
         self._goal_update_steps = config.AGENT.POLICY.SEMANTIC.goal_update_steps
+        self.inference_downscaling = config.AGENT.POLICY.SEMANTIC.inference_downscaling
         self.map_resolution = config.AGENT.SEMANTIC_MAP.map_resolution
         num_sem_categories = config.ENVIRONMENT.num_sem_categories
         self.local_map_size = (
             config.AGENT.SEMANTIC_MAP.map_size_cm //
             config.AGENT.SEMANTIC_MAP.global_downscaling //
-            self.map_resolution
+            self.map_resolution //
+            self.inference_downscaling
         )
         map_features_shape = (
             config.ENVIRONMENT.num_sem_categories + 8,
@@ -44,6 +47,7 @@ class SemanticExplorationPolicy(Policy):
                           found_hint):
         batch_size, goal_map_size, _ = goal_map.shape
         orientation = torch.div(torch.trunc(local_pose[:, 2]) % 360, 5).long()
+        map_features = F.avg_pool2d(map_features, self.inference_downscaling)
 
         outputs, value = self.network(
             map_features,

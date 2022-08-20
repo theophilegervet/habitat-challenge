@@ -84,12 +84,11 @@ if __name__ == "__main__":
         SemanticExplorationPolicyWrapper
     )
 
-    map_resolution = config.AGENT.SEMANTIC_MAP.map_resolution
-    num_sem_categories = config.ENVIRONMENT.num_sem_categories
     local_map_size = (
         config.AGENT.SEMANTIC_MAP.map_size_cm //
         config.AGENT.SEMANTIC_MAP.global_downscaling //
-        map_resolution
+        config.AGENT.SEMANTIC_MAP.map_resolution //
+        config.AGENT.POLICY.SEMANTIC.inference_downscaling
     )
     map_features_shape = (
         config.ENVIRONMENT.num_sem_categories + 8,

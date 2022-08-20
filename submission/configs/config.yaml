@@ -91,4 +91,4 @@ AGENT:
 
     SEMANTIC:
       goal_update_steps: 25    # frequency at which to update the high-level goal during inference
-      training_downscaling: 2  # ratio of map size in this code over map size used to train the policy
+      inference_downscaling: 2 # ratio of map size for policy inference over map size used for planning
