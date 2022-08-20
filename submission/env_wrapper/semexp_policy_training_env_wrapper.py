@@ -1,3 +1,5 @@
+import json
+import os
 import torch
 from torch import Tensor
 import torch.nn.functional as F
@@ -118,9 +120,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.goal_category_tensor = None
         self.goal_category = None
         self.goal_name = None
+        self.infos = None
 
     def reset(self) -> dict:
         self.timestep = 0
+        self.infos = []
 
         self.obs_preprocessor.reset()
         self.planner.reset()
@@ -246,14 +250,21 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         goal_reward = 1. if (found_goal and self.timestep > 1) else 0.
         reward = goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
 
-        done = found_goal or self.timestep == self.max_steps - 1
-
         info = {
             "timestep": self.timestep,
             "goal_rew": goal_reward,
             "unscaled_intrinsic_rew": intrinsic_reward,
             "scaled_intrinsic_rew": intrinsic_reward * self.intrinsic_rew_coeff
         }
+        self.infos.append(info)
+
+        done = found_goal or self.timestep == self.max_steps - 1
+        if done and self.visualizer.print_images:
+            json.dump(
+                self.infos,
+                open(os.path.join(self.visualizer.vis_dir, "infos.json"), "w"),
+                indent=4
+            )
 
         return obs, reward, done, info
 
