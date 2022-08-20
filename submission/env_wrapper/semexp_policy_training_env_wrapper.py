@@ -47,11 +47,14 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                 config.TASK_CONFIG.DATASET)
         else:
             dataset = make_dataset(config.TASK_CONFIG.DATASET.TYPE)
+        # scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
+        # if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
+        #     scenes = [dataset.scene_from_scene_path(scene_id)
+        #               for scene_id in dataset.scene_ids]
         scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
         if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
-            scenes = [dataset.scene_from_scene_path(scene_id)
-                      for scene_id in dataset.scene_ids]
-        print("scenes:::::", scenes)
+            scenes = dataset.get_scenes_to_load(config.TASK_CONFIG.DATASET)
+        print("scenesXX:::::", scenes)
         del dataset
 
         if config is None:
