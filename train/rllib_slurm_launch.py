@@ -1,9 +1,9 @@
 # Usage:
 # python train/rllib_slurm_launch.py \
 #   --exp-name train_semexp \
-#   --command "python train/train_semantic_exploration_policy.py" \
+#   --command "python train/train_semantic_exploration_policy_temp_ddppo.py" \
 #   --load-env "conda activate habitat-challenge" \
-#   --num-nodes 1 \
+#   --num-nodes 4 \
 #   --num-gpus 8 \
 #   --partition learnfair
 
