@@ -56,10 +56,10 @@ TRAIN:
       #remote_worker_envs: True    # if True and num_envs_per_worker > 1, spawn worker envs as remote processes
 
       # 2 x 32GB GPUs
-      num_workers: 10
+      num_workers: 22
       num_envs_per_worker: 1
-      num_gpus_per_worker: 0.2
-      num_cpus_per_worker: 5
+      num_gpus_per_worker: 0.33
+      num_cpus_per_worker: 3
       remote_worker_envs: False
 
       # 8 x 32GB GPUs
