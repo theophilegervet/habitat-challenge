@@ -182,12 +182,12 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         }
         return obs
 
-    def step(self, action: np.ndarray) -> Tuple[dict, float, bool, dict]:
+    def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
         self.timestep += 1
         prev_explored_area = self.semantic_map.global_map[0, 1].sum()
 
         # Set high-level goal predicted by the policy
-        goal_location = (action * (self.semantic_map.local_h - 1)).astype(int)
+        goal_location = (goal_action * (self.semantic_map.local_h - 1)).astype(int)
         goal_map = np.zeros((
             self.semantic_map.local_h,
             self.semantic_map.local_w
@@ -263,8 +263,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "goal_rew": goal_reward,
             "unscaled_intrinsic_rew": intrinsic_reward,
             "scaled_intrinsic_rew": intrinsic_reward * self.intrinsic_rew_coeff,
-            "action_0": action[0],
-            "action_1": action[1],
+            "action_0": goal_action[0],
+            "action_1": goal_action[1],
         }
         self.infos.append(info)
 
