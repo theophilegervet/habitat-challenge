@@ -31,17 +31,17 @@ TRAIN:
 
     PPO:
       # 2 x 32GB GPUs
-      #num_workers: 7              # number of parallel workers
-      #num_gpus: 0.25              # number of GPUs for driver process training the policy model
-      #num_cpus_for_driver: 6      # number of CPUs for driver
-      #num_gpus_per_worker: 0.25   # number of GPUs per worker collecting environment rollouts
-      #num_cpus_per_worker: 3      # number of CPUs per worker
+      #num_workers: 9              # number of parallel workers
+      #num_gpus: 0.2               # number of GPUs for driver process training the policy model
+      #num_cpus_for_driver: 9      # number of CPUs for driver
+      #num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
+      #num_cpus_per_worker: 7      # number of CPUs per worker
 
       # 8 x 32GB GPUs
-      num_workers: 28
-      num_gpus: 1
-      num_cpus_for_driver: 15
-      num_gpus_per_worker: 0.25
+      num_workers: 36
+      num_gpus: 0.8
+      num_cpus_for_driver: 7
+      num_gpus_per_worker: 0.2
       num_cpus_per_worker: 2
 
       rollout_fragment_length: 20  # divide episodes into fragments of this many steps each
@@ -55,10 +55,8 @@ TRAIN:
       remote_worker_envs: False   # if True and num_envs_per_worker > 1, spawn worker envs as remote processes
       remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
 
-      # sgd_steps_per_batch: 10     # number of SGD steps per batch per worker
-      # minibatch_size: 48          # minibatch size for each SGD step per worker (effective batch size = sgd_steps_per_batch * minibatch_size * num_workers)
-      sgd_steps_per_batch: 1
-      minibatch_size: 6
+      rollout_fragment_length: 20
+      sgd_epochs: 4
 
 ENVIRONMENT:
   num_sem_categories: 16  # number of semantic segmentation categories
