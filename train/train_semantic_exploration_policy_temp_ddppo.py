@@ -75,7 +75,7 @@ class LogRewardDetailsCallback(DefaultCallbacks):
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/config.yaml")
+    config, config_str = get_config("submission/configs/config_temp_ddppo.yaml")
 
     ray.init()
 
