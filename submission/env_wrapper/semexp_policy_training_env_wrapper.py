@@ -66,6 +66,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             assert sum(map(len, scene_splits)) == len(scenes)
             config.TASK_CONFIG.DATASET.CONTENT_SCENES = scene_splits[
                 rllib_config.worker_index - 1]
+            print("scenes::::", scenes)
 
             # Set random seed
             config.TASK_CONFIG.SEED = rllib_config.worker_index
@@ -261,7 +262,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "timestep": self.timestep,
             "goal_rew": goal_reward,
             "unscaled_intrinsic_rew": intrinsic_reward,
-            "scaled_intrinsic_rew": intrinsic_reward * self.intrinsic_rew_coeff
+            "scaled_intrinsic_rew": intrinsic_reward * self.intrinsic_rew_coeff,
+            "action_0": action[0],
+            "action_1": action[1],
         }
         self.infos.append(info)
 
