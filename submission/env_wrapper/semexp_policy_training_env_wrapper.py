@@ -66,8 +66,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                 scene_splits[idx % len(scene_splits)].append(scene)
             assert sum(map(len, scene_splits)) == len(scenes)
             print("scene_splitsYY::", scene_splits)
-            config.TASK_CONFIG.DATASET.CONTENT_SCENES = [
-                scene_splits[rllib_config.worker_index - 1]]
+            config.TASK_CONFIG.DATASET.CONTENT_SCENES = scene_splits[
+                rllib_config.worker_index - 1]
             print("config.TASK_CONFIG.DATASET.CONTENT_SCENES", config.TASK_CONFIG.DATASET.CONTENT_SCENES)
 
             # Set random seed
