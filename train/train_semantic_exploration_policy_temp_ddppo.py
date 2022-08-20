@@ -148,8 +148,7 @@ if __name__ == "__main__":
             #   train_batch_size: total batch size is implicitly
             #    (num_workers * num_envs_per_worker * rollout_fragment_length)
             "rollout_fragment_length": config.TRAIN.RL.PPO.rollout_fragment_length,
-            # TODO This doesn't work with num_envs_per_worker==1
-            "sgd_minibatch_size": 2 * config.TRAIN.RL.PPO.rollout_fragment_length,
+            "sgd_minibatch_size": config.TRAIN.RL.PPO.rollout_fragment_length,
             "num_sgd_iter": config.TRAIN.RL.PPO.sgd_epochs,
         })
 
