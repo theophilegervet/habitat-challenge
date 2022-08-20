@@ -38,7 +38,7 @@ TRAIN:
       #num_cpus_per_worker: 7      # number of CPUs per worker
 
       # 8 x 32GB GPUs
-      num_workers: 36
+      num_workers: 18 #36
       num_gpus: 0.8
       num_cpus_for_driver: 7
       num_gpus_per_worker: 0.2
