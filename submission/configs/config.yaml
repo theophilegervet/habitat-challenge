@@ -6,10 +6,10 @@ SIMULATOR_GPU_IDS: [0, 1] # IDs of GPUs to use for vectorized environments
 NO_GPU: 0                 # 1: ignore IDs above and run on CPU, 0: run on GPUs with IDs above
 NUM_ENVIRONMENTS: 1       # number of environments (per agent process)
 DUMP_LOCATION: data       # path to dump models and log
-EXP_NAME: semexp_challenge_dataset       # experiment name
+EXP_NAME: 1node_ppo_challenge_dataset       # experiment name
 MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
 VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
-PRINT_IMAGES: 1           # 1: save visualization as images, 0: no image saving
+PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
 
 EVAL_VECTORIZED:
   specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
@@ -21,7 +21,7 @@ EVAL_VECTORIZED:
 
 TRAIN:
   RL:
-    exp_name: semexp_challenge_dataset         # experiment name
+    exp_name: 1node_ppo_challenge_dataset         # experiment name
     algorithm: PPO              # one of "PPO" or "DDPPO"
     gamma: 0.9                  # discount factor of the MDP
     intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
@@ -31,18 +31,18 @@ TRAIN:
 
     PPO:
       # 2 x 32GB GPUs
-      num_workers: 9              # number of parallel workers
-      num_gpus: 0.2               # number of GPUs for driver process training the policy model
-      num_cpus_for_driver: 9      # number of CPUs for driver
-      num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
-      num_cpus_per_worker: 7      # number of CPUs per worker
+      #num_workers: 9              # number of parallel workers
+      #num_gpus: 0.2               # number of GPUs for driver process training the policy model
+      #num_cpus_for_driver: 9      # number of CPUs for driver
+      #num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
+      #num_cpus_per_worker: 7      # number of CPUs per worker
 
       # 8 x 32GB GPUs
-      #num_workers: 22 # 22 good, 27-36 oom
-      #num_gpus: 1
-      #num_cpus_for_driver: 10
-      #num_gpus_per_worker: 0.25
-      #num_cpus_per_worker: 3
+      num_workers: 22 # 22 good, 27-36 oom
+      num_gpus: 1
+      num_cpus_for_driver: 10
+      num_gpus_per_worker: 0.25
+      num_cpus_per_worker: 3
 
       rollout_fragment_length: 20  # divide episodes into fragments of this many steps each
       sgd_epochs: 4                # number of SGD epochs (number of SGD iterations per minibatch)
