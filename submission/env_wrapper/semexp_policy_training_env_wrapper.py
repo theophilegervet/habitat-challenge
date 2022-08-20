@@ -263,8 +263,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "goal_rew": goal_reward,
             "unscaled_intrinsic_rew": intrinsic_reward,
             "scaled_intrinsic_rew": intrinsic_reward * self.intrinsic_rew_coeff,
-            "action_0": goal_action[0],
-            "action_1": goal_action[1],
+            "action_0": float(goal_action[0]),
+            "action_1": float(goal_action[1]),
         }
         self.infos.append(info)
 
