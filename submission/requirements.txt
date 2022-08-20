@@ -2,7 +2,4 @@ scikit-image
 scikit-fmm
 torchvision
 GPUtil
-
-# In order to use X11 forwarding properly
-# pyqt5==5.15.2
-# opencv-python==4.3.0.36
+gym==0.21.0 # Need <0.22.0 for DDPPO training with Ray
