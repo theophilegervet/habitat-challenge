@@ -137,8 +137,9 @@ if __name__ == "__main__":
         train_config.update({
             "num_workers": config.TRAIN.RL.DDPPO.num_workers,
             "num_envs_per_worker": config.TRAIN.RL.DDPPO.num_envs_per_worker,
-            "remote_worker_envs": config.TRAIN.RL.DDPPO.remote_worker_envs,
             "num_gpus_per_worker": config.TRAIN.RL.DDPPO.num_gpus_per_worker,
+            "num_cpus_per_worker": config.TRAIN.RL.DDPPO.num_cpus_per_worker,
+            "remote_worker_envs": config.TRAIN.RL.DDPPO.remote_worker_envs,
             "remote_env_batch_wait_ms": config.TRAIN.RL.DDPPO.remote_env_batch_wait_ms,
             "num_sgd_iter": config.TRAIN.RL.DDPPO.sgd_steps_per_batch,
             "sgd_minibatch_size": config.TRAIN.RL.DDPPO.minibatch_size,
