@@ -12,7 +12,6 @@ import argparse
 import subprocess
 import sys
 import time
-
 from pathlib import Path
 
 template_file = Path(__file__).resolve().parent / "rllib_slurm_template.sh"
