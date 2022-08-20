@@ -48,20 +48,20 @@ TRAIN:
       sgd_epochs: 4                # number of SGD epochs (number of SGD iterations per minibatch)
 
     DDPPO:
-      # Need to debug gym version conflict for remote_worker_envs=True
+      # TODO When using remote_worker_envs=True, the environments don't run on GPU
       #num_workers: 2
-      #num_envs_per_worker: 5      # number of parallel environments per worker
+      #num_envs_per_worker: 2      # number of parallel environments per worker
       #num_gpus_per_worker: 1
       #num_cpus_per_worker: 9
       #remote_worker_envs: True    # if True and num_envs_per_worker > 1, spawn worker envs as remote processes
       #remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
 
-      num_workers: 2
-      num_envs_per_worker: 2      # number of parallel environments per worker
-      num_gpus_per_worker: 1
-      num_cpus_per_worker: 9
-      remote_worker_envs: True    # if True and num_envs_per_worker > 1, spawn worker envs as remote processes
-      remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
+      num_workers: 10
+      num_envs_per_worker: 1
+      num_gpus_per_worker: 0.2
+      num_cpus_per_worker: 5
+      remote_worker_envs: False
+      remote_env_batch_wait_ms: 0
 
       rollout_fragment_length: 20
       sgd_epochs: 4
