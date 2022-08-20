@@ -16,6 +16,7 @@ from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 from ray.rllib.evaluation import Episode
 from ray.tune import tuner
 from ray.tune.logger import pretty_print
+from ray.tune.tune_config import TuneConfig
 from ray.air.config import RunConfig
 
 from submission.utils.config_utils import get_config
@@ -121,9 +122,9 @@ if __name__ == "__main__":
         train_config.update({
             "num_workers": config.TRAIN.RL.PPO.num_workers,
             "num_gpus": config.TRAIN.RL.PPO.num_gpus,
-            "num_cpus_for_driver": 9,
+            "num_cpus_for_driver": config.TRAIN.RL.PPO.num_cpus_for_driver,
             "num_gpus_per_worker": config.TRAIN.RL.PPO.num_gpus_per_worker,
-            "num_cpus_per_worker": 3,
+            "num_cpus_per_worker": config.TRAIN.RL.PPO.num_cpus_per_worker,
             "num_sgd_iter": config.TRAIN.RL.PPO.sgd_steps_per_batch,
             "sgd_minibatch_size": config.TRAIN.RL.PPO.minibatch_size,
             "train_batch_size": (config.TRAIN.RL.PPO.sgd_steps_per_batch *
@@ -171,7 +172,8 @@ if __name__ == "__main__":
     tuner = tuner.Tuner(
         config.TRAIN.RL.algorithm,
         param_space=train_config,
-        run_config=RunConfig(name=config.TRAIN.RL.exp_name)
+        run_config=RunConfig(name=config.TRAIN.RL.exp_name),
+        tune_config=TuneConfig(max_concurrent_trials=1)
     )
     tuner.fit()
 
