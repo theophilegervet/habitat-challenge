@@ -41,22 +41,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                  ):
         assert rllib_config is not None or config is not None
 
-        # TODO Remove
-        if config.TASK_CONFIG.DATASET.TYPE == "SemexpPolicyTraining":
-            dataset = SemanticExplorationPolicyTrainingDataset(
-                config.TASK_CONFIG.DATASET)
-        else:
-            dataset = make_dataset(config.TASK_CONFIG.DATASET.TYPE)
-        # scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
-        # if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
-        #     scenes = [dataset.scene_from_scene_path(scene_id)
-        #               for scene_id in dataset.scene_ids]
-        scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
-        if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
-            scenes = dataset.get_scenes_to_load(config.TASK_CONFIG.DATASET)
-        print("scenesXX:::::", scenes)
-        del dataset
-
         if config is None:
             config = rllib_config["config"]
             config.defrost()
@@ -65,12 +49,16 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             if config.TASK_CONFIG.DATASET.TYPE == "SemexpPolicyTraining":
                 dataset = SemanticExplorationPolicyTrainingDataset(
                     config.TASK_CONFIG.DATASET)
+                scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
+                if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
+                    scenes = [dataset.scene_from_scene_path(scene_id)
+                              for scene_id in dataset.scene_ids]
             else:
                 dataset = make_dataset(config.TASK_CONFIG.DATASET.TYPE)
-            scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
-            if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
-                scenes = [dataset.scene_from_scene_path(scene_id)
-                          for scene_id in dataset.scene_ids]
+                scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
+                if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
+                    scenes = dataset.get_scenes_to_load(
+                        config.TASK_CONFIG.DATASET)
             del dataset
             scene_splits = [[] for _ in range(rllib_config.num_workers)]
             for idx, scene in enumerate(scenes):
