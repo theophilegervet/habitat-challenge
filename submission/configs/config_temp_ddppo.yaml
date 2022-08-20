@@ -49,10 +49,10 @@ TRAIN:
 
     DDPPO:
       num_workers: 6
-      num_envs_per_worker: 1      # number of parallel environments per worker
-      num_gpus_per_worker: 0.33
-      num_cpus_per_worker: 10
-      remote_worker_envs: False   # if True and num_envs_per_worker > 1, spawn worker envs as remote processes
+      num_envs_per_worker: 5      # number of parallel environments per worker
+      num_gpus_per_worker: 1
+      num_cpus_per_worker: 9
+      remote_worker_envs: True    # if True and num_envs_per_worker > 1, spawn worker envs as remote processes
       remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
 
       rollout_fragment_length: 20
