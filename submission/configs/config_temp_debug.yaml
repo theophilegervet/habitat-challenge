@@ -31,7 +31,13 @@ TRAIN:
 
     PPO:
       # 2 x 32GB GPUs
-      num_workers: 9              # number of parallel workers
+      #num_workers: 9              # number of parallel workers
+      #num_gpus: 0.2               # number of GPUs for driver process training the policy model
+      #num_cpus_for_driver: 9      # number of CPUs for driver
+      #num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
+      #num_cpus_per_worker: 7      # number of CPUs per worker
+
+      num_workers: 1              # number of parallel workers
       num_gpus: 0.2               # number of GPUs for driver process training the policy model
       num_cpus_for_driver: 9      # number of CPUs for driver
       num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
