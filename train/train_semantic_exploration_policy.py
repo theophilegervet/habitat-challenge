@@ -67,13 +67,19 @@ class LoggingCallback(DefaultCallbacks):
     def on_episode_step(self, *, worker, base_env, policies,
                         episode: Episode, env_index, **kwargs):
         info = episode.last_info_for()
+
         for k in ["goal_reward", "intrinsic_reward", "unscaled_intrinsic_reward",
-                  "discounted_goal_reward", "discounted_unscaled_intrinsic_reward",
-                  "action_0", "action_1"]:
+                  "discounted_goal_reward", "discounted_unscaled_intrinsic_reward"]:
             if k not in episode.custom_metrics:
                 episode.custom_metrics[k] = info[k]
             else:
                 episode.custom_metrics[k] += info[k]
+
+        for k in ["action_0", "action_1"]:
+            if k not in episode.hist_data:
+                episode.hist_data[k] = [info[k]]
+            else:
+                episode.hist_data[k].append(info[k])
 
 
 if __name__ == "__main__":
