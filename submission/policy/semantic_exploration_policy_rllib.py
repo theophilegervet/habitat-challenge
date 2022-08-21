@@ -56,7 +56,7 @@ class SemanticExplorationPolicy(Policy):
         )
 
         # TODO Sample action from network outputs with RLLib ActionDistribution
-        goal_location = (nn.Sigmoid()(outputs) * (goal_map_size - 1)).long()
+        goal_location = (nn.Sigmoid()(outputs[:, :2]) * (goal_map_size - 1)).long()
 
         for e in range(batch_size):
             if not found_goal[e] and not found_hint[e]:
@@ -98,6 +98,7 @@ class SemanticExplorationPolicyNetwork(NNBase):
         self.linear2 = nn.Linear(hidden_size, 256)
 
         self.actor_linear = nn.Linear(256, 2)
+        self.goal_action_std = nn.Parameter(torch.zeros(1))
         self.critic_linear = nn.Linear(256, 1)
 
     def forward(self, map_features, orientation, object_goal):
@@ -107,6 +108,8 @@ class SemanticExplorationPolicyNetwork(NNBase):
         x = torch.cat((map_features, orientation_emb, goal_emb), 1)
         x = nn.ReLU()(self.linear1(x))
         x = nn.ReLU()(self.linear2(x))
-        outputs = self.actor_linear(x)
+        goal_action_mean = self.actor_linear(x)
+        goal_action_std = self.goal_action_std.expand_as(goal_action_mean)
+        outputs = torch.cat([goal_action_mean, goal_action_std], dim=1)
         value = self.critic_linear(x).squeeze(-1)
         return outputs, value
