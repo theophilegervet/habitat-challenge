@@ -87,6 +87,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         else:
             self.panorama_start_steps = 0
         self.intrinsic_rew_coeff = config.TRAIN.RL.intrinsic_rew_coeff
+        self.gamma = config.TRAIN.RL.gamma
         self.inference_downscaling = config.AGENT.POLICY.SEMANTIC.inference_downscaling
 
         self.planner = Planner(config)
@@ -262,9 +263,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         info = {
             "timestep": self.timestep,
-            "goal_rew": goal_reward,
-            "unscaled_intrinsic_rew": intrinsic_reward,
-            "scaled_intrinsic_rew": intrinsic_reward * self.intrinsic_rew_coeff,
+            "goal_reward": goal_reward,
+            "intrinsic_reward": intrinsic_reward * self.intrinsic_rew_coeff,
+            "unscaled_intrinsic_reward": intrinsic_reward,
+            "discounted_goal_reward": goal_reward * (self.gamma ** self.timestep),
+            "discounted_unscaled_intrinsic_reward": intrinsic_reward * (self.gamma ** self.timestep),
             "action_0": float(goal_action[0]),
             "action_1": float(goal_action[1]),
         }
