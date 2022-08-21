@@ -60,6 +60,8 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
         # TODO Remove
         print("outputs.shape", outputs.shape)
         print("self.value.shape", self.value.shape)
+        print("outputs", outputs)
+        print("self.value", self.value)
 
         return outputs, []
 
