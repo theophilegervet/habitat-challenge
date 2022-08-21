@@ -9,7 +9,7 @@ DUMP_LOCATION: data       # path to dump models and log
 EXP_NAME: semexp_debug       # experiment name
 MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
 VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
-PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
+PRINT_IMAGES: 1           # 1: save visualization as images, 0: no image saving
 
 EVAL_VECTORIZED:
   specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
