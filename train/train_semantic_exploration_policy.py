@@ -3,6 +3,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 from pathlib import Path
+import argparse
 import warnings
 warnings.filterwarnings("ignore")
 import sys
@@ -83,7 +84,17 @@ class LoggingCallback(DefaultCallbacks):
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/config.yaml")
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--config_path",
+        type=str,
+        default="submission/configs/ppo_train_challenge_dataset_config.yaml",
+        help="Path to config yaml",
+    )
+    args = parser.parse_args()
+
+    config, config_str = get_config(args.config_path)
+    print(config_str)
 
     ray.init()
 
@@ -156,8 +167,6 @@ if __name__ == "__main__":
                                         config.TRAIN.RL.DDPPO.minibatch_size //
                                         config.TRAIN.RL.DDPPO.num_envs_per_worker)
         })
-
-    print(config_str)
 
     # Debugging
     # if config.TRAIN.RL.algorithm == "PPO":

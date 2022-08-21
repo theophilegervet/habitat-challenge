@@ -31,14 +31,21 @@ SIMULATOR:
     POSITION: [0, 0.88, 0]
 
 TASK:
-  TYPE: Nav-v0
+  TYPE: ObjectNav-v1
   POSSIBLE_ACTIONS: ["STOP", "MOVE_FORWARD", "TURN_LEFT", "TURN_RIGHT", "LOOK_UP", "LOOK_DOWN"]
-  SENSORS: ["OBJECTGOAL_SENSOR", "COMPASS_SENSOR", "GPS_SENSOR"]
+
+  SENSORS: ['OBJECTGOAL_SENSOR', 'COMPASS_SENSOR', 'GPS_SENSOR']
   GOAL_SENSOR_UUID: objectgoal
-  MEASUREMENTS: []
+
+  MEASUREMENTS: ['DISTANCE_TO_GOAL', 'SUCCESS', 'SPL', 'SOFT_SPL']
+
+  DISTANCE_TO_GOAL:
+    DISTANCE_TO: VIEW_POINTS
+  SUCCESS:
+    SUCCESS_DISTANCE: 0.1
 
 DATASET:
-  TYPE: SemexpPolicyTraining
-  SPLIT: val
-  DATA_PATH: "habitat-challenge-data/semexp_policy_training_hm3d/{split}/{split}.json.gz"
+  TYPE: ObjectNav-v1
+  SPLIT: train
+  DATA_PATH: "habitat-challenge-data/objectgoal_hm3d/{split}/{split}.json.gz"
   SCENES_DIR: "habitat-challenge-data/data/scene_datasets/"

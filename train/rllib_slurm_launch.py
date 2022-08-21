@@ -1,7 +1,7 @@
 # Usage:
 # python train/rllib_slurm_launch.py \
 #   --exp-name train_semexp \
-#   --command "python train/train_semantic_exploration_policy.py" \
+#   --command "python train/train_semantic_exploration_policy.py submission/configs/ppo_train_challenge_dataset_config.yaml" \
 #   --load-env "conda activate habitat-challenge" \
 #   --num-nodes 1 \
 #   --num-gpus 8 \
