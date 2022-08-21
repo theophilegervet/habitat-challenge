@@ -119,8 +119,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         })
 
         self.action_space = Box(
-            low=0,
-            high=1,
+            low=np.array([0., 0.]),
+            high=np.array([1., 1.]),
             shape=(2,),
             dtype=np.float32,
         )
