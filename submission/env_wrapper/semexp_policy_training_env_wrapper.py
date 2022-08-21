@@ -198,13 +198,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         goal_map[goal_location[0], goal_location[1]] = 1
         self.semantic_map.update_global_goal_for_env(0, goal_map)
 
-        # TODO Remove
-        print()
-        print("goal_action", goal_action)
-        print("goal_location", goal_location)
-        print("goal_map.shape", goal_map.shape)
-        print()
-
         # For each low-level step
         for t in range(self.goal_update_steps):
             # 1 - Plan
