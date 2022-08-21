@@ -60,14 +60,15 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                     scenes = dataset.get_scenes_to_load(
                         config.TASK_CONFIG.DATASET)
             del dataset
-            print("scenes1::::", scenes)
-            scene_splits = [[] for _ in range(rllib_config.num_workers)]
-            for idx, scene in enumerate(scenes):
-                scene_splits[idx % len(scene_splits)].append(scene)
-            assert sum(map(len, scene_splits)) == len(scenes)
+            if len(scenes) == 1:
+                scene_splits = [[scenes[0]] for _ in range(rllib_config.num_workers)]
+            else:
+                scene_splits = [[] for _ in range(rllib_config.num_workers)]
+                for idx, scene in enumerate(scenes):
+                    scene_splits[idx % len(scene_splits)].append(scene)
+                assert sum(map(len, scene_splits)) == len(scenes)
             config.TASK_CONFIG.DATASET.CONTENT_SCENES = scene_splits[
                 rllib_config.worker_index - 1]
-            print("scenes2::::", config.TASK_CONFIG.DATASET.CONTENT_SCENES)
 
             # Set random seed
             config.TASK_CONFIG.SEED = rllib_config.worker_index
