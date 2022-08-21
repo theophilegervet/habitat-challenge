@@ -34,7 +34,6 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
 
         # TODO Remove
         self.action_space = action_space
-        self.obs_space = obs_space
         self.num_outputs = num_outputs
 
         self.policy_network = SemanticExplorationPolicyNetwork(
@@ -63,7 +62,6 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
         self.value = value
 
         # TODO Remove
-        print(self.obs_space)
         print(self.action_space)
         print(self.num_outputs)
         print("outputs.shape", outputs.shape)
