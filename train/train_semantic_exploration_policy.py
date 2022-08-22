@@ -93,10 +93,17 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    print("-" * 100)
+    print("Config:")
     config, config_str = get_config(args.config_path)
     print(config_str)
+    print("-" * 100)
 
-    ray.init()
+    print("Cluster resources:")
+    ray.init(address="auto")
+    print(ray.nodes())
+    print(ray.cluster_resources())
+    print("-" * 100)
 
     ModelCatalog.register_custom_model(
         "semantic_exploration_policy",

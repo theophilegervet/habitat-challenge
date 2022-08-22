@@ -27,14 +27,14 @@ ${LOAD_ENV}
 redis_password=$(uuidgen)
 export redis_password
 
-nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST") # Getting the node names
+# Get the node names
+nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
 nodes_array=($nodes)
 
+# Make redis-address
 node_1=${nodes_array[0]}
-ip=$(srun --nodes=1 --ntasks=1 -w "$node_1" hostname --ip-address) # making redis-address
+ip=$(srun --nodes=1 --ntasks=1 -w "$node_1" hostname --ip-address)
 
-# if we detect a space character in the head node IP, we'll
-# convert it to an ipv4 address. This step is optional.
 if [[ "$ip" == *" "* ]]; then
   IFS=' ' read -ra ADDR <<< "$ip"
   if [[ ${#ADDR[0]} -gt 16 ]]; then
@@ -42,7 +42,7 @@ if [[ "$ip" == *" "* ]]; then
   else
     ip=${ADDR[0]}
   fi
-  echo "IPV6 address detected. We split the IPV4 address as $ip"
+  echo "We detected a space in ip! You are using IPV6 address. We split the IPV4 address as $ip"
 fi
 
 port=6379
@@ -55,7 +55,7 @@ srun --nodes=1 --ntasks=1 -w "$node_1" \
   ray start --head --node-ip-address="$ip" --port=$port --redis-password="$redis_password" --block &
 sleep 30
 
-worker_num=$((SLURM_JOB_NUM_NODES - 1)) #number of nodes other than the head node
+worker_num=$((SLURM_JOB_NUM_NODES - 1))  # Number of nodes other than the head node
 for ((i = 1; i <= worker_num; i++)); do
   node_i=${nodes_array[$i]}
   echo "STARTING WORKER $i at $node_i"
