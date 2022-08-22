@@ -4,6 +4,7 @@ import torch
 import torch.nn as nn
 from pathlib import Path
 import argparse
+import traceback
 import warnings
 warnings.filterwarnings("ignore")
 import sys
@@ -105,7 +106,11 @@ if __name__ == "__main__":
     print(f"ip_head: {ip_head}")
     print(f"redis_password: {redis_password}")
     if ip_head is not None and redis_password is not None:
-        ray.init(address=ip_head, _redis_password=redis_password)
+        try:
+            ray.init(address=ip_head, _redis_password=redis_password)
+        except:
+            traceback.print_exc()
+            ray.init()
     else:
         ray.init()
     print(ray.nodes())
