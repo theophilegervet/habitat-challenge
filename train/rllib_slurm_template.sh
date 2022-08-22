@@ -19,21 +19,27 @@ ${GIVEN_NODE}
 # Load modules or your own conda environment here
 # module load pytorch/v1.4.0-gpu
 # conda activate ${CONDA_ENV}
+echo "(1) Load environment"
 ${LOAD_ENV}
 
 # ===== DO NOT CHANGE THINGS HERE UNLESS YOU KNOW WHAT YOU ARE DOING =====
 # This script is a modification to the implementation suggest by gregSchwartz18 here:
 # https://github.com/ray-project/ray/issues/826#issuecomment-522116599
+echo "(2) Generate redis password"
+${LOAD_ENV}
 redis_password=$(uuidgen)
 export redis_password
+echo $redis_password
 
-# Get the node names
+echo "(3) Get node names"
 nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
 nodes_array=($nodes)
+echo $nodes
 
-# Make redis-address
+echo "(4) Make redis address"
 node_1=${nodes_array[0]}
 ip=$(srun --nodes=1 --ntasks=1 -w "$node_1" hostname --ip-address)
+echo $ip
 
 if [[ "$ip" == *" "* ]]; then
   IFS=' ' read -ra ADDR <<< "$ip"
