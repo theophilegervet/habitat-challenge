@@ -148,6 +148,7 @@ if __name__ == "__main__":
         "framework": "torch",
         "disable_env_checking": True,
         "_disable_preprocessor_api": True,
+        "recreate_failed_workers": True,
     }
 
     if config.TRAIN.RL.algorithm == "PPO":
