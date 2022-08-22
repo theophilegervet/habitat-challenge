@@ -111,7 +111,7 @@ if __name__ == "__main__":
             ray.init(address=ip_head, _redis_password=redis_password)
         except:
             print("Could not initialize cluster with "
-                  "ray.init(address=ip_head, _redis_password=redis_password)."
+                  "ray.init(address=ip_head, _redis_password=redis_password). "
                   "Initializing it with ray.init()")
             print()
             traceback.print_exc()

@@ -58,7 +58,7 @@ echo "IP Head: $ip_head"
 echo "(5) Starting head at $node_1"
 srun --nodes=1 --ntasks=1 -w "$node_1" \
   ray start --head --node-ip-address="$ip" --port=$port --redis-password="$redis_password" --block &
-echo "(5) Head at $node_1 successfully started"
+echo "(5) Command to launch $node_1 executed"
 sleep 30
 
 worker_num=$((SLURM_JOB_NUM_NODES - 1))  # Number of nodes other than the head node
@@ -66,7 +66,7 @@ for ((i = 1; i <= worker_num; i++)); do
   node_i=${nodes_array[$i]}
   echo "(6) Starting worker $i at $node_i"
   srun --nodes=1 --ntasks=1 -w "$node_i" ray start --address "$ip_head" --redis-password="$redis_password" --block &
-  echo "(6) Worker $i at $node_i successfully started"
+  echo "(6) Command to launch worker $i at $node_i executed"
   sleep 5
 done
 
