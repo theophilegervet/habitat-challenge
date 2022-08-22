@@ -29,17 +29,16 @@ echo "(2) Generate redis password"
 ${LOAD_ENV}
 redis_password=$(uuidgen)
 export redis_password
-echo $redis_password
+echo "Redis password: $redis_password"
 
 echo "(3) Get node names"
 nodes=$(scontrol show hostnames "$SLURM_JOB_NODELIST")
 nodes_array=($nodes)
-echo $nodes
+echo "Node names: $nodes"
 
 echo "(4) Make redis address"
 node_1=${nodes_array[0]}
 ip=$(srun --nodes=1 --ntasks=1 -w "$node_1" hostname --ip-address)
-echo $ip
 
 if [[ "$ip" == *" "* ]]; then
   IFS=' ' read -ra ADDR <<< "$ip"
@@ -56,16 +55,18 @@ ip_head=$ip:$port
 export ip_head
 echo "IP Head: $ip_head"
 
-echo "STARTING HEAD at $node_1"
+echo "(5) Starting head at $node_1"
 srun --nodes=1 --ntasks=1 -w "$node_1" \
   ray start --head --node-ip-address="$ip" --port=$port --redis-password="$redis_password" --block &
+echo "(5) Head at $node_1 successfully started"
 sleep 30
 
 worker_num=$((SLURM_JOB_NUM_NODES - 1))  # Number of nodes other than the head node
 for ((i = 1; i <= worker_num; i++)); do
   node_i=${nodes_array[$i]}
-  echo "STARTING WORKER $i at $node_i"
+  echo "(6) Starting worker $i at $node_i"
   srun --nodes=1 --ntasks=1 -w "$node_i" ray start --address "$ip_head" --redis-password="$redis_password" --block &
+  echo "(6) Worker $i at $node_i successfully started"
   sleep 5
 done
 
