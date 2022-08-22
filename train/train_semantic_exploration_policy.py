@@ -99,6 +99,7 @@ if __name__ == "__main__":
     config, config_str = get_config(args.config_path)
     print(config_str)
     print("-" * 100)
+    print()
 
     print("Cluster resources:")
     ip_head = os.environ.get("ip_head")
@@ -109,13 +110,18 @@ if __name__ == "__main__":
         try:
             ray.init(address=ip_head, _redis_password=redis_password)
         except:
+            print("Could not initialize cluster with "
+                  "ray.init(address=ip_head, _redis_password=redis_password)."
+                  "Initializing it with ray.init()")
+            print()
             traceback.print_exc()
             ray.init()
     else:
         ray.init()
-    print(ray.nodes())
-    print(ray.cluster_resources())
+    print(f"ray.nodes(): {ray.nodes()}")
+    print(f"ray.cluster_resources(): {ray.cluster_resources()}")
     print("-" * 100)
+    print()
 
     ModelCatalog.register_custom_model(
         "semantic_exploration_policy",
@@ -153,7 +159,8 @@ if __name__ == "__main__":
         "framework": "torch",
         "disable_env_checking": True,
         "_disable_preprocessor_api": True,
-        "recreate_failed_workers": True,
+        "ignore_worker_failures": True
+        # "recreate_failed_workers": True,
     }
 
     if config.TRAIN.RL.algorithm == "PPO":
