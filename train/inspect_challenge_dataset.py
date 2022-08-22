@@ -1,3 +1,7 @@
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from habitat import make_dataset
 
 from submission.utils.config_utils import get_config
