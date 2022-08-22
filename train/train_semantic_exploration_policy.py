@@ -171,16 +171,19 @@ if __name__ == "__main__":
         })
     elif config.TRAIN.RL.algorithm == "DDPPO":
         train_config.update({
+            # Workers
             "num_workers": config.TRAIN.RL.DDPPO.num_workers,
             "num_envs_per_worker": config.TRAIN.RL.DDPPO.num_envs_per_worker,
-            "remote_worker_envs": True,
             "num_gpus_per_worker": config.TRAIN.RL.DDPPO.num_gpus_per_worker,
+            "num_cpus_per_worker": config.TRAIN.RL.DDPPO.num_cpus_per_worker,
+            "remote_worker_envs": config.TRAIN.RL.DDPPO.remote_worker_envs,
             "remote_env_batch_wait_ms": config.TRAIN.RL.DDPPO.remote_env_batch_wait_ms,
-            "num_sgd_iter": config.TRAIN.RL.DDPPO.sgd_steps_per_batch,
-            "sgd_minibatch_size": config.TRAIN.RL.DDPPO.minibatch_size,
-            "rollout_fragment_length": (config.TRAIN.RL.DDPPO.sgd_steps_per_batch *
-                                        config.TRAIN.RL.DDPPO.minibatch_size //
-                                        config.TRAIN.RL.DDPPO.num_envs_per_worker)
+            # Batching
+            #   train_batch_size: total batch size is implicitly
+            #    (num_workers * num_envs_per_worker * rollout_fragment_length)
+            "rollout_fragment_length": config.TRAIN.RL.PPO.rollout_fragment_length,
+            "sgd_minibatch_size": config.TRAIN.RL.PPO.rollout_fragment_length,
+            "num_sgd_iter": config.TRAIN.RL.PPO.sgd_epochs,
         })
 
     # Debugging
