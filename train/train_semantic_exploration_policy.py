@@ -105,7 +105,7 @@ if __name__ == "__main__":
     print(f"ip_head: {ip_head}")
     print(f"redis_password: {redis_password}")
     if ip_head is not None and redis_password is not None:
-        ray.init(address=f"ray://{ip_head}", _redis_password=redis_password)
+        ray.init(address=ip_head, _redis_password=redis_password)
     else:
         ray.init()
     print(ray.nodes())
