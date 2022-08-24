@@ -1,7 +1,7 @@
 # Usage:
 # python train/rllib_slurm_launch.py \
 #   --exp-name train_semexp \
-#   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ppo_overfit_challenge_dataset_config.yaml" \
+#   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ppo_debug_config.yaml" \
 #   --load-env "" \
 #   --num-nodes 1 \
 #   --num-gpus 8 \
