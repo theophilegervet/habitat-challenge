@@ -15,14 +15,14 @@ import ray
 # from ray.rllib.algorithms.callbacks import DefaultCallbacks
 # from ray.rllib.evaluation import Episode
 # from ray.tune import tuner
+# from ray.tune.tune_config import TuneConfig
+# from ray.air.config import RunConfig
 from ray.rllib.agents import ppo
 from ray.rllib.agents.callbacks import DefaultCallbacks
 from ray.rllib.models import ModelCatalog
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 from ray.rllib.evaluation import MultiAgentEpisode as Episode
 from ray.tune.logger import pretty_print
-from ray.tune.tune_config import TuneConfig
-from ray.air.config import RunConfig
 
 from submission.utils.config_utils import get_config
 from submission.policy.semantic_exploration_policy_rllib import SemanticExplorationPolicyNetwork
