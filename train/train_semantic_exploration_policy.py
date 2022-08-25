@@ -234,7 +234,7 @@ if __name__ == "__main__":
         # checkpoint_freq=,
         # checkpoint_at_end=,
         # restore=,
-        sync_to_driver=False,
+        # sync_to_driver=False,
     )
 
     ray.shutdown()
