@@ -55,10 +55,6 @@ ip_head=$ip:$port
 export ip_head
 echo "IP Head: $ip_head"
 
-echo "Debugging: check if Redis is already running on head node"
-ping=$(srun --nodes=1 --ntasks=1 -w "$node_1" redis-cli -h "$node_1" -p $port ping)
-echo "Ping: $ping"
-
 echo "(5) Starting head at $node_1"
 srun --nodes=1 --ntasks=1 -w "$node_1" \
   ray start --head --node-ip-address="$ip" --port=$port --redis-password="$redis_password" --block &

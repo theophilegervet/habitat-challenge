@@ -217,13 +217,24 @@ if __name__ == "__main__":
     #     result = trainer.train()
     #     print(pretty_print(result))
 
-    # Training
-    tuner = tuner.Tuner(
+    # Training with class API
+    # tuner = tuner.Tuner(
+    #     config.TRAIN.RL.algorithm,
+    #     param_space=train_config,
+    #     run_config=RunConfig(name=config.TRAIN.RL.exp_name),
+    #     tune_config=TuneConfig(max_concurrent_trials=1)
+    # )
+    # tuner.fit()
+
+    # Training with functional API
+    ray.tune.run(
         config.TRAIN.RL.algorithm,
-        param_space=train_config,
-        run_config=RunConfig(name=config.TRAIN.RL.exp_name),
-        tune_config=TuneConfig(max_concurrent_trials=1)
+        name=config.TRAIN.RL.exp_name,
+        config=train_config,
+        # checkpoint_freq=,
+        # checkpoint_at_end=,
+        # restore=,
+        sync_to_driver=False,
     )
-    tuner.fit()
 
     ray.shutdown()
