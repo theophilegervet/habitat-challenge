@@ -160,7 +160,7 @@ if __name__ == "__main__":
         "entropy_coeff": config.TRAIN.RL.entropy_coeff,
         "clip_param": config.TRAIN.RL.clip_param,
         "framework": "torch",
-        "disable_env_checking": True,
+        # "disable_env_checking": True,
         "_disable_preprocessor_api": True,
         # "ignore_worker_failures": True
         # "recreate_failed_workers": True,
