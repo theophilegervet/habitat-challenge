@@ -1,12 +1,12 @@
 # Usage:
-# python train/rllib_slurm_launch.py \
-#   --exp-name train_semexp \
-#   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ppo_debug_config.yaml" \
-#   --load-env "" \
-#   --num-nodes 1 \
-#   --num-gpus 8 \
-#   --partition learnfair \
-#   --external-redis
+python train/rllib_slurm_launch.py \
+  --exp-name train_semexp \
+  --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ppo_debug_config.yaml" \
+  --load-env "" \
+  --num-nodes 1 \
+  --num-gpus 8 \
+  --partition learnfair \
+  --external-redis
 
 import os
 import argparse
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     text = text.replace(COMMAND_PLACEHOLDER, str(args.command))
     text = text.replace(LOAD_ENV, str(args.load_env))
     text = text.replace(GIVEN_NODE, node_info)
-    text = text.replace(EXTERNAL_REDIS, str(args.external_redis))
+    text = text.replace(EXTERNAL_REDIS, str(args.external_redis).lower())
     text = text.replace(
         "# THIS FILE IS A TEMPLATE AND IT SHOULD NOT BE DEPLOYED TO " "PRODUCTION!",
         "# THIS FILE IS MODIFIED AUTOMATICALLY FROM TEMPLATE AND SHOULD BE "
