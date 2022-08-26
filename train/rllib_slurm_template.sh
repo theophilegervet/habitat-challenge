@@ -51,25 +51,22 @@ if [[ "$ip" == *" "* ]]; then
   echo "We detected a space in ip! You are using IPV6 address. We split the IPV4 address as $ip"
 fi
 
+# External Redis server
 if ${EXTERNAL_REDIS}
 then
   port=8765
+  RAY_REDIS_ADDRESS=$ip:6379
 else
   port=6379
 fi
+
 ip_head=$ip:$port
 export ip_head
 echo "IP Head: $ip_head"
 
 echo "(5) Starting head at $node_1"
-if ${EXTERNAL_REDIS}
-then
-  srun --nodes=1 --ntasks=1 -w "$node_1" --export=RAY_REDIS_ADDRESS=$ip:6379 ray start --head \
-    --node-ip-address="$ip" --port=$port --redis-password="$redis_password" --block &
-else
-  srun --nodes=1 --ntasks=1 -w "$node_1" ray start --head --node-ip-address="$ip" \
-    --port=$port --redis-password="$redis_password" --block &
-fi
+srun --nodes=1 --ntasks=1 -w "$node_1" \
+  ray start --head --node-ip-address="$ip" --port=$port --redis-password="$redis_password" --block &
 
 echo "(5) Command to launch $node_1 executed"
 sleep 30
