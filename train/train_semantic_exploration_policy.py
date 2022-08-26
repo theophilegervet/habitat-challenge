@@ -234,10 +234,8 @@ if __name__ == "__main__":
         config.TRAIN.RL.algorithm,
         name=config.TRAIN.RL.exp_name,
         config=train_config,
-        # checkpoint_freq=,
-        # checkpoint_at_end=,
-        # restore=,
-        # sync_to_driver=False,
+        checkpoint_freq=config.TRAIN.RL.checkpoint_freq,
+        #restore=,
     )
 
     ray.shutdown()
