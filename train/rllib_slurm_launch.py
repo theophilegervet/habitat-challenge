@@ -111,12 +111,12 @@ if __name__ == "__main__":
         f.write(text)
 
     # ===== Submit the job =====
-    # print("Starting to submit job!")
-    # os.makedirs("slurm_logs", exist_ok=True)
-    # subprocess.Popen(["sbatch", script_file])
-    # print(
-    #     "Job submitted! Script file is at: <{}>. Log files are at: <{}>".format(
-    #         script_file, "slurm_logs/{}.err/out".format(job_name)
-    #     )
-    # )
-    # sys.exit(0)
+    print("Starting to submit job!")
+    os.makedirs("slurm_logs", exist_ok=True)
+    subprocess.Popen(["sbatch", script_file])
+    print(
+        "Job submitted! Script file is at: <{}>. Log files are at: <{}>".format(
+            script_file, "slurm_logs/{}.err/out".format(job_name)
+        )
+    )
+    sys.exit(0)
