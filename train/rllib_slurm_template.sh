@@ -59,6 +59,7 @@ then
 else
   port=6379
 fi
+echo "RAY_REDIS_ADDRESS: $RAY_REDIS_ADDRESS"
 
 ip_head=$ip:$port
 export ip_head
