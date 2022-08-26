@@ -5,7 +5,8 @@
 #   --load-env "" \
 #   --num-nodes 1 \
 #   --num-gpus 8 \
-#   --partition learnfair
+#   --partition learnfair \
+#   --external-redis
 
 import os
 import argparse
@@ -22,6 +23,7 @@ PARTITION_OPTION = "${PARTITION_OPTION}"
 COMMAND_PLACEHOLDER = "${COMMAND_PLACEHOLDER}"
 GIVEN_NODE = "${GIVEN_NODE}"
 LOAD_ENV = "${LOAD_ENV}"
+EXTERNAL_REDIS = "${EXTERNAL_REDIS}"
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -51,6 +53,11 @@ if __name__ == "__main__":
         "--partition",
         "-p",
         type=str,
+    )
+    parser.add_argument(
+        "--external-redis",
+        action="store_true",
+        help="Flag to specify there's already a Redis server running"
     )
     parser.add_argument(
         "--load-env",
@@ -91,6 +98,7 @@ if __name__ == "__main__":
     text = text.replace(COMMAND_PLACEHOLDER, str(args.command))
     text = text.replace(LOAD_ENV, str(args.load_env))
     text = text.replace(GIVEN_NODE, node_info)
+    text = text.replace(EXTERNAL_REDIS, str(args.external_redis))
     text = text.replace(
         "# THIS FILE IS A TEMPLATE AND IT SHOULD NOT BE DEPLOYED TO " "PRODUCTION!",
         "# THIS FILE IS MODIFIED AUTOMATICALLY FROM TEMPLATE AND SHOULD BE "
@@ -103,12 +111,12 @@ if __name__ == "__main__":
         f.write(text)
 
     # ===== Submit the job =====
-    print("Starting to submit job!")
-    os.makedirs("slurm_logs", exist_ok=True)
-    subprocess.Popen(["sbatch", script_file])
-    print(
-        "Job submitted! Script file is at: <{}>. Log files are at: <{}>".format(
-            script_file, "slurm_logs/{}.err/out".format(job_name)
-        )
-    )
-    sys.exit(0)
+    # print("Starting to submit job!")
+    # os.makedirs("slurm_logs", exist_ok=True)
+    # subprocess.Popen(["sbatch", script_file])
+    # print(
+    #     "Job submitted! Script file is at: <{}>. Log files are at: <{}>".format(
+    #         script_file, "slurm_logs/{}.err/out".format(job_name)
+    #     )
+    # )
+    # sys.exit(0)
