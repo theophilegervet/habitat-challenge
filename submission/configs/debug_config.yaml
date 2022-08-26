@@ -1,11 +1,11 @@
-BASE_TASK_CONFIG_PATH: submission/dataset/train_challenge_dataset_config.yaml
+BASE_TASK_CONFIG_PATH: submission/dataset/overfit_challenge_dataset_config.yaml
 
 AGENT_GPU_IDS: [0]        # IDs of GPUs to use for agent with DistributedDataParallel — each GPU corresponds to one agent process
 SIMULATOR_GPU_IDS: [0, 1] # IDs of GPUs to use for vectorized environments
 NO_GPU: 0                 # 1: ignore IDs above and run on CPU, 0: run on GPUs with IDs above
 NUM_ENVIRONMENTS: 1       # number of environments (per agent process)
 DUMP_LOCATION: data       # path to dump models and log
-EXP_NAME: ppo_train_challenge  # experiment name
+EXP_NAME: debug           # experiment name
 MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
 VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
 PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
@@ -20,7 +20,7 @@ EVAL_VECTORIZED:
 
 TRAIN:
   RL:
-    exp_name: ppo_train_challenge  # experiment name
+    exp_name: debug             # experiment name
     algorithm: PPO              # one of "PPO" or "DDPPO"
     gamma: 0.9                  # discount factor of the MDP
     intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
@@ -31,11 +31,11 @@ TRAIN:
 
     PPO:
       # 2 x 32GB GPUs
-      #num_workers: 9              # number of parallel workers
-      #num_gpus: 0.2               # number of GPUs for driver process training the policy model
-      #num_cpus_for_driver: 9      # number of CPUs for driver
-      #num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
-      #num_cpus_per_worker: 7      # number of CPUs per worker
+      num_workers: 9              # number of parallel workers
+      num_gpus: 0.2               # number of GPUs for driver process training the policy model
+      num_cpus_for_driver: 9      # number of CPUs for driver
+      num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
+      num_cpus_per_worker: 7      # number of CPUs per worker
 
       # 8 x 32GB GPUs
       #num_workers: 35
@@ -52,20 +52,20 @@ TRAIN:
       #num_cpus_per_worker: 2
 
       # 8 x 8 x 32GB GPUs
-      num_workers: 280
-      num_gpus: 8
-      num_cpus_for_driver: 79
-      num_gpus_per_worker: 0.2
-      num_cpus_per_worker: 2
+      #num_workers: 280
+      #num_gpus: 8
+      #num_cpus_for_driver: 79
+      #num_gpus_per_worker: 0.2
+      #num_cpus_per_worker: 2
 
       rollout_fragment_length: 20  # divide episodes into fragments of this many steps each
       sgd_epochs: 4                # number of SGD epochs (number of SGD iterations per minibatch)
 
     DDPPO:
       # 2 x 32GB GPUs
-      #num_workers: 9
-      #num_gpus_per_worker: 0.2
-      #num_cpus_per_worker: 8
+      num_workers: 9
+      num_gpus_per_worker: 0.2
+      num_cpus_per_worker: 8
 
       # 8 x 32GB GPUs
       #num_workers: 39
@@ -78,9 +78,9 @@ TRAIN:
       #num_cpus_per_worker: 2
 
       # 8 x 8 x 32GB GPUs
-      num_workers: 319
-      num_gpus_per_worker: 0.2
-      num_cpus_per_worker: 2
+      #num_workers: 319
+      #num_gpus_per_worker: 0.2
+      #num_cpus_per_worker: 2
 
       num_envs_per_worker: 1
       remote_worker_envs: False

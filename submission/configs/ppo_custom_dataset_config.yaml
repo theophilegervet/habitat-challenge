@@ -38,30 +38,52 @@ TRAIN:
       #num_cpus_per_worker: 7      # number of CPUs per worker
 
       # 8 x 32GB GPUs
-      num_workers: 22  # 27 OOM
-      num_gpus: 1
-      num_cpus_for_driver: 10
-      num_gpus_per_worker: 0.25
-      num_cpus_per_worker: 3
+      #num_workers: 35
+      #num_gpus: 1
+      #num_cpus_for_driver: 9
+      #num_gpus_per_worker: 0.2
+      #num_cpus_per_worker: 2
+
+      # 4 x 8 x 32GB GPUs
+      #num_workers: 140
+      #num_gpus: 4
+      #num_cpus_for_driver: 39
+      #num_gpus_per_worker: 0.2
+      #num_cpus_per_worker: 2
+
+      # 8 x 8 x 32GB GPUs
+      num_workers: 280
+      num_gpus: 8
+      num_cpus_for_driver: 79
+      num_gpus_per_worker: 0.2
+      num_cpus_per_worker: 2
 
       rollout_fragment_length: 20  # divide episodes into fragments of this many steps each
       sgd_epochs: 4                # number of SGD epochs (number of SGD iterations per minibatch)
 
     DDPPO:
+      # 2 x 32GB GPUs
+      #num_workers: 9
+      #num_gpus_per_worker: 0.2
+      #num_cpus_per_worker: 8
+
       # 8 x 32GB GPUs
-      num_workers: 22
-      num_envs_per_worker: 1
-      num_gpus_per_worker: 0.33
-      num_cpus_per_worker: 3
-      remote_worker_envs: False
+      #num_workers: 39
+      #num_gpus_per_worker: 0.2
+      #num_cpus_per_worker: 2
 
       # 4 x 8 x 32GB GPUs
-      #num_workers: 88
-      #num_envs_per_worker: 1
-      #num_gpus_per_worker: 0.33
-      #num_cpus_per_worker: 3
-      #remote_worker_envs: False
+      #num_workers: 159
+      #num_gpus_per_worker: 0.2
+      #num_cpus_per_worker: 2
 
+      # 8 x 8 x 32GB GPUs
+      num_workers: 319
+      num_gpus_per_worker: 0.2
+      num_cpus_per_worker: 2
+
+      num_envs_per_worker: 1
+      remote_worker_envs: False
       remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
       rollout_fragment_length: 20
       sgd_epochs: 4
