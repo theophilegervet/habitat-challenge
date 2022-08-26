@@ -1,9 +1,9 @@
 # Usage:
 # python train/rllib_slurm_launch.py \
-#   --exp-name train_semexp \
-#   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/debug_config.yaml" \
+#   --exp-name ddppo_overfit \
+#   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ddppo_overfit_challenge_dataset_config.yaml" \
 #   --load-env "" \
-#   --num-nodes 2 \
+#   --num-nodes 1 \
 #   --num-gpus 8 \
 #   --partition learnfair \
 #   --external-redis
