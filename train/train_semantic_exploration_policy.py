@@ -163,7 +163,7 @@ if __name__ == "__main__":
         # "disable_env_checking": True,
         "_disable_preprocessor_api": True,
         # "ignore_worker_failures": True
-        # "recreate_failed_workers": True,
+        "recreate_failed_workers": True,
     }
 
     if config.TRAIN.RL.algorithm == "PPO":
@@ -234,6 +234,7 @@ if __name__ == "__main__":
         config.TRAIN.RL.algorithm,
         name=config.TRAIN.RL.exp_name,
         config=train_config,
+        max_concurrent_trials=1,
         checkpoint_freq=config.TRAIN.RL.checkpoint_freq,
         #restore=,
     )
