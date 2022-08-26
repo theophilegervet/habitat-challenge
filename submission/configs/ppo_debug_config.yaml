@@ -38,18 +38,18 @@ TRAIN:
       #num_cpus_per_worker: 7      # number of CPUs per worker
 
       # 8 x 32GB GPUs
-      #num_workers: 22  # 27 OOM
-      #num_gpus: 1
-      #num_cpus_for_driver: 10
-      #num_gpus_per_worker: 0.25
-      #num_cpus_per_worker: 3
-
-      # 2 x 8 x 32GB GPUs
-      num_workers: 44  # 27 OOM
+      num_workers: 22  # 27 OOM
       num_gpus: 1
       num_cpus_for_driver: 10
       num_gpus_per_worker: 0.25
       num_cpus_per_worker: 3
+
+      # 2 x 8 x 32GB GPUs
+      #num_workers: 44  # 27 OOM
+      #num_gpus: 1
+      #num_cpus_for_driver: 10
+      #num_gpus_per_worker: 0.25
+      #num_cpus_per_worker: 3
 
       rollout_fragment_length: 20  # divide episodes into fragments of this many steps each
       sgd_epochs: 4                # number of SGD epochs (number of SGD iterations per minibatch)

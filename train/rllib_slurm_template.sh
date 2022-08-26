@@ -64,7 +64,7 @@ echo "IP Head: $ip_head"
 echo "(5) Starting head at $node_1"
 if ${EXTERNAL_REDIS}
 then
-  srun --nodes=1 --ntasks=1 -w "$node_1" RAY_REDIS_ADDRESS=$ip:6379 ray start --head \
+  srun --nodes=1 --ntasks=1 -w "$node_1" --export=RAY_REDIS_ADDRESS=$ip:6379 ray start --head \
     --node-ip-address="$ip" --port=$port --redis-password="$redis_password" --block &
 else
   srun --nodes=1 --ntasks=1 -w "$node_1" ray start --head --node-ip-address="$ip" \
