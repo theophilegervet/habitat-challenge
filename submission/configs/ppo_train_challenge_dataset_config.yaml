@@ -52,9 +52,15 @@ TRAIN:
       #num_cpus_per_worker: 2
 
       # 8 x 8 x 32GB GPUs
+      #num_workers: 280
+      #num_gpus: 8
+      #num_cpus_for_driver: 79
+      #num_gpus_per_worker: 0.2
+      #num_cpus_per_worker: 2
+      # TODO debugging resources
       num_workers: 280
-      num_gpus: 8
-      num_cpus_for_driver: 79
+      num_gpus: 1
+      num_cpus_for_driver: 9
       num_gpus_per_worker: 0.2
       num_cpus_per_worker: 2
 
