@@ -177,7 +177,7 @@ if __name__ == "__main__":
             # Batching
             #   train_batch_size: total batch size
             #   sgd_minibatch_size: SGD minibatch size (chunk train_batch_size
-            #    in sgd_minibatch_size pieces)
+            #    in sgd_minibatch_size sized pieces)
             "rollout_fragment_length": config.TRAIN.RL.PPO.rollout_fragment_length,
             "train_batch_size": (config.TRAIN.RL.PPO.rollout_fragment_length *
                                  config.TRAIN.RL.PPO.num_workers),
@@ -196,8 +196,14 @@ if __name__ == "__main__":
             # Batching
             #   train_batch_size: total batch size is implicitly
             #    (num_workers * num_envs_per_worker * rollout_fragment_length)
+            #   sgd_minibatch_size: total SGD minibatch size is
+            #    (num_workers * sgd_minibatch_size)
             "rollout_fragment_length": config.TRAIN.RL.PPO.rollout_fragment_length,
-            "sgd_minibatch_size": config.TRAIN.RL.PPO.rollout_fragment_length,
+            "sgd_minibatch_size": max(
+                2 * config.TRAIN.RL.PPO.rollout_fragment_length //
+                config.TRAIN.RL.DDPPO.num_workers,
+                1
+            ),
             "num_sgd_iter": config.TRAIN.RL.PPO.sgd_epochs,
         })
 

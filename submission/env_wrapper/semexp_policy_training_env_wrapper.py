@@ -89,6 +89,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.intrinsic_rew_coeff = config.TRAIN.RL.intrinsic_rew_coeff
         self.gamma = config.TRAIN.RL.gamma
         self.inference_downscaling = config.AGENT.POLICY.SEMANTIC.inference_downscaling
+        self.print_images = config.PRINT_IMAGES
 
         self.planner = Planner(config)
         self.visualizer = Visualizer(config)
@@ -139,7 +140,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         self.obs_preprocessor.reset()
         self.planner.reset()
-        self.visualizer.reset()
         self.semantic_map.init_map_and_pose()
 
         obs = super().reset()
@@ -147,7 +147,10 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         self.scene_id = self.current_episode.scene_id.split("/")[-1].split(".")[0]
         self.episode_id = self.current_episode.episode_id
-        self.visualizer.set_vis_dir(self.scene_id, self.episode_id)
+
+        if self.print_images:
+            self.visualizer.reset()
+            self.visualizer.set_vis_dir(self.scene_id, self.episode_id)
 
         for _ in range(self.panorama_start_steps):
             obs, _, _, _ = super().step(HabitatSimActions.TURN_RIGHT)
@@ -162,20 +165,21 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         ) = self._update_map(seq_obs, update_global=True)
         self.goal_category = self.goal_category_tensor.item()
 
-        vis_inputs = {
-            "sensor_pose": self.semantic_map.get_planner_pose_inputs(0),
-            "obstacle_map": self.semantic_map.get_obstacle_map(0),
-            "goal_map": self.semantic_map.get_goal_map(0),
-            "found_goal": False,
-            "found_hint": False,
-            "explored_map": self.semantic_map.get_explored_map(0),
-            "semantic_map": self.semantic_map.get_semantic_map(0),
-            "semantic_frame": semantic_frame,
-            "goal_name": self.goal_name,
-            "goal_category": self.goal_category,
-            "timestep": self.timestep
-        }
-        self.visualizer.visualize(**vis_inputs)
+        if self.print_images:
+            vis_inputs = {
+                "sensor_pose": self.semantic_map.get_planner_pose_inputs(0),
+                "obstacle_map": self.semantic_map.get_obstacle_map(0),
+                "goal_map": self.semantic_map.get_goal_map(0),
+                "found_goal": False,
+                "found_hint": False,
+                "explored_map": self.semantic_map.get_explored_map(0),
+                "semantic_map": self.semantic_map.get_semantic_map(0),
+                "semantic_frame": semantic_frame,
+                "goal_name": self.goal_name,
+                "goal_category": self.goal_category,
+                "timestep": self.timestep
+            }
+            self.visualizer.visualize(**vis_inputs)
 
         map_features = F.avg_pool2d(map_features, self.inference_downscaling)
         obs = {
@@ -230,21 +234,22 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             if found_goal:
                 break
 
-        # Visualize the final state
-        vis_inputs = {
-            "sensor_pose": self.semantic_map.get_planner_pose_inputs(0),
-            "obstacle_map": self.semantic_map.get_obstacle_map(0),
-            "goal_map": self.semantic_map.get_goal_map(0),
-            "found_goal": False,
-            "found_hint": False,
-            "explored_map": self.semantic_map.get_explored_map(0),
-            "semantic_map": self.semantic_map.get_semantic_map(0),
-            "semantic_frame": semantic_frame,
-            "goal_name": self.goal_name,
-            "goal_category": self.goal_category,
-            "timestep": self.timestep
-        }
-        self.visualizer.visualize(**vis_inputs)
+        if self.print_images:
+            # Visualize the final state
+            vis_inputs = {
+                "sensor_pose": self.semantic_map.get_planner_pose_inputs(0),
+                "obstacle_map": self.semantic_map.get_obstacle_map(0),
+                "goal_map": self.semantic_map.get_goal_map(0),
+                "found_goal": False,
+                "found_hint": False,
+                "explored_map": self.semantic_map.get_explored_map(0),
+                "semantic_map": self.semantic_map.get_semantic_map(0),
+                "semantic_frame": semantic_frame,
+                "goal_name": self.goal_name,
+                "goal_category": self.goal_category,
+                "timestep": self.timestep
+            }
+            self.visualizer.visualize(**vis_inputs)
 
         map_features = F.avg_pool2d(map_features, self.inference_downscaling)
         obs = {
@@ -274,7 +279,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.infos.append(info)
 
         done = found_goal or self.timestep == self.max_steps - 1
-        if done and self.visualizer.print_images:
+        if done and self.print_images:
             json.dump(
                 self.infos,
                 open(os.path.join(self.visualizer.vis_dir, "infos.json"), "w"),
