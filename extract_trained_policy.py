@@ -58,11 +58,11 @@ ppo_config.update({
     #   train_batch_size: total batch size
     #   sgd_minibatch_size: SGD minibatch size (chunk train_batch_size
     #    in sgd_minibatch_size sized pieces)
-    "rollout_fragment_length": config.TRAIN.RL.PPO.rollout_fragment_length,
-    "train_batch_size": (config.TRAIN.RL.PPO.rollout_fragment_length *
+    "rollout_fragment_length": config.TRAIN.RL.rollout_fragment_length,
+    "train_batch_size": (config.TRAIN.RL.rollout_fragment_length *
                          config.TRAIN.RL.PPO.num_workers),
-    "sgd_minibatch_size": 2 * config.TRAIN.RL.PPO.rollout_fragment_length,
-    "num_sgd_iter": config.TRAIN.RL.PPO.sgd_epochs,
+    "sgd_minibatch_size": 2 * config.TRAIN.RL.rollout_fragment_length,
+    "num_sgd_iter": config.TRAIN.RL.sgd_epochs,
 })
 
 
