@@ -49,7 +49,7 @@ ppo_config.update({
     "lr": config.TRAIN.RL.lr,
     "entropy_coeff": config.TRAIN.RL.entropy_coeff,
     "clip_param": config.TRAIN.RL.clip_param,
-    "framework": "torch",
+    # "framework": "torch",
     # "disable_env_checking": True,
     "_disable_preprocessor_api": True,
     # "ignore_worker_failures": True
