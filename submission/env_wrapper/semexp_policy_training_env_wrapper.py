@@ -190,6 +190,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         return obs
 
     def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
+        print("goal_action", goal_action)
+
         self.timestep += 1
         prev_explored_area = self.semantic_map.global_map[0, 1].sum()
 
