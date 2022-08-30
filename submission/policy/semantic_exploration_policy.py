@@ -37,6 +37,7 @@ class SemanticExplorationPolicy(Policy):
         )
         ppo_config = ppo.DEFAULT_CONFIG.copy()
         ppo_config.update({
+            "env": SemanticExplorationPolicyTrainingEnvWrapper,
             "env_config": {"config": config},
             "model": {
                 "custom_model": "semantic_exploration_policy",
