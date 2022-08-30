@@ -90,7 +90,9 @@ class SemanticExplorationPolicy(Policy):
         print("goal_action", goal_action)
         goal_location = (goal_action * (goal_map_size - 1)).long()
         print("goal_location", goal_location)
-        # TODO Why is action not in [0, 1]? How to extract post-processing?
+        # TODO Why is action not in [0, 1]?
+        #  Why is action distribution TorchDiagGaussian?
+        #  Shouldn't it be TorchSquashedGaussian?
 
         for e in range(batch_size):
             if not found_goal[e] and not found_hint[e]:
