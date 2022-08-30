@@ -88,7 +88,7 @@ checkpoint_path = "/private/home/theop123/ray_results/ddppo_overfit_challenge/DD
 with open(checkpoint_path, 'rb') as f:
     checkpoint = pickle.load(f)
 
-print(checkpoint["model"].keys())
+print(checkpoint.keys())
 
 # value = model["worker"]
 # weights=pickle.loads(value)
