@@ -1,7 +1,7 @@
 # Usage:
 # python train/rllib_slurm_launch.py \
-#   --exp-name ddppo_challenge \
-#   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ddppo_train_challenge_dataset_config.yaml" \
+#   --exp-name ddppo_custom \
+#   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ddppo_custom_dataset_config.yaml" \
 #   --load-env "" \
 #   --num-nodes 8 \
 #   --num-gpus 8 \
