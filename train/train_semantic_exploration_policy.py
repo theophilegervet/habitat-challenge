@@ -11,12 +11,6 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import ray
-# from ray.rllib.algorithms import ppo, ddppo
-# from ray.rllib.algorithms.callbacks import DefaultCallbacks
-# from ray.rllib.evaluation import Episode
-# from ray.tune import tuner
-# from ray.tune.tune_config import TuneConfig
-# from ray.air.config import RunConfig
 from ray.rllib.agents import ppo
 from ray.rllib.agents.callbacks import DefaultCallbacks
 from ray.rllib.models import ModelCatalog
@@ -24,48 +18,17 @@ from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
 from ray.rllib.evaluation import MultiAgentEpisode as Episode
 from ray.tune.logger import pretty_print
 
+# Ray 2.0.0 imports
+# from ray.rllib.algorithms import ppo, ddppo
+# from ray.rllib.algorithms.callbacks import DefaultCallbacks
+# from ray.rllib.evaluation import Episode
+# from ray.tune import tuner
+# from ray.tune.tune_config import TuneConfig
+# from ray.air.config import RunConfig
+
 from submission.utils.config_utils import get_config
-from submission.policy.semantic_exploration_policy_rllib import SemanticExplorationPolicyNetwork
+from submission.policy.semantic_exploration_policy_network import SemanticExplorationPolicyWrapper
 from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
-
-
-class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
-
-    def __init__(self, obs_space, action_space, num_outputs, model_config, name):
-        TorchModelV2.__init__(
-            self, obs_space, action_space, num_outputs, model_config, name
-        )
-        nn.Module.__init__(self)
-
-        self.policy_network = SemanticExplorationPolicyNetwork(
-            model_config["custom_model_config"]["map_features_shape"],
-            model_config["custom_model_config"]["hidden_size"],
-            model_config["custom_model_config"]["num_sem_categories"]
-        )
-        self.dummy = nn.Parameter(torch.empty(0))
-
-        self.value = None
-
-    def forward(self, input_dict, state, seq_lens):
-        for k, v in input_dict["obs"].items():
-            if type(v) == np.ndarray:
-                input_dict["obs"][k] = torch.from_numpy(v).to(self.dummy.device)
-
-        orientation = torch.div(
-            torch.trunc(input_dict["obs"]["local_pose"][:, 2]) % 360, 5
-        ).long()
-
-        outputs, value = self.policy_network(
-            input_dict["obs"]["map_features"],
-            orientation,
-            input_dict["obs"]["goal_category"]
-        )
-        self.value = value
-
-        return outputs, []
-
-    def value_function(self):
-        return self.value
 
 
 class LoggingCallback(DefaultCallbacks):
@@ -159,11 +122,13 @@ if __name__ == "__main__":
         "lr": config.TRAIN.RL.lr,
         "entropy_coeff": config.TRAIN.RL.entropy_coeff,
         "clip_param": config.TRAIN.RL.clip_param,
+        "rollout_fragment_length": config.TRAIN.RL.rollout_fragment_length,
+        "num_sgd_iter": config.TRAIN.RL.sgd_epochs,
         "framework": "torch",
-        # "disable_env_checking": True,
+        # "disable_env_checking": True,     # Ray 2.0.0
         "_disable_preprocessor_api": True,
         "ignore_worker_failures": True
-        # "recreate_failed_workers": True,
+        # "recreate_failed_workers": True,  # Ray 2.0.0
     }
 
     if config.TRAIN.RL.algorithm == "PPO":
@@ -178,11 +143,9 @@ if __name__ == "__main__":
             #   train_batch_size: total batch size
             #   sgd_minibatch_size: SGD minibatch size (chunk train_batch_size
             #    in sgd_minibatch_size sized pieces)
-            "rollout_fragment_length": config.TRAIN.RL.PPO.rollout_fragment_length,
-            "train_batch_size": (config.TRAIN.RL.PPO.rollout_fragment_length *
+            "train_batch_size": (config.TRAIN.RL.rollout_fragment_length *
                                  config.TRAIN.RL.PPO.num_workers),
-            "sgd_minibatch_size": 2 * config.TRAIN.RL.PPO.rollout_fragment_length,
-            "num_sgd_iter": config.TRAIN.RL.PPO.sgd_epochs,
+            "sgd_minibatch_size": 2 * config.TRAIN.RL.rollout_fragment_length,
         })
     elif config.TRAIN.RL.algorithm == "DDPPO":
         train_config.update({
@@ -198,13 +161,11 @@ if __name__ == "__main__":
             #    (num_workers * num_envs_per_worker * rollout_fragment_length)
             #   sgd_minibatch_size: total SGD minibatch size is
             #    (num_workers * sgd_minibatch_size)
-            "rollout_fragment_length": config.TRAIN.RL.PPO.rollout_fragment_length,
             "sgd_minibatch_size": max(
-                2 * config.TRAIN.RL.PPO.rollout_fragment_length //
+                2 * config.TRAIN.RL.rollout_fragment_length //
                 config.TRAIN.RL.DDPPO.num_workers,
                 1
             ),
-            "num_sgd_iter": config.TRAIN.RL.PPO.sgd_epochs,
         })
 
     # Debugging
@@ -226,7 +187,7 @@ if __name__ == "__main__":
     #     result = trainer.train()
     #     print(pretty_print(result))
 
-    # Training with class API
+    # Training with class API (Ray 2.0.0)
     # tuner = tuner.Tuner(
     #     config.TRAIN.RL.algorithm,
     #     param_space=train_config,
@@ -235,14 +196,14 @@ if __name__ == "__main__":
     # )
     # tuner.fit()
 
-    # Training with functional API
+    # Training with functional API (Ray 1.8.0)
     ray.tune.run(
         config.TRAIN.RL.algorithm,
         name=config.TRAIN.RL.exp_name,
         config=train_config,
         max_concurrent_trials=1,
         checkpoint_freq=config.TRAIN.RL.checkpoint_freq,
-        #restore=,
+        restore=config.TRAIN.RL.restore,
     )
 
     ray.shutdown()

@@ -16,7 +16,7 @@ pip install mmcv-full -f https://download.openmmlab.com/mmcv/dist/cu102/torch1.1
 git clone https://github.com/open-mmlab/mmdetection.git
 pushd mmdetection; pip install -r requirements/build.txt; pip install "git+https://github.com/cocodataset/cocoapi.git#subdirectory=PythonAPI"; pip install -v -e .; popd
 
-# Ray: 1.8.0 or 2.0.0rc0?
+# Ray
 pip install ray["rllib"]==1.8.0
 pip install ray["tune"]==1.8.0
 pip install ray["default"]==1.8.0
