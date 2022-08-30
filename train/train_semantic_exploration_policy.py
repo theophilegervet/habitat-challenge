@@ -51,7 +51,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--config_path",
         type=str,
-        default="submission/configs/ppo_train_challenge_dataset_config.yaml",
+        default="submission/configs/debug_config.yaml",
         help="Path to config yaml",
     )
     args = parser.parse_args()
