@@ -93,6 +93,9 @@ class SemanticExplorationPolicy(Policy):
         # TODO Why is action not in [0, 1]?
         #  Why is action distribution TorchDiagGaussian?
         #  Shouldn't it be TorchSquashedGaussian?
+        #  The default action distribution seems to be TorchDiagGaussian
+        #  truncated to the right range => replace it by TorchSquashedGaussian
+        #  and check whether we can overfit faster
 
         for e in range(batch_size):
             if not found_goal[e] and not found_hint[e]:
