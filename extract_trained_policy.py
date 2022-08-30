@@ -39,11 +39,11 @@ ppo_config.update({
     "env_config": {"config": config},
     "model": {
         "custom_model": "semantic_exploration_policy",
-        "custom_model_config": {
-            "map_features_shape": map_features_shape,
-            "hidden_size": 256,
-            "num_sem_categories": config.ENVIRONMENT.num_sem_categories,
-        }
+        # "custom_model_config": {
+        #     "map_features_shape": map_features_shape,
+        #     "hidden_size": 256,
+        #     "num_sem_categories": config.ENVIRONMENT.num_sem_categories,
+        # }
     },
     "gamma": config.TRAIN.RL.gamma,
     "lr": config.TRAIN.RL.lr,
