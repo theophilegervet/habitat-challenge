@@ -44,8 +44,8 @@ ppo_config.update({
             "hidden_size": 256,
             "num_sem_categories": config.ENVIRONMENT.num_sem_categories,
         },
-    "num_gpus_per_worker": 1
     },
+    "num_gpus_per_worker": 1
     # "gamma": config.TRAIN.RL.gamma,
     # "lr": config.TRAIN.RL.lr,
     # "entropy_coeff": config.TRAIN.RL.entropy_coeff,
