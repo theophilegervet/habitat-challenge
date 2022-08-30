@@ -2,21 +2,6 @@ import torch
 from torch import nn
 
 
-# https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/master/a2c_ppo_acktr/utils.py#L32
-class AddBias(nn.Module):
-    def __init__(self, bias):
-        super(AddBias, self).__init__()
-        self._bias = nn.Parameter(bias.unsqueeze(1))
-
-    def forward(self, x):
-        if x.dim() == 2:
-            bias = self._bias.t().view(1, -1)
-        else:
-            bias = self._bias.t().view(1, -1, 1, 1)
-
-        return x + bias
-
-
 # https://github.com/ikostrikov/pytorch-a2c-ppo-acktr-gail/blob/master/a2c_ppo_acktr/model.py#L10
 class Flatten(nn.Module):
     def forward(self, x):
