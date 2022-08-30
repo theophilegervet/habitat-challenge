@@ -1,10 +1,18 @@
 from ray.rllib.agents import ppo
+from ray.rllib.models import ModelCatalog
 
 from submission.utils.config_utils import get_config
+from submission.policy.semantic_exploration_policy_rllib_wrapper import SemanticExplorationPolicyWrapper
 from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
 
 config, config_str = get_config("submission/configs/debug_config.yaml")
+
+
+ModelCatalog.register_custom_model(
+    "semantic_exploration_policy",
+    SemanticExplorationPolicyWrapper
+)
 
 
 # ppo_config = ppo.DEFAULT_CONFIG.copy()
