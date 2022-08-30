@@ -3,7 +3,7 @@ from ray.rllib.agents import ppo
 from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
 
-algo = ppo.PPO(
+algo = ppo.PPOTrainer(
     config=ppo.DEFAULT_CONFIG.copy(),
     env=SemanticExplorationPolicyTrainingEnvWrapper
 )
