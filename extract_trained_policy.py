@@ -5,7 +5,7 @@ from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticEx
 
 config, config_str = get_config("submission/configs/debug_config.yaml")
 ppo_config = ppo.DEFAULT_CONFIG.copy()
-ppo_config.update({"config": config})
+ppo_config.update({"env_config": {"config": config}})
 algo = ppo.PPOTrainer(
     config=ppo_config,
     env=SemanticExplorationPolicyTrainingEnvWrapper
