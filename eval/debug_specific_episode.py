@@ -1,3 +1,7 @@
+from pathlib import Path
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
 from habitat.core.env import Env
 from habitat.core.simulator import Observations
 
@@ -37,10 +41,6 @@ if __name__ == "__main__":
     config, config_str = get_config("submission/configs/debug_config.yaml")
     config.defrost()
     config.NUM_ENVIRONMENTS = 1
-    config.AGENT_GPU_IDS = [1]
-    config.EXP_NAME = "debug_semantic"
-    config.AGENT.POLICY.type = "semantic"
-    config.PRINT_IMAGES = 1
     config.freeze()
 
     agent = Agent(config=config, rank=0, ddp=False)
@@ -53,22 +53,11 @@ if __name__ == "__main__":
     agent.reset()
     agent.set_vis_dir(scene_id=scene_id, episode_id=episode_id)
 
-    # t = 0
-    # while not env.episode_over:
-    #     t += 1
-    #     print(t)
-    #     action = agent.act(obs)
-    #     obs = env.step(action)
-    #
-    # print(env.get_metrics())
+    t = 0
+    while not env.episode_over:
+        t += 1
+        print(t)
+        action = agent.act(obs)
+        obs = env.step(action)
 
-    for ep_idx in range(100):
-        print(ep_idx)
-        obs = env.reset()
-        agent.reset()
-        t = 0
-        while not env.episode_over:
-            t += 1
-            print(t)
-            action = agent.act(obs)
-            obs = env.step(action)
+    print(env.get_metrics())
