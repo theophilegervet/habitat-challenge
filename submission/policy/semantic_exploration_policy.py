@@ -83,7 +83,7 @@ class SemanticExplorationPolicy(Policy):
         }})
         print(outputs.shape)
         dist = self.dist_class(outputs, self.model)
-        goal_location = dist.sample()
+        goal_location = (dist.sample() * (goal_map_size - 1)).long()
         print(goal_location)
 
         for e in range(batch_size):
