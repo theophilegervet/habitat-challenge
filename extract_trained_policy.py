@@ -45,3 +45,8 @@ algo = ppo.PPOTrainer(
     env=SemanticExplorationPolicyTrainingEnvWrapper
 )
 algo.restore(config.AGENT.POLICY.SEMANTIC.checkpoint_path)
+policy = algo.get_policy()
+print(type(policy))
+model = policy.model
+print(type(model))
+help(policy)
