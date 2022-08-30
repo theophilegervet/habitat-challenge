@@ -102,7 +102,7 @@ AGENT:
     obs_dilation_selem_radius: 3    # radius (in cells) of obstacle dilation structuring element
 
   POLICY:
-    type: semantic             # one of "frontier" or "semantic"
+    type: frontier             # one of "frontier" or "semantic"
     hint_follow_steps: 15      # how many steps to follow a hint of the object goal category
     hint_in_frame: 0           # 1: look for hint in frame, 0: don't
 
