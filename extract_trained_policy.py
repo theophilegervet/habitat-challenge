@@ -51,7 +51,7 @@ ppo_config.update({
     # "clip_param": config.TRAIN.RL.clip_param,
     "framework": "torch",
     # "disable_env_checking": True,
-    # "_disable_preprocessor_api": True,
+    "_disable_preprocessor_api": True,
     # "ignore_worker_failures": True
     # "recreate_failed_workers": True,
     "num_gpus_per_worker": 1,
