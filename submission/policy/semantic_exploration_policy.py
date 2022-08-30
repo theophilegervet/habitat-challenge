@@ -55,7 +55,9 @@ class SemanticExplorationPolicy(Policy):
             env=SemanticExplorationPolicyTrainingEnvWrapper
         )
         trainer.restore(config.AGENT.POLICY.SEMANTIC.checkpoint_path)
-        self.policy = trainer.get_policy()
+        policy = trainer.get_policy()
+        self.dist_class = policy.dist_class
+        self.model = policy.model
 
         # TODO How to load trained network weights from checkpoint without
         #  importing Ray?
@@ -74,12 +76,12 @@ class SemanticExplorationPolicy(Policy):
         batch_size, goal_map_size, _ = goal_map.shape
         map_features = F.avg_pool2d(map_features, self.inference_downscaling)
 
-        outputs, _ = self.policy.model({"obs": {
+        outputs, _ = self.model({"obs": {
             "map_features": map_features,
             "local_pose": local_pose,
             "goal_category": goal_category
         }})
-        dist = self.policy.dist_class(outputs, self.policy.model)
+        dist = self.dist_class(outputs, self.model)
         goal_location = dist.sample()
 
         for e in range(batch_size):
