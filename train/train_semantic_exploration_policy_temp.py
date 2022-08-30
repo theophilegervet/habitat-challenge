@@ -27,7 +27,7 @@ from ray.tune.logger import pretty_print
 # from ray.air.config import RunConfig
 
 from submission.utils.config_utils import get_config
-from submission.policy.semantic_exploration_policy_rllib_wrapper import SemanticExplorationPolicyWrapper
+from submission.policy.semantic_exploration_policy_network import SemanticExplorationPolicyWrapper
 from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
 
