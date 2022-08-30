@@ -15,7 +15,7 @@ from .planner.planner import Planner
 from .visualizer.visualizer import Visualizer
 from .obs_preprocessor.obs_preprocessor import ObsPreprocessor
 from .policy.frontier_exploration_policy import FrontierExplorationPolicy
-from .policy.semantic_exploration_policy_rllib import SemanticExplorationPolicy
+from .policy.semantic_exploration_policy import SemanticExplorationPolicy
 
 
 exploration_policies = {
