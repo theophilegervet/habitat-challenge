@@ -78,4 +78,4 @@ algo = ppo.PPOTrainer(
     config=ppo_config,
     env=SemanticExplorationPolicyTrainingEnvWrapper
 )
-algo.restore("~/ray_results/ddppo_overfit_challenge/DDPPO_SemanticExplorationPolicyTrainingEnvWrapper_7d280_00000_0_2022-08-28_14-29-25/checkpoint_000400/checkpoint-400")
+# algo.restore("~/ray_results/ddppo_overfit_challenge/DDPPO_SemanticExplorationPolicyTrainingEnvWrapper_7d280_00000_0_2022-08-28_14-29-25/checkpoint_000400/checkpoint-400")
