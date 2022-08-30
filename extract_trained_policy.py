@@ -45,7 +45,6 @@ ppo_config.update({
             "num_sem_categories": config.ENVIRONMENT.num_sem_categories,
         },
     },
-    "num_gpus_per_worker": 1
     # "gamma": config.TRAIN.RL.gamma,
     # "lr": config.TRAIN.RL.lr,
     # "entropy_coeff": config.TRAIN.RL.entropy_coeff,
@@ -56,23 +55,23 @@ ppo_config.update({
     # "ignore_worker_failures": True
     # "recreate_failed_workers": True,
 })
-# ppo_config.update({
-#     # Workers
-#     "num_workers": config.TRAIN.RL.PPO.num_workers,
-#     "num_gpus": config.TRAIN.RL.PPO.num_gpus,
-#     "num_cpus_for_driver": config.TRAIN.RL.PPO.num_cpus_for_driver,
-#     "num_gpus_per_worker": config.TRAIN.RL.PPO.num_gpus_per_worker,
-#     "num_cpus_per_worker": config.TRAIN.RL.PPO.num_cpus_per_worker,
-#     # Batching
-#     #   train_batch_size: total batch size
-#     #   sgd_minibatch_size: SGD minibatch size (chunk train_batch_size
-#     #    in sgd_minibatch_size sized pieces)
-#     "rollout_fragment_length": config.TRAIN.RL.rollout_fragment_length,
-#     "train_batch_size": (config.TRAIN.RL.rollout_fragment_length *
-#                          config.TRAIN.RL.PPO.num_workers),
-#     "sgd_minibatch_size": 2 * config.TRAIN.RL.rollout_fragment_length,
-#     "num_sgd_iter": config.TRAIN.RL.sgd_epochs,
-# })
+ppo_config.update({
+    # Workers
+    "num_workers": config.TRAIN.RL.PPO.num_workers,
+    "num_gpus": config.TRAIN.RL.PPO.num_gpus,
+    "num_cpus_for_driver": config.TRAIN.RL.PPO.num_cpus_for_driver,
+    "num_gpus_per_worker": config.TRAIN.RL.PPO.num_gpus_per_worker,
+    "num_cpus_per_worker": config.TRAIN.RL.PPO.num_cpus_per_worker,
+    # Batching
+    #   train_batch_size: total batch size
+    #   sgd_minibatch_size: SGD minibatch size (chunk train_batch_size
+    #    in sgd_minibatch_size sized pieces)
+    "rollout_fragment_length": config.TRAIN.RL.rollout_fragment_length,
+    "train_batch_size": (config.TRAIN.RL.rollout_fragment_length *
+                         config.TRAIN.RL.PPO.num_workers),
+    "sgd_minibatch_size": 2 * config.TRAIN.RL.rollout_fragment_length,
+    "num_sgd_iter": config.TRAIN.RL.sgd_epochs,
+})
 
 
 algo = ppo.PPOTrainer(
