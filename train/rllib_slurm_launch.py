@@ -1,6 +1,6 @@
 # Usage:
 # python train/rllib_slurm_launch.py \
-#   --exp-name ddppo_custom \
+#   --exp-name debug \
 #   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/debug_config.yaml" \
 #   --load-env "" \
 #   --num-nodes 8 \
