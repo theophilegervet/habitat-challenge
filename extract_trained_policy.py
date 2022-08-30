@@ -53,7 +53,7 @@ ppo_config.update({
     # "disable_env_checking": True,
     "_disable_preprocessor_api": True,
     # "ignore_worker_failures": True
-    "recreate_failed_workers": True,
+    # "recreate_failed_workers": True,
 })
 ppo_config.update({
     # Workers
