@@ -30,7 +30,7 @@ TRAIN:
     checkpoint_freq: 100        # how many training iterations between checkpoints
     rollout_fragment_length: 20 # divide episodes into fragments of this many steps each
     sgd_epochs: 4               # number of SGD epochs (number of SGD iterations per minibatch)
-    restore:                    # checkpoint to resume training from (if any)
+    restore: ~/ray_results/ddppo_overfit_challenge/DDPPO_SemanticExplorationPolicyTrainingEnvWrapper_7d280_00000_0_2022-08-28_14-29-25/checkpoint_000400/checkpoint-400                   # checkpoint to resume training from (if any)
 
     PPO:
       # 2 x 32GB GPUs

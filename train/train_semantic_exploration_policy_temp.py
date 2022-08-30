@@ -236,7 +236,6 @@ if __name__ == "__main__":
     # tuner.fit()
 
     # Training with functional API (Ray 1.8.0)
-    print("config.TRAIN.RL.restore", config.TRAIN.RL.restore)
     ray.tune.run(
         config.TRAIN.RL.algorithm,
         name=config.TRAIN.RL.exp_name,
