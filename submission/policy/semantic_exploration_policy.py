@@ -81,8 +81,10 @@ class SemanticExplorationPolicy(Policy):
             "local_pose": local_pose,
             "goal_category": goal_category
         }})
+        print(outputs.shape)
         dist = self.dist_class(outputs, self.model)
         goal_location = dist.sample()
+        print(goal_location)
 
         for e in range(batch_size):
             if not found_goal[e] and not found_hint[e]:
