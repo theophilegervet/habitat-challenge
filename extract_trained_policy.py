@@ -49,4 +49,5 @@ policy = algo.get_policy()
 print(type(policy))
 model = policy.model
 print(type(model))
-help(policy)
+dist_class = policy.dist_class
+print(type(dist_class))
