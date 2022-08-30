@@ -182,9 +182,9 @@ if __name__ == "__main__":
             #   train_batch_size: total batch size
             #   sgd_minibatch_size: SGD minibatch size (chunk train_batch_size
             #    in sgd_minibatch_size sized pieces)
-            "train_batch_size": (config.TRAIN.RL.PPO.rollout_fragment_length *
+            "train_batch_size": (config.TRAIN.RL.rollout_fragment_length *
                                  config.TRAIN.RL.PPO.num_workers),
-            "sgd_minibatch_size": 2 * config.TRAIN.RL.PPO.rollout_fragment_length,
+            "sgd_minibatch_size": 2 * config.TRAIN.RL.rollout_fragment_length,
         })
     elif config.TRAIN.RL.algorithm == "DDPPO":
         train_config.update({
@@ -201,7 +201,7 @@ if __name__ == "__main__":
             #   sgd_minibatch_size: total SGD minibatch size is
             #    (num_workers * sgd_minibatch_size)
             "sgd_minibatch_size": max(
-                2 * config.TRAIN.RL.PPO.rollout_fragment_length //
+                2 * config.TRAIN.RL.rollout_fragment_length //
                 config.TRAIN.RL.DDPPO.num_workers,
                 1
             ),
