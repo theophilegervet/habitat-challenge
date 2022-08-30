@@ -83,7 +83,7 @@ from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticEx
 
 import pickle
 
-checkpoint = "~/ray_results/ddppo_overfit_challenge/DDPPO_SemanticExplorationPolicyTrainingEnvWrapper_7d280_00000_0_2022-08-28_14-29-25/checkpoint_000400/checkpoint-400"
+checkpoint = "/private/home/theop123/ray_results/ddppo_overfit_challenge/DDPPO_SemanticExplorationPolicyTrainingEnvWrapper_7d280_00000_0_2022-08-28_14-29-25/checkpoint_000400/checkpoint-400"
 
 with open(checkpoint, 'rb') as f:
     model = pickle.load(f)
