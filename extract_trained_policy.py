@@ -50,4 +50,4 @@ print(type(policy))
 model = policy.model
 print(type(model))
 dist_class = policy.dist_class
-print(type(dist_class))
+print(dist_class)
