@@ -83,10 +83,13 @@ class SemanticExplorationPolicy(Policy):
         }})
         print(outputs.shape)
         dist = self.dist_class(outputs, self.model)
+        print("self.dist_class", self.dist_class)
+        print("dist", dist)
         goal_action = dist.sample()
         print("goal_action", goal_action)
         goal_location = (goal_action * (goal_map_size - 1)).long()
         print("goal_location", goal_location)
+        # TODO Why is action not in [0, 1]? How to extract post-processing?
 
         for e in range(batch_size):
             if not found_goal[e] and not found_hint[e]:
