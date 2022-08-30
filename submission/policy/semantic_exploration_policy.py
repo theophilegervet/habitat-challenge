@@ -74,11 +74,11 @@ class SemanticExplorationPolicy(Policy):
         batch_size, goal_map_size, _ = goal_map.shape
         map_features = F.avg_pool2d(map_features, self.inference_downscaling)
 
-        outputs, _ = self.policy.model({
+        outputs, _ = self.policy.model({"obs": {
             "map_features": map_features,
             "local_pose": local_pose,
             "goal_category": goal_category
-        })
+        }})
         dist = self.policy.dist_class(outputs, self.policy.model)
         goal_location = dist.sample()
 
