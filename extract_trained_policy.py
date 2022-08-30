@@ -45,7 +45,15 @@ ppo_config.update({
             "num_sem_categories": config.ENVIRONMENT.num_sem_categories,
         },
     },
-    "num_gpus_per_worker": 1,
+    # "gamma": config.TRAIN.RL.gamma,
+    # "lr": config.TRAIN.RL.lr,
+    # "entropy_coeff": config.TRAIN.RL.entropy_coeff,
+    # "clip_param": config.TRAIN.RL.clip_param,
+    # "framework": "torch",
+    # # "disable_env_checking": True,
+    # "_disable_preprocessor_api": True,
+    # "ignore_worker_failures": True
+    # "recreate_failed_workers": True,
 })
 ppo_config.update({
     # Workers
