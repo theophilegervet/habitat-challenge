@@ -83,8 +83,10 @@ class SemanticExplorationPolicy(Policy):
         }})
         print(outputs.shape)
         dist = self.dist_class(outputs, self.model)
-        goal_location = (dist.sample() * (goal_map_size - 1)).long()
-        print(goal_location)
+        goal_action = dist.sample()
+        print("goal_action", goal_action)
+        goal_location = (goal_action * (goal_map_size - 1)).long()
+        print("goal_location", goal_location)
 
         for e in range(batch_size):
             if not found_goal[e] and not found_hint[e]:
