@@ -51,3 +51,4 @@ model = policy.model
 print(type(model))
 dist_class = policy.dist_class
 print(dist_class)
+# dist = dist_class(outputs, model)

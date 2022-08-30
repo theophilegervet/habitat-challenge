@@ -34,7 +34,7 @@ def reset_to_episode(env: Env,
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/config.yaml")
+    config, config_str = get_config("submission/configs/debug_config.yaml")
     config.defrost()
     config.NUM_ENVIRONMENTS = 1
     config.AGENT_GPU_IDS = [1]

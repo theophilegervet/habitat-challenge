@@ -2,8 +2,13 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from ray.rllib.agents import ppo
+from ray.rllib.models import ModelCatalog
+
 from .policy import Policy
+from .semantic_exploration_policy_rllib_wrapper import SemanticExplorationPolicyWrapper
 from .utils.model import Flatten, NNBase
+from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
 
 class SemanticExplorationPolicy(Policy):
@@ -17,7 +22,6 @@ class SemanticExplorationPolicy(Policy):
         self._goal_update_steps = config.AGENT.POLICY.SEMANTIC.goal_update_steps
         self.inference_downscaling = config.AGENT.POLICY.SEMANTIC.inference_downscaling
         self.map_resolution = config.AGENT.SEMANTIC_MAP.map_resolution
-        num_sem_categories = config.ENVIRONMENT.num_sem_categories
         self.local_map_size = (
             config.AGENT.SEMANTIC_MAP.map_size_cm //
             config.AGENT.SEMANTIC_MAP.global_downscaling //
@@ -29,10 +33,38 @@ class SemanticExplorationPolicy(Policy):
             self.local_map_size,
             self.local_map_size
         )
-        hidden_size = 256
-        self.network = SemanticExplorationPolicyNetwork(
-            map_features_shape, hidden_size, num_sem_categories
+
+        ModelCatalog.register_custom_model(
+            "semantic_exploration_policy",
+            SemanticExplorationPolicyWrapper
         )
+        ppo_config = ppo.DEFAULT_CONFIG.copy()
+        ppo_config.update({
+            "env_config": {"config": config},
+            "model": {
+                "custom_model": "semantic_exploration_policy",
+                "custom_model_config": {
+                    "map_features_shape": map_features_shape,
+                    "hidden_size": 256,
+                    "num_sem_categories": config.ENVIRONMENT.num_sem_categories,
+                },
+            },
+            "framework": "torch",
+            "_disable_preprocessor_api": True,
+            "num_gpus_per_worker": 1,
+        })
+        trainer = ppo.PPOTrainer(
+            config=ppo_config,
+            env=SemanticExplorationPolicyTrainingEnvWrapper
+        )
+        trainer.restore(config.AGENT.POLICY.SEMANTIC.checkpoint_path)
+        self.policy = trainer.get_policy()
+
+        # TODO How to load trained network weights from checkpoint without
+        #  importing Ray?
+        # self.network = SemanticExplorationPolicyNetwork(
+        #     map_features_shape, 256, num_sem_categories
+        # )
 
     @property
     def goal_update_steps(self):
@@ -46,17 +78,15 @@ class SemanticExplorationPolicy(Policy):
                           found_goal,
                           found_hint):
         batch_size, goal_map_size, _ = goal_map.shape
-        orientation = torch.div(torch.trunc(local_pose[:, 2]) % 360, 5).long()
         map_features = F.avg_pool2d(map_features, self.inference_downscaling)
 
-        outputs, value = self.network(
-            map_features,
-            orientation,
-            goal_category
-        )
-
-        # TODO Sample action from network outputs with RLLib ActionDistribution
-        goal_location = (nn.Sigmoid()(outputs[:, :2]) * (goal_map_size - 1)).long()
+        outputs, _ = self.policy.model({
+            "map_features": map_features,
+            "local_pose": local_pose,
+            "goal_category": goal_category
+        })
+        dist = self.policy.dist_class(outputs, self.policy.model)
+        goal_location = dist.sample()
 
         for e in range(batch_size):
             if not found_goal[e] and not found_hint[e]:
