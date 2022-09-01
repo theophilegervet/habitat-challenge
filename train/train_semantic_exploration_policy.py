@@ -23,7 +23,10 @@ from ray.tune.logger import pretty_print
 # from ray.air.config import RunConfig
 
 from submission.utils.config_utils import get_config
-from submission.policy.semantic_exploration_policy_network import SemanticExplorationPolicyWrapper
+from submission.policy.semantic_exploration_policy_network import (
+    SemanticExplorationPolicyModelWrapper,
+    SemanticExplorationPolicyActionDistribution
+)
 from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
 
@@ -86,8 +89,12 @@ if __name__ == "__main__":
     print()
 
     ModelCatalog.register_custom_model(
-        "semantic_exploration_policy",
-        SemanticExplorationPolicyWrapper
+        "semexp_custom_model",
+        SemanticExplorationPolicyModelWrapper
+    )
+    ModelCatalog.register_custom_action_dist(
+        "semexp_custom_action_dist",
+        SemanticExplorationPolicyActionDistribution
     )
 
     local_map_size = (
@@ -107,7 +114,8 @@ if __name__ == "__main__":
         "env_config": {"config": config},
         "callbacks": LoggingCallback,
         "model": {
-            "custom_model": "semantic_exploration_policy",
+            "custom_model": "semexp_custom_model",
+            "custom_action_dist": "semexp_custom_action_dist",
             "custom_model_config": {
                 "map_features_shape": map_features_shape,
                 "hidden_size": 256,
@@ -198,7 +206,7 @@ if __name__ == "__main__":
         name=config.TRAIN.RL.exp_name,
         config=train_config,
         max_concurrent_trials=1,
-        checkpoint_freq=config.TRAIN.RL.checkpoint_freq,
+        checkpoint_freq=1,#config.TRAIN.RL.checkpoint_freq,
         restore=config.TRAIN.RL.restore,
     )
 

@@ -4,7 +4,7 @@ from ray.rllib.agents import ppo
 from ray.rllib.models import ModelCatalog
 
 from .policy import Policy
-from .semantic_exploration_policy_network import SemanticExplorationPolicyWrapper
+from .semantic_exploration_policy_network import SemanticExplorationPolicyModelWrapper
 from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
 
@@ -32,15 +32,15 @@ class SemanticExplorationPolicy(Policy):
         )
 
         ModelCatalog.register_custom_model(
-            "semantic_exploration_policy",
-            SemanticExplorationPolicyWrapper
+            "semexp_custom_model",
+            SemanticExplorationPolicyModelWrapper
         )
         ppo_config = ppo.DEFAULT_CONFIG.copy()
         ppo_config.update({
             "env": SemanticExplorationPolicyTrainingEnvWrapper,
             "env_config": {"config": config},
             "model": {
-                "custom_model": "semantic_exploration_policy",
+                "custom_model": "semexp_custom_model",
                 "custom_model_config": {
                     "map_features_shape": map_features_shape,
                     "hidden_size": 256,

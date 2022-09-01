@@ -3,6 +3,10 @@ import torch
 import torch.nn as nn
 
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
+from ray.rllib.models.torch.torch_action_dist import (
+    TorchDistributionWrapper,
+    TorchSquashedGaussian
+)
 
 from .utils.model import Flatten, NNBase
 
@@ -58,7 +62,7 @@ class SemanticExplorationPolicyNetwork(NNBase):
         return outputs, value
 
 
-class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
+class SemanticExplorationPolicyModelWrapper(TorchModelV2, nn.Module):
 
     def __init__(self, obs_space, action_space, num_outputs, model_config, name):
         TorchModelV2.__init__(
@@ -96,3 +100,8 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
 
     def value_function(self):
         return self.value
+
+
+class SemanticExplorationPolicyActionDistribution(TorchSquashedGaussian):
+    def __init__(self, inputs, model):
+        super().__init__(inputs, model, low=0.0, high=1.0)
