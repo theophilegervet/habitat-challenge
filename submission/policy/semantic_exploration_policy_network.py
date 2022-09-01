@@ -91,6 +91,7 @@ class SemanticExplorationPolicyWrapper(TorchModelV2, nn.Module):
         )
         self.value = value
 
+        print("outputs", outputs)
         return outputs, []
 
     def value_function(self):
