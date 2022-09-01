@@ -100,8 +100,3 @@ class SemanticExplorationPolicyModelWrapper(TorchModelV2, nn.Module):
 
     def value_function(self):
         return self.value
-
-
-class SemanticExplorationPolicyActionDistribution(TorchSquashedGaussian):
-    def __init__(self, inputs, model):
-        super().__init__(inputs, model, low=0.0, high=1.0)
