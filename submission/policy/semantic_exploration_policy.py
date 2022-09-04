@@ -94,11 +94,6 @@ class SemanticExplorationPolicy(Policy):
         print("goal_location", goal_location)
         print()
         # TODO Why is action not in [0, 1]?
-        #  Why is action distribution TorchDiagGaussian?
-        #  Shouldn't it be TorchSquashedGaussian?
-        #  The default action distribution seems to be TorchDiagGaussian
-        #  truncated to the right range => replace it by TorchSquashedGaussian
-        #  and check whether we can overfit faster
 
         goal_action = self.algo.compute_single_action(obs)
         print("goal_action", goal_action)
