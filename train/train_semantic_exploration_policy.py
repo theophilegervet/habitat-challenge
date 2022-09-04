@@ -122,6 +122,7 @@ if __name__ == "__main__":
         "num_sgd_iter": config.TRAIN.RL.sgd_epochs,
         "framework": "torch",
         # "disable_env_checking": True,     # Ray 2.0.0
+        "normalize_actions": False,
         "_disable_preprocessor_api": True,
         "ignore_worker_failures": True
         # "recreate_failed_workers": True,  # Ray 2.0.0
