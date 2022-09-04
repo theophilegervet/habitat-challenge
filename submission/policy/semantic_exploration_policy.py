@@ -1,3 +1,4 @@
+import torch
 import torch.nn.functional as F
 
 from ray.rllib.agents import ppo
@@ -91,17 +92,17 @@ class SemanticExplorationPolicy(Policy):
         print("dist", dist)
         goal_action = dist.sample()
         print("goal_action", goal_action)
-        goal_location = (goal_action * (goal_map_size - 1)).long()
+        goal_location = (torch.sigmoid(goal_action) * (goal_map_size - 1)).long()
         print("goal_location", goal_location)
         print()
         # TODO Why is action not in [0, 1]?
 
-        goal_action = self.algo.compute_single_action(obs)
-        print("goal_action", goal_action)
-        goal_location = (goal_action * (goal_map_size - 1)).long()
-        print("goal_location", goal_location)
-        print()
-        print()
+        # goal_action = self.algo.compute_single_action(obs)
+        # print("goal_action", goal_action)
+        # goal_location = (goal_action * (goal_map_size - 1)).long()
+        # print("goal_location", goal_location)
+        # print()
+        # print()
 
         for e in range(batch_size):
             if not found_goal[e] and not found_hint[e]:
