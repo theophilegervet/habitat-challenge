@@ -3,7 +3,7 @@
 #   --exp-name ppo_overfit \
 #   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ppo_overfit_challenge_dataset_config.yaml" \
 #   --load-env "" \
-#   --num-nodes 8 \
+#   --num-nodes 1 \
 #   --num-gpus 8 \
 #   --partition learnfair \
 #   --external-redis
