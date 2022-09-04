@@ -199,7 +199,7 @@ if __name__ == "__main__":
         name=config.TRAIN.RL.exp_name,
         config=train_config,
         max_concurrent_trials=1,
-        checkpoint_freq=config.TRAIN.RL.checkpoint_freq,
+        checkpoint_freq=1,#config.TRAIN.RL.checkpoint_freq,
         restore=config.TRAIN.RL.restore,
     )
 
