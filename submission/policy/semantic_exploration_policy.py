@@ -48,6 +48,7 @@ class SemanticExplorationPolicy(Policy):
                 },
             },
             "framework": "torch",
+            "normalize_actions": False,
             "_disable_preprocessor_api": True,
             "num_gpus_per_worker": 1,
         })
