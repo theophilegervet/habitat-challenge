@@ -120,8 +120,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         })
 
         self.action_space = Box(
-            low=np.array([0., 0.]),
-            high=np.array([1., 1.]),
+            low=-np.inf,
+            high=np.inf,
             shape=(2,),
             dtype=np.float32,
         )
@@ -191,6 +191,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
     def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
         print("goal_action", goal_action)
+        goal_action = np.sigmoid(goal_action)
+        print("goal_action post sigmoid", goal_action)
 
         self.timestep += 1
         prev_explored_area = self.semantic_map.global_map[0, 1].sum()
