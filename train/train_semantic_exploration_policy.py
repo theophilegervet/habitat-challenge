@@ -108,7 +108,6 @@ if __name__ == "__main__":
         "callbacks": LoggingCallback,
         "model": {
             "custom_model": "semexp_custom_model",
-            "custom_action_dist": "semexp_custom_action_dist",
             "custom_model_config": {
                 "map_features_shape": map_features_shape,
                 "hidden_size": 256,

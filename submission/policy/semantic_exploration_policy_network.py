@@ -3,10 +3,6 @@ import torch
 import torch.nn as nn
 
 from ray.rllib.models.torch.torch_modelv2 import TorchModelV2
-from ray.rllib.models.torch.torch_action_dist import (
-    TorchDistributionWrapper,
-    TorchSquashedGaussian
-)
 
 from .utils.model import Flatten, NNBase
 
