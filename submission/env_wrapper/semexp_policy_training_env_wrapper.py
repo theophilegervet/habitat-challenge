@@ -120,6 +120,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "goal_category": Discrete(6),
         })
 
+        # Action space is logit pre sigmoid normalization to [0, 1]
         self.action_space = Box(
             low=-np.inf,
             high=np.inf,
@@ -191,15 +192,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         return obs
 
     def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
-        print("goal_action", goal_action)
-        goal_action = expit(goal_action)
-        print("goal_action post sigmoid", goal_action)
-
         self.timestep += 1
         prev_explored_area = self.semantic_map.global_map[0, 1].sum()
 
         # Set high-level goal predicted by the policy
-        goal_location = (goal_action * (self.semantic_map.local_h - 1)).astype(int)
+        goal_location = (expit(goal_action) * (self.semantic_map.local_h - 1)).astype(int)
         goal_map = np.zeros((
             self.semantic_map.local_h,
             self.semantic_map.local_w
