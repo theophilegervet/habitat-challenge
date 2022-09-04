@@ -5,6 +5,7 @@ from torch import Tensor
 import torch.nn.functional as F
 import numpy as np
 from typing import Tuple, List, Optional
+from scipy.special import expit
 
 from habitat import Config, make_dataset
 from habitat.core.env import RLEnv
@@ -191,7 +192,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
     def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
         print("goal_action", goal_action)
-        goal_action = np.sigmoid(goal_action)
+        goal_action = expit(goal_action)
         print("goal_action post sigmoid", goal_action)
 
         self.timestep += 1
