@@ -53,12 +53,12 @@ class SemanticExplorationPolicy(Policy):
             "_disable_preprocessor_api": True,
             "num_gpus_per_worker": 1,
         })
-        self.algo = ppo.PPOTrainer(
+        algo = ppo.PPOTrainer(
             config=ppo_config,
             env=SemanticExplorationPolicyTrainingEnvWrapper
         )
-        self.algo.restore(config.AGENT.POLICY.SEMANTIC.checkpoint_path)
-        policy = self.algo.get_policy()
+        algo.restore(config.AGENT.POLICY.SEMANTIC.checkpoint_path)
+        policy = algo.get_policy()
         self.dist_class = policy.dist_class
         self.model = policy.model
 
@@ -84,25 +84,10 @@ class SemanticExplorationPolicy(Policy):
             "goal_category": goal_category
         }}
 
-        print()
         outputs, _ = self.model(obs)
-        print(outputs.shape)
         dist = self.dist_class(outputs, self.model)
-        print("self.dist_class", self.dist_class)
-        print("dist", dist)
         goal_action = dist.sample()
-        print("goal_action", goal_action)
         goal_location = (torch.sigmoid(goal_action) * (goal_map_size - 1)).long()
-        print("goal_location", goal_location)
-        print()
-        # TODO Why is action not in [0, 1]?
-
-        # goal_action = self.algo.compute_single_action(obs)
-        # print("goal_action", goal_action)
-        # goal_location = (goal_action * (goal_map_size - 1)).long()
-        # print("goal_location", goal_location)
-        # print()
-        # print()
 
         for e in range(batch_size):
             if not found_goal[e] and not found_hint[e]:
