@@ -43,7 +43,7 @@ class Detectron2Segmentation:
             one_hot_predictions: one hot segmentation predictions of shape
              (batch_size, H, W, num_sem_categories)
             visualizations: prediction visualization images
-             shape (batch_size, H, W, 3) of self.visualize=True, else
+             shape (batch_size, H, W, 3) if self.visualize=True, else
              original images
         """
         batch_size, height, width, _ = images.shape
