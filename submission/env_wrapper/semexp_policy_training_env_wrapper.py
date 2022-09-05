@@ -74,7 +74,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                 # Workers distributed among scenes
                 scene_splits = [[scenes[idx % len(scenes)]]
                                 for idx in range(rllib_config.num_workers)]
-            print("scene_splits", scene_splits)
             config.TASK_CONFIG.DATASET.CONTENT_SCENES = scene_splits[
                 rllib_config.worker_index - 1]
 
