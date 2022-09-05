@@ -62,12 +62,19 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                         config.TASK_CONFIG.DATASET)
             del dataset
             if len(scenes) == 1:
+                # Same scene for all workers
                 scene_splits = [[scenes[0]] for _ in range(rllib_config.num_workers)]
-            else:
+            elif len(scenes) >= rllib_config.num_workers:
+                # Scenes distributed among workers
                 scene_splits = [[] for _ in range(rllib_config.num_workers)]
                 for idx, scene in enumerate(scenes):
                     scene_splits[idx % len(scene_splits)].append(scene)
                 assert sum(map(len, scene_splits)) == len(scenes)
+            else:  # 1 < len(scenes) < rllib_config.num_workers
+                # Workers distributed among scenes
+                scene_splits = [[scenes[idx % len(scenes)]]
+                                for idx in range(rllib_config.num_workers)]
+            print("scene_splits", scene_splits)
             config.TASK_CONFIG.DATASET.CONTENT_SCENES = scene_splits[
                 rllib_config.worker_index - 1]
 
