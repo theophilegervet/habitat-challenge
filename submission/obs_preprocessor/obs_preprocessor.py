@@ -64,6 +64,7 @@ class ObsPreprocessor:
     def reset(self):
         self.last_poses = [np.zeros(3)] * self.num_environments
         self.last_actions = [None] * self.num_environments
+        self.instance_id_to_category_id = None
 
     def set_instance_id_to_category_id(self, instance_id_to_category_id):
         self.instance_id_to_category_id = instance_id_to_category_id.to(self.device)
