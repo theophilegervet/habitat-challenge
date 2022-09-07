@@ -10,6 +10,7 @@ from scipy.special import expit
 from habitat import Config, make_dataset
 from habitat.core.env import RLEnv
 from habitat.core.simulator import Observations
+from habitat.core.dataset import EpisodeIterator
 from habitat.sims.habitat_simulator.actions import HabitatSimActions
 from habitat.core.dataset import ALL_SCENES_MASK
 from gym.spaces import Dict as SpaceDict
@@ -83,6 +84,25 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             config.freeze()
 
         super().__init__(config=config.TASK_CONFIG)
+
+        # Keep only episodes with a goal on the same floor as the
+        #  starting position
+        eps_before = len(self.habitat_env._dataset.episodes)
+        new_episode_order = [
+            episode for episode in self.habitat_env._dataset.episodes
+            if len([
+                goal for goal in episode.goals
+                if abs(episode.start_position[1] - goal.position[1]) < 1.5
+            ]) > 0
+        ]
+        self.habitat_env._dataset.episodes = new_episode_order
+        self.habitat_env.episode_iterator = EpisodeIterator(
+            new_episode_order,
+            shuffle=False, group_by_scene=False,
+        )
+        self.habitat_env._current_episode = None
+        eps_after = len(self.habitat_env._dataset.episodes)
+        print(f"eps_before {eps_before} eps_after {eps_after}")
 
         assert config.NUM_ENVIRONMENTS == 1
         self.device = (torch.device("cpu") if config.NO_GPU else

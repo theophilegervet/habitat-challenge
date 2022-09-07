@@ -123,7 +123,6 @@ class EvalEnvWrapper(Env):
             self._disable_print_images()
 
         if self.ground_truth_semantics:
-            print("GROUND_TRUTH_SEMANTICS 1")
             self.obs_preprocessor.set_instance_id_to_category_id(
                 torch.tensor([
                     mp3d_categories_mapping.get(
