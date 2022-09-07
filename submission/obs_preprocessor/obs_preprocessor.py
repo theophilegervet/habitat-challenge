@@ -195,6 +195,7 @@ class ObsPreprocessor:
             semantic_vis = np.expand_dims(semantic_vis, 0)
 
         else:
+            print("GROUND_TRUTH_SEMANTICS 2")
             # Predicted semantic segmentation
             semantic, semantic_vis = self.segmentation.get_prediction(
                 rgb.cpu().numpy(),

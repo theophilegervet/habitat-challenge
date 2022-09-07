@@ -10,7 +10,11 @@ from habitat.core.dataset import EpisodeIterator
 from submission.obs_preprocessor.obs_preprocessor import ObsPreprocessor
 from submission.planner.planner import Planner
 from submission.visualizer.visualizer import Visualizer
-from submission.utils.constants import challenge_goal_name_to_goal_name
+from submission.utils.constants import (
+    challenge_goal_name_to_goal_name,
+    mp3d_categories_mapping,
+    hm3d_to_mp3d
+)
 
 
 class EvalEnvWrapper(Env):
@@ -32,6 +36,7 @@ class EvalEnvWrapper(Env):
         """
         super().__init__(config=config.TASK_CONFIG)
 
+        self.ground_truth_semantics = config.GROUND_TRUTH_SEMANTICS
         self.device = (torch.device("cpu") if config.NO_GPU else
                        torch.device(f"cuda:{self.sim.gpu_device}"))
         self.max_steps = config.AGENT.max_steps
@@ -45,8 +50,6 @@ class EvalEnvWrapper(Env):
 
         # Keep only episodes with a goal on the same floor as the
         #  starting position
-        print("BEFORE len(self.episodes)", len(self.episodes))
-        print("BEFORE len(self._dataset.episodes)", len(self._dataset.episodes))
         if config.EVAL_VECTORIZED.goal_on_same_floor:
             new_episode_order = [
                 episode for episode in self._dataset.episodes
@@ -61,9 +64,6 @@ class EvalEnvWrapper(Env):
                 shuffle=False, group_by_scene=False,
             )
             self._current_episode = None
-        print("AFTER len(self.episodes)", len(self.episodes))
-        print("AFTER len(self._dataset.episodes)",
-              len(self._dataset.episodes))
 
         # Put episodes with specified object category first
         forced_category = config.EVAL_VECTORIZED.specific_category
@@ -121,6 +121,18 @@ class EvalEnvWrapper(Env):
         if (len(self.forced_episode_ids) > 0 and
                 self.episode_id not in self.forced_episode_ids):
             self._disable_print_images()
+
+        if self.ground_truth_semantics:
+            print("GROUND_TRUTH_SEMANTICS 1")
+            self.obs_preprocessor.set_instance_id_to_category_id(
+                torch.tensor([
+                    mp3d_categories_mapping.get(
+                        hm3d_to_mp3d.get(obj.category.name().lower().strip()),
+                        self.obs_preprocessor.num_sem_categories - 1
+                    )
+                    for obj in self.sim.semantic_annotations().objects
+                ])
+            )
 
         obs_preprocessed, info = self._preprocess_obs(obs)
 

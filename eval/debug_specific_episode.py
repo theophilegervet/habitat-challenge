@@ -55,13 +55,15 @@ if __name__ == "__main__":
     agent.reset()
     agent.set_vis_dir(scene_id=scene_id, episode_id=episode_id)
     if config.GROUND_TRUTH_SEMANTICS:
-        agent.obs_preprocessor.set_instance_id_to_category_id(torch.tensor([
-            mp3d_categories_mapping.get(
-                hm3d_to_mp3d.get(obj.category.name().lower().strip()),
-                config.ENVIRONMENT.num_sem_categories - 1
-            )
-            for obj in env.sim.semantic_annotations().objects
-        ]))
+        agent.obs_preprocessor.set_instance_id_to_category_id(
+            torch.tensor([
+                mp3d_categories_mapping.get(
+                    hm3d_to_mp3d.get(obj.category.name().lower().strip()),
+                    config.ENVIRONMENT.num_sem_categories - 1
+                )
+                for obj in env.sim.semantic_annotations().objects
+            ])
+        )
 
     t = 0
     while not env.episode_over:
