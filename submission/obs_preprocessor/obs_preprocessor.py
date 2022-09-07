@@ -18,8 +18,8 @@ from submission.utils.constants import (
     MIN_DEPTH_REPLACEMENT_VALUE,
     MAX_DEPTH_REPLACEMENT_VALUE
 )
-from .detectron2_segmentation import Detectron2Segmentation
-# from .mmdetection_segmentation import MMDetectionSegmentation
+# from .detectron2_segmentation import Detectron2Segmentation
+from .mmdetection_segmentation import MMDetectionSegmentation
 
 
 class ObsPreprocessor:
@@ -41,16 +41,16 @@ class ObsPreprocessor:
         self.min_depth = config.ENVIRONMENT.min_depth
         self.max_depth = config.ENVIRONMENT.max_depth
 
-        self.segmentation = Detectron2Segmentation(
-            sem_pred_prob_thr=0.9,
-            sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
-            visualize=True
-        )
-        # self.segmentation = MMDetectionSegmentation(
+        # self.segmentation = Detectron2Segmentation(
         #     sem_pred_prob_thr=0.9,
-        #     device=self.device,
+        #     sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
         #     visualize=True
         # )
+        self.segmentation = MMDetectionSegmentation(
+            sem_pred_prob_thr=0.9,
+            device=self.device,
+            visualize=True
+        )
 
         self.one_hot_encoding = torch.eye(
             self.num_sem_categories, device=self.device)
