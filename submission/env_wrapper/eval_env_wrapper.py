@@ -43,10 +43,26 @@ class EvalEnvWrapper(Env):
         self.forced_episode_ids = episode_ids if episode_ids else []
         self.episode_idx = 0
 
+        # Keep only episodes with a goal on the same floor as the
+        #  starting position
+        if config.EVAL_VECTORIZED.goal_on_same_floor:
+            new_episode_order = [
+                episode for episode in self._dataset.episodes
+                if len([
+                    goal for goal in episode.goals
+                    if abs(episode.start_position[1] - goal.position[1]) < 1.5
+                ]) > 0
+            ]
+            self._dataset.episodes = new_episode_order
+            self.episode_iterator = EpisodeIterator(
+                new_episode_order,
+                shuffle=False, group_by_scene=False,
+            )
+            self._current_episode = None
+
         # Put episodes with specified object category first
         forced_category = config.EVAL_VECTORIZED.specific_category
         num_ep = config.EVAL_VECTORIZED.num_episodes_per_env
-        assert not (len(self.forced_episode_ids) > 0 and forced_category)
         if forced_category:
             episodes_with_category = []
             other_episodes = []

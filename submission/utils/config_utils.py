@@ -80,4 +80,8 @@ def get_config(path: str, opts: Optional[list] = None) -> Tuple[Config, str]:
 
     assert config.TRAIN.RL.algorithm in ["PPO", "DDPPO"]
 
+    assert (config.EVAL_VECTORIZED.specific_episodes +
+            config.EVAL_VECTORIZED.specific_category +
+            config.EVAL_VECTORIZED.goal_on_same_floor) <= 1
+
     return config, config_str
