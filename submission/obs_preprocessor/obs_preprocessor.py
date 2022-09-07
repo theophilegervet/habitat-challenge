@@ -41,17 +41,16 @@ class ObsPreprocessor:
         self.min_depth = config.ENVIRONMENT.min_depth
         self.max_depth = config.ENVIRONMENT.max_depth
 
-        if not config.GROUND_TRUTH_SEMANTICS:
-            self.segmentation = Detectron2Segmentation(
-                sem_pred_prob_thr=0.9,
-                sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
-                visualize=True
-            )
-            # self.segmentation = MMDetectionSegmentation(
-            #     sem_pred_prob_thr=0.9,
-            #     device=self.device,
-            #     visualize=True
-            # )
+        self.segmentation = Detectron2Segmentation(
+            sem_pred_prob_thr=0.9,
+            sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
+            visualize=True
+        )
+        # self.segmentation = MMDetectionSegmentation(
+        #     sem_pred_prob_thr=0.9,
+        #     device=self.device,
+        #     visualize=True
+        # )
 
         self.one_hot_encoding = torch.eye(
             self.num_sem_categories, device=self.device)
@@ -184,6 +183,7 @@ class ObsPreprocessor:
 
         depth = preprocess_depth(depth)
 
+        print("(obs[0].keys()", obs[0].keys())
         if "semantic" in obs[0] and self.instance_id_to_category_id is not None:
             # Ground-truth semantic segmentation (useful for debugging)
             # TODO Allow multiple environments with ground-truth segmentation
