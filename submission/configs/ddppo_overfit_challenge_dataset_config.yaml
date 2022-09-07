@@ -9,6 +9,7 @@ EXP_NAME: ddppo_overfit_challenge  # experiment name
 MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
 VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
 PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
+GROUND_TRUTH_SEMANTICS: 0 # 1: use ground-truth semantics (for debugging / ablations)
 
 EVAL_VECTORIZED:
   specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
