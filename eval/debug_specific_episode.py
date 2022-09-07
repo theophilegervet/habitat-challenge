@@ -54,20 +54,22 @@ if __name__ == "__main__":
     obs = reset_to_episode(env, scene_id, episode_id)
     agent.reset()
     agent.set_vis_dir(scene_id=scene_id, episode_id=episode_id)
-    if config.GROUND_TRUTH_SEMANTICS:
-        agent.obs_preprocessor.set_instance_id_to_category_id(torch.tensor([
-            mp3d_categories_mapping.get(
-                hm3d_to_mp3d.get(obj.category.name().lower().strip()),
-                config.ENVIRONMENT.num_sem_categories - 1
-            )
-            for obj in env.sim.semantic_annotations().objects
-        ]))
-
-    t = 0
-    while not env.episode_over:
-        t += 1
-        print(t)
-        action = agent.act(obs)
-        obs = env.step(action)
-
-    print(env.get_metrics())
+    print(hm3d_to_mp3d)
+    print(mp3d_categories_mapping)
+    # if config.GROUND_TRUTH_SEMANTICS:
+    #     agent.obs_preprocessor.set_instance_id_to_category_id(torch.tensor([
+    #         mp3d_categories_mapping.get(
+    #             hm3d_to_mp3d.get(obj.category.name().lower().strip()),
+    #             config.ENVIRONMENT.num_sem_categories - 1
+    #         )
+    #         for obj in env.sim.semantic_annotations().objects
+    #     ]))
+    #
+    # t = 0
+    # while not env.episode_over:
+    #     t += 1
+    #     print(t)
+    #     action = agent.act(obs)
+    #     obs = env.step(action)
+    #
+    # print(env.get_metrics())
