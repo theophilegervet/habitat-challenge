@@ -1,3 +1,7 @@
+from pathlib import Path
+import pandas as pd
+
+
 MIN_DEPTH_REPLACEMENT_VALUE = 10000
 MAX_DEPTH_REPLACEMENT_VALUE = 10001
 
@@ -47,18 +51,18 @@ coco_categories = {
     "no-category": 15,
 }
 
-# detectron2 model
+# detectron2 model trained on COCO
 detectron2_categories_mapping = {
-    56: 0,  # chair
-    57: 1,  # couch
-    58: 2,  # potted plant
-    59: 3,  # bed
-    61: 4,  # toilet
-    62: 5,  # tv
-    60: 6,  # dining table
-    69: 7,  # oven
-    71: 8,  # sink
-    72: 9,  # refrigerator
+    56: 0,   # chair
+    57: 1,   # couch
+    58: 2,   # plant
+    59: 3,   # bed
+    61: 4,   # toilet
+    62: 5,   # tv
+    60: 6,   # table
+    69: 7,   # oven
+    71: 8,   # sink
+    72: 9,   # refrigerator
     73: 10,  # book
     74: 11,  # clock
     75: 12,  # vase
@@ -66,60 +70,34 @@ detectron2_categories_mapping = {
     39: 14,  # bottle
 }
 
-# mmdetection model
+# mmdetection model trained on HM3D
 mmdetection_categories_mapping = {
     0: 0,   # chair
     5: 1,   # couch
-    8: 2,   # potted plant
+    8: 2,   # plant
     6: 3,   # bed
     10: 4,  # toilet
     13: 5,  # tv
-    1: 6,   # dining table
+    1: 6,   # table
     9: 8,   # sink
 }
 
-# ground-truth semantics
-# TODO This mapping is only valid for scene wcojb4TFT35 (used for debugging)
-hm3d_categories_mapping = {
-    # chair
-    196: 0,  # folding chair
-    192: 0,  # camping chair
-    90: 0,   # armchair
-    22: 0,   # chair
-    # couch
-    72: 1,   # sofa
-    # potted plant
-    86: 2,   # decorative plant
-    # bed
-    10: 3,   # bed
-    # toilet
-    46: 4,   # toilet
-    47: 4,   # toilet bin
-    # tv
-    74: 5,   # tv
-    # dining table
-    23: 6,   # table
-    # oven
-    103: 7,  # microwave
-    # sink
-    50: 8,   # sink
-    62: 8,   # sink tap
-    # refrigerator
-    97: 9,   # refrigerator
-    # book
-    25: 10,  # book
-    82: 10,  # books
-    207: 10, # notebooks
-    127: 10, # box with books
-    89: 10,  # basket with books
-    # clock
-    19: 11,  # clock
-    # vase
-    58: 12,  # flower vase
-    # cup
-    20: 13,  # pen cup
-    # bottle
+# ground-truth HM3D semantics are mapped to MP3D categories
+mp3d_categories_mapping = {
+    3: 0,   # chair
+    10: 1,  # couch
+    14: 2,  # plant
+    11: 3,  # bed
+    18: 4,  # toilet
+    22: 5,  # tv
+    5: 6,   # table
+    15: 8,  # sink
+
 }
+
+hm3d_to_mp3d_path = Path(__file__).resolve().parent / "matterport_category_mappings.tsv"
+df = pd.read_csv(hm3d_to_mp3d_path, sep='    ', header=0)
+hm3d_to_mp3d = {row["category"]: row["mpcat40index"] for _, row in df.iterrows()}
 
 coco_categories_color_palette = [
     0.9400000000000001,

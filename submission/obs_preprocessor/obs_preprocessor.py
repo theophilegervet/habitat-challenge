@@ -13,6 +13,8 @@ from submission.utils.constants import (
     frame_color_palette,
     goal_id_to_goal_name,
     goal_id_to_coco_id,
+    hm3d_to_mp3d,
+    mp3d_categories_mapping,
     MIN_DEPTH_REPLACEMENT_VALUE,
     MAX_DEPTH_REPLACEMENT_VALUE
 )
@@ -39,24 +41,25 @@ class ObsPreprocessor:
         self.min_depth = config.ENVIRONMENT.min_depth
         self.max_depth = config.ENVIRONMENT.max_depth
 
-        self.segmentation = Detectron2Segmentation(
-            sem_pred_prob_thr=0.9,
-            sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
-            visualize=True
-        )
-        # self.segmentation = MMDetectionSegmentation(
-        #     sem_pred_prob_thr=0.9,
-        #     device=self.device,
-        #     visualize=True
-        # )
+        if not config.GROUND_TRUTH_SEMANTICS:
+            self.segmentation = Detectron2Segmentation(
+                sem_pred_prob_thr=0.9,
+                sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
+                visualize=True
+            )
+            # self.segmentation = MMDetectionSegmentation(
+            #     sem_pred_prob_thr=0.9,
+            #     device=self.device,
+            #     visualize=True
+            # )
 
-        self.instance_id_to_category_id = None
         self.one_hot_encoding = torch.eye(
             self.num_sem_categories, device=self.device)
         self.color_palette = [int(x * 255.) for x in frame_color_palette]
 
         self.last_poses = None
         self.last_actions = None
+        self.instance_id_to_category_id = None
 
     def reset(self):
         self.last_poses = [np.zeros(3)] * self.num_environments
