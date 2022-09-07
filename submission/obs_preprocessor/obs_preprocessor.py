@@ -184,7 +184,6 @@ class ObsPreprocessor:
         depth = preprocess_depth(depth)
 
         if "semantic" in obs[0] and self.instance_id_to_category_id is not None:
-            print("self.instance_id_to_category_id", self.instance_id_to_category_id)
             # Ground-truth semantic segmentation (useful for debugging)
             # TODO Allow multiple environments with ground-truth segmentation
             assert "semantic" in obs[0]
