@@ -87,7 +87,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         # Keep only episodes with a goal on the same floor as the
         #  starting position
-        eps_before = len(self.habitat_env._dataset.episodes)
         new_episode_order = [
             episode for episode in self.habitat_env._dataset.episodes
             if len([
@@ -101,8 +100,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             shuffle=False, group_by_scene=False,
         )
         self.habitat_env._current_episode = None
-        eps_after = len(self.habitat_env._dataset.episodes)
-        print(f"eps_before {eps_before} eps_after {eps_after}")
 
         assert config.NUM_ENVIRONMENTS == 1
         self.device = (torch.device("cpu") if config.NO_GPU else
