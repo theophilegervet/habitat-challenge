@@ -124,7 +124,7 @@ if __name__ == "__main__":
         # "disable_env_checking": True,     # Ray 2.0.0
         "normalize_actions": False,
         "_disable_preprocessor_api": True,
-        "ignore_worker_failures": True,
+        # "ignore_worker_failures": True,
         # "recreate_failed_workers": True,  # Ray 2.0.0
     }
 
