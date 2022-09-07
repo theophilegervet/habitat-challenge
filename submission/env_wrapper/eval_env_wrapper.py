@@ -45,6 +45,8 @@ class EvalEnvWrapper(Env):
 
         # Keep only episodes with a goal on the same floor as the
         #  starting position
+        print("BEFORE len(self.episodes)", len(self.episodes))
+        print("BEFORE len(self._dataset.episodes)", len(self._dataset.episodes))
         if config.EVAL_VECTORIZED.goal_on_same_floor:
             new_episode_order = [
                 episode for episode in self._dataset.episodes
@@ -59,6 +61,9 @@ class EvalEnvWrapper(Env):
                 shuffle=False, group_by_scene=False,
             )
             self._current_episode = None
+        print("AFTER len(self.episodes)", len(self.episodes))
+        print("AFTER len(self._dataset.episodes)",
+              len(self._dataset.episodes))
 
         # Put episodes with specified object category first
         forced_category = config.EVAL_VECTORIZED.specific_category
