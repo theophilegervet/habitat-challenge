@@ -13,8 +13,6 @@ from submission.utils.constants import (
     frame_color_palette,
     goal_id_to_goal_name,
     goal_id_to_coco_id,
-    hm3d_to_mp3d,
-    mp3d_categories_mapping,
     MIN_DEPTH_REPLACEMENT_VALUE,
     MAX_DEPTH_REPLACEMENT_VALUE
 )
