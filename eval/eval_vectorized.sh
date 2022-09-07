@@ -12,4 +12,4 @@
 #SBATCH --gpus-per-task=8
 #SBATCH --constraint=volta32gb
 
-python eval/eval_vectorized.py
+python eval/eval_vectorized.py "$@"
