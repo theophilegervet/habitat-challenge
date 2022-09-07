@@ -250,7 +250,7 @@ if __name__ == "__main__":
     print("-" * 100)
 
     print("Config:")
-    config, config_str = get_config("submission/configs/config.yaml", args.opts)
+    config, config_str = get_config("submission/configs/eval_config.yaml", args.opts)
     evaluator = VectorizedEvaluator(config, config_str)
     print(config_str)
     print("-" * 100)
