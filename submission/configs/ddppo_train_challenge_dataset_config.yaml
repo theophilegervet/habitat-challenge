@@ -11,68 +11,6 @@ VISUALIZE: 0              # 1: render observation and predicted semantic map, 0:
 PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
 GROUND_TRUTH_SEMANTICS: 0 # 1: use ground-truth semantics (for debugging / ablations)
 
-EVAL_VECTORIZED:
-  specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
-  specific_category: 0      # "chair": eval only on chair episodes, 0: eval on all episodes
-  split: val                # eval split
-  num_episodes_per_env: 100 # number of eval episodes per environment
-  record_videos: 0          # 1: record videos from printed images, 0: don't
-  record_planner_videos: 0  # 1: record planner videos (if record videos), 0: don't
-
-TRAIN:
-  RL:
-    exp_name: ddppo_train_challenge  # experiment name
-    algorithm: DDPPO              # one of "PPO" or "DDPPO"
-    gamma: 0.9                  # discount factor of the MDP
-    intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
-    lr: 0.00005                 # learning rate
-    entropy_coeff: 0.001        # entropy regularization scaling
-    clip_param: 0.2             # how far the new policy can go from the old policy while improving the objective
-    checkpoint_freq: 100        # how many training iterations between checkpoints
-    rollout_fragment_length: 20 # divide episodes into fragments of this many steps each
-    sgd_epochs: 4               # number of SGD epochs (number of SGD iterations per minibatch)
-    restore:                    # checkpoint to resume training from (if any)
-
-    PPO:
-      # 2 x 32GB GPUs
-      #num_workers: 9              # number of parallel workers
-      #num_gpus: 0.2               # number of GPUs for driver process training the policy model
-      #num_cpus_for_driver: 9      # number of CPUs for driver
-      #num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
-      #num_cpus_per_worker: 7      # number of CPUs per worker
-
-      # 8 x 32GB GPUs
-      num_workers: 35
-      num_gpus: 1
-      num_cpus_for_driver: 9
-      num_gpus_per_worker: 0.2
-      num_cpus_per_worker: 2
-
-    DDPPO:
-      # 2 x 32GB GPUs
-      #num_workers: 9
-      #num_gpus_per_worker: 0.2
-      #num_cpus_per_worker: 8
-
-      # 8 x 32GB GPUs
-      #num_workers: 39
-      #num_gpus_per_worker: 0.2
-      #num_cpus_per_worker: 2
-
-      # 4 x 8 x 32GB GPUs
-      #num_workers: 159
-      #num_gpus_per_worker: 0.2
-      #num_cpus_per_worker: 2
-
-      # 8 x 8 x 32GB GPUs
-      num_workers: 319
-      num_gpus_per_worker: 0.2
-      num_cpus_per_worker: 2
-
-      num_envs_per_worker: 1
-      remote_worker_envs: False
-      remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
-
 ENVIRONMENT:
   num_sem_categories: 16  # number of semantic segmentation categories
   turn_angle: 30.0        # agent turn angle (in degrees)
@@ -110,3 +48,113 @@ AGENT:
     SEMANTIC:
       goal_update_steps: 25    # frequency at which to update the high-level goal during inference
       inference_downscaling: 2 # ratio of map size for policy inference over map size used for planning
+
+EVAL_VECTORIZED:
+  specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
+  specific_category: 0      # "chair": eval only on chair episodes, 0: eval on all episodes
+  split: val                # eval split
+  num_episodes_per_env: 100 # number of eval episodes per environment
+  record_videos: 0          # 1: record videos from printed images, 0: don't
+  record_planner_videos: 0  # 1: record planner videos (if record videos), 0: don't
+
+TRAIN:
+  RL:
+    exp_name: ddppo_train_challenge  # experiment name
+    algorithm: DDPPO              # one of "PPO" or "DDPPO"
+    gamma: 0.9                  # discount factor of the MDP
+    intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
+    lr: 0.00005                 # learning rate
+    entropy_coeff: 0.001        # entropy regularization scaling
+    clip_param: 0.2             # how far the new policy can go from the old policy while improving the objective
+    checkpoint_freq: 100        # how many training iterations between checkpoints
+    rollout_fragment_length: 20 # divide episodes into fragments of this many steps each
+    sgd_epochs: 4               # number of SGD epochs (number of SGD iterations per minibatch)
+    restore:                    # checkpoint to resume training from (if any)
+
+    # -----------------------------
+    # With MMDetection segmentation
+    # -----------------------------
+
+    PPO:
+      # 2 x 32GB GPUs
+      #num_workers: 5              # number of parallel workers
+      #num_gpus: 0.33              # number of GPUs for driver process training the policy model
+      #num_cpus_for_driver: 13     # number of CPUs for driver
+      #num_gpus_per_worker: 0.33   # number of GPUs per worker collecting environment rollouts
+      #num_cpus_per_worker: 13     # number of CPUs per worker
+
+      # 8 x 32GB GPUs
+      num_workers: 21
+      num_gpus: 1
+      num_cpus_for_driver: 13
+      num_gpus_per_worker: 0.33
+      num_cpus_per_worker: 3
+
+    DDPPO:
+      # 2 x 32GB GPUs
+      #num_workers: 6
+      #num_gpus_per_worker: 0.33
+      #num_cpus_per_worker: 13
+
+      # 8 x 32GB GPUs
+      #num_workers: 24
+      #num_gpus_per_worker: 0.33
+      #num_cpus_per_worker: 3
+
+      # 4 x 8 x 32GB GPUs
+      #num_workers: 96
+      #num_gpus_per_worker: 0.33
+      #num_cpus_per_worker: 3
+
+      # 8 x 8 x 32GB GPUs
+      num_workers: 192
+      num_gpus_per_worker: 0.33
+      num_cpus_per_worker: 3
+
+      num_envs_per_worker: 1
+      remote_worker_envs: False
+      remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
+
+    # ----------------------------
+    # With Detectron2 segmentation
+    # ----------------------------
+
+    #PPO:
+    #  # 2 x 32GB GPUs
+    #  num_workers: 9              # number of parallel workers
+    #  num_gpus: 0.2               # number of GPUs for driver process training the policy model
+    #  num_cpus_for_driver: 9      # number of CPUs for driver
+    #  num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
+    #  num_cpus_per_worker: 7      # number of CPUs per worker
+    #
+    #  # 8 x 32GB GPUs
+    #  #num_workers: 35
+    #  #num_gpus: 1
+    #  #num_cpus_for_driver: 9
+    #  #num_gpus_per_worker: 0.2
+    #  #num_cpus_per_worker: 2
+    #
+    #DDPPO:
+    #  # 2 x 32GB GPUs
+    #  num_workers: 9
+    #  num_gpus_per_worker: 0.2
+    #  num_cpus_per_worker: 8
+    #
+    #  # 8 x 32GB GPUs
+    #  #num_workers: 39
+    #  #num_gpus_per_worker: 0.2
+    #  #num_cpus_per_worker: 2
+    #
+    #  # 4 x 8 x 32GB GPUs
+    #  #num_workers: 159
+    #  #num_gpus_per_worker: 0.2
+    #  #num_cpus_per_worker: 2
+    #
+    #  # 8 x 8 x 32GB GPUs
+    #  #num_workers: 319
+    #  #num_gpus_per_worker: 0.2
+    #  #num_cpus_per_worker: 2
+    #
+    #  num_envs_per_worker: 1
+    #  remote_worker_envs: False
+    #  remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
