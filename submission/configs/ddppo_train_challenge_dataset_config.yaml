@@ -70,7 +70,7 @@ TRAIN:
     checkpoint_freq: 100        # how many training iterations between checkpoints
     rollout_fragment_length: 20 # divide episodes into fragments of this many steps each
     sgd_epochs: 4               # number of SGD epochs (number of SGD iterations per minibatch)
-    restore:                    # checkpoint to resume training from (if any)
+    restore: "/private/home/theop123/ray_results/ddppo_train_challenge/DDPPO_SemanticExplorationPolicyTrainingEnvWrapper_bd55e_00000_0_2022-09-08_03-55-24/checkpoint_000600/checkpoint-600"                   # checkpoint to resume training from (if any)
 
     # -----------------------------
     # With MMDetection segmentation
