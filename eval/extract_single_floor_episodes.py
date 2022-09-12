@@ -9,7 +9,7 @@ from submission.utils.config_utils import get_config
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/ddppo_train_challenge_dataset_config.yaml")
+    config, config_str = get_config("submission/configs/eval_config.yaml")
 
     env = Env(config=config.TASK_CONFIG)
     obs = env.reset()
@@ -36,7 +36,7 @@ if __name__ == "__main__":
         episode for episode in env._dataset.episodes
         if len([
             goal for goal in episode.goals
-            if abs(episode.start_position[1] - goal.position[1]) < 1.5
+            if abs(episode.start_position[1] - goal.position[1]) < 1.0  # 1.5
         ]) > 0
     ]
     same_floor_episodes = len(env._dataset.episodes)
