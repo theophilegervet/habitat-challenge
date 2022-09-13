@@ -29,7 +29,7 @@ AGENT:
     map_size_cm: 4800        # global map size (in centimetres)
     map_resolution: 5        # size of map bins (in centimeters)
     vision_range: 100        # diameter of local map region visible by the agent (in cells)
-    global_downscaling: 1    # ratio of global over local map
+    global_downscaling: 2    # ratio of global over local map
     du_scale: 4              # frame downscaling before projecting to point cloud
     cat_pred_threshold: 5.0  # number of depth points to be in bin to classify it as a certain semantic category
     exp_pred_threshold: 1.0  # number of depth points to be in bin to consider it as explored
