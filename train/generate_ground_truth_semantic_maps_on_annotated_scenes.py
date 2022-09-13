@@ -232,9 +232,9 @@ class HabitatFloorMaps:
             sequence_length = positions.shape[0]
 
             # Sample rotations
-            yaws = np.zeros(sequence_length)
+            # yaws = np.zeros(sequence_length)
             # yaws = np.ones(sequence_length) * np.pi / 2
-            # yaws = np.random.random(sequence_length) * 2 * np.pi
+            yaws = np.random.random(sequence_length) * 2 * np.pi
             # TODO Should yaw be in [-pi, pi] instead of [0, 2 pi]?
             #    => if x > pi, x = x - 2 * pi
             # TODO Is this necessary?
@@ -245,20 +245,6 @@ class HabitatFloorMaps:
             seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
                        for t in range(sequence_length)]
             for t in range(sequence_length):
-                # seq_obs[t]["gps"] = np.array([positions[t, 0],
-                #                               -positions[t, 2]])
-                # seq_obs[t]["compass"] = [yaws[t]]
-
-                # curr_pose = np.array([
-                #     obs[e]["gps"][0],
-                #     -obs[e]["gps"][1],
-                #     obs[e]["compass"][0]
-                # ])
-                # pose_delta = pu.get_rel_pose_change(curr_pose, last_poses[e])
-                #
-                # agent_state = self.habitat_env.sim.get_agent_state(0)
-                # dx, dy, do = pu.get_rel_pose_change(curr_pose, self.last_pose)
-
                 pose = pu.get_pose(positions[t], rotations[t])
                 seq_obs[t]["gps"] = np.array([pose[0], -pose[1]])
                 seq_obs[t]["compass"] = [pose[2]]
@@ -269,9 +255,6 @@ class HabitatFloorMaps:
             ) = self.obs_preprocessor.preprocess_sequence(seq_obs)
 
             seq_dones = torch.tensor([False] * sequence_length)
-            # TODO
-            # seq_update_global = torch.tensor([False] * sequence_length)
-            # seq_update_global[-1] = True
             seq_update_global = torch.tensor([True] * sequence_length)
 
             # Update semantic map with observations
@@ -295,12 +278,6 @@ class HabitatFloorMaps:
                 self.semantic_map.lmb,
                 self.semantic_map.origins,
             )
-
-            # print("positions", positions)
-            # print("seq_pose_delta", seq_pose_delta)
-            # print("seq_global_pose", seq_global_pose)
-            # print("seq_local_pose", seq_local_pose)
-            # raise NotImplementedError
 
             self.semantic_map.local_pose = seq_local_pose[:, -1]
             self.semantic_map.global_pose = seq_global_pose[:, -1]
@@ -366,7 +343,6 @@ def generate_scene_semantic_maps(scene_path: str,
     floor_maps = HabitatFloorMaps(sim, generation_method, config, device)
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
-        np.save(f"scenes_{generation_method}/{scene_id}_{i}.npy", sem_map)
         sem_map_vis = visualize_sem_map(sem_map)
         sem_map_vis.save(f"scenes_{generation_method}/{scene_id}_{i}.png", "PNG")
 
