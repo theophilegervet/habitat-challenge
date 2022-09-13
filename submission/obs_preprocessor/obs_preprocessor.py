@@ -131,7 +131,7 @@ class ObsPreprocessor:
                 [seq_obs[t]], self.last_poses)
 
         goal, goal_name = self.preprocess_goal([seq_obs[0]])
-        goal_name = goal_name[0]
+        goal_name = goal_name[0] if goal_name is not None else goal_name
         return (
             seq_obs_preprocessed,
             seq_semantic_frame,
