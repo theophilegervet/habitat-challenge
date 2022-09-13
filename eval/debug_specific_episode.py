@@ -72,13 +72,13 @@ if __name__ == "__main__":
     rotation = quaternion.from_euler_angles(0., yaw, 0.)
     obs = env.sim.get_observations_at(position, rotation)
     print(f"position {position}, yaw {yaw}, rotation {rotation}")
-    print(f"gps {obs['gps']}, compass {obs['compass']}")
 
-    # t = 0
-    # while not env.episode_over:
-    #     t += 1
-    #     print(t)
-    #     action = agent.act(obs)
-    #     obs = env.step(action)
-    #
-    # print(env.get_metrics())
+    t = 0
+    while not env.episode_over:
+        t += 1
+        print(t)
+        action = agent.act(obs)
+        obs = env.step(action)
+        print(obs["gps"], obs["compass"])
+
+    print(env.get_metrics())
