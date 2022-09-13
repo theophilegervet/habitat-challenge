@@ -184,7 +184,7 @@ class ObsPreprocessor:
 
         depth = preprocess_depth(depth)
 
-        if (not self.ground_truth_semantics
+        if (self.ground_truth_semantics
                 and "semantic" in obs[0]
                 and self.instance_id_to_category_id is not None):
             # Ground-truth semantic segmentation (useful for debugging)
