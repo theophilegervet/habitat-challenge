@@ -200,7 +200,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=100, batch_size=10):
+            self, y, num_frames=100, batch_size=30):
         self.obs_preprocessor.reset()
         self.semantic_map.init_map_and_pose()
 
