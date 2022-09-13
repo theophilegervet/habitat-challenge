@@ -199,7 +199,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=50, batch_size=50):
+            self, y, num_frames=10, batch_size=10):
         self.obs_preprocessor.reset()
         self.semantic_map.init_map_and_pose()
 
@@ -247,6 +247,9 @@ class HabitatFloorMaps:
             (
                 seq_obs_preprocessed, seq_semantic_frame, seq_pose_delta, _, _
             ) = self.obs_preprocessor.preprocess_sequence(seq_obs)
+            print("positions", positions)
+            print("seq_pose_delta", seq_pose_delta)
+            raise NotImplementedError
 
             seq_dones = torch.tensor([False] * sequence_length)
             seq_update_global = torch.tensor([False] * sequence_length)
@@ -279,6 +282,9 @@ class HabitatFloorMaps:
             self.semantic_map.lmb = seq_lmb[:, -1]
             self.semantic_map.origins = seq_origins[:, -1]
 
+        # TODO Start by getting global map right, then index it
+        sem_map = self.semantic_map.global_map.cpu().numpy()[0, 4:-1]
+
         # navigable_map = self._get_floor_navigable_map(y)
         # sem_map = np.zeros((
         #     len(coco_categories.keys()),
@@ -291,8 +297,6 @@ class HabitatFloorMaps:
         # x2 = x1 + self.map_size[0]
         # z2 = z1 + self.map_size[1]
         # sem_map[1:] = self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2]
-
-        sem_map = self.semantic_map.global_map.cpu().numpy()[0, 4:-1]
 
         return sem_map
 
