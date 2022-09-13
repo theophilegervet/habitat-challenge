@@ -215,8 +215,9 @@ class ObsPreprocessor:
                     # semantic_[filter_mask] = 0.
                     semantic[0, :, :, i][filter_mask] = 0.
 
-                    pixels = semantic[0, :, :, i][filter_mask].sum().item()
-                    print(f"Filtering out {pixels} pixels")
+                    pixels = int(semantic[0, :, :, i][filter_mask].sum().item())
+                    if pixels > 0:
+                        print(f"Filtering out {pixels} pixels")
 
             # raise NotImplementedError
 
