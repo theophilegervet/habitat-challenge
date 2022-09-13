@@ -211,6 +211,7 @@ class ObsPreprocessor:
                                    (depth[0, :, :, -1] <= depth_md - 50))
                     print("filter_mask.shape", filter_mask.shape)
                     semantic[0, :, :, i][filter_mask] = 0.
+            raise NotImplementedError
 
             semantic_vis = self._get_semantic_frame_vis(
                 rgb[0].cpu().numpy(), semantic[0].cpu().numpy())
