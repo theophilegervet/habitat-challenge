@@ -212,7 +212,8 @@ class ObsPreprocessor:
                     filter_mask = ((depth_ >= depth_md + 50) |
                                    (depth_ <= depth_md - 50))
                     # print("filter_mask.shape", filter_mask.shape)
-                    semantic_[filter_mask] = 0.
+                    # semantic_[filter_mask] = 0.
+                    semantic[0, :, :, i][filter_mask] = 0.
             # raise NotImplementedError
 
             semantic_vis = self._get_semantic_frame_vis(
