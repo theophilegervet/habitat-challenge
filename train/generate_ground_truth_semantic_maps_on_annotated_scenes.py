@@ -250,9 +250,6 @@ class HabitatFloorMaps:
             (
                 seq_obs_preprocessed, seq_semantic_frame, seq_pose_delta, _, _
             ) = self.obs_preprocessor.preprocess_sequence(seq_obs)
-            # print("positions", positions)
-            # print("seq_pose_delta", seq_pose_delta)
-            # raise NotImplementedError
 
             seq_dones = torch.tensor([False] * sequence_length)
             seq_update_global = torch.tensor([False] * sequence_length)
@@ -279,6 +276,12 @@ class HabitatFloorMaps:
                 self.semantic_map.lmb,
                 self.semantic_map.origins,
             )
+
+            print("positions", positions)
+            print("seq_pose_delta", seq_pose_delta)
+            print("seq_global_pose", seq_global_pose)
+            print("seq_local_pose", seq_local_pose)
+            raise NotImplementedError
 
             self.semantic_map.local_pose = seq_local_pose[:, -1]
             self.semantic_map.global_pose = seq_global_pose[:, -1]
