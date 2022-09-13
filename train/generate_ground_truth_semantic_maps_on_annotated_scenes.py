@@ -209,8 +209,9 @@ class HabitatFloorMaps:
         sequence_length = positions.shape[0]
         yaws = np.random.random(sequence_length)
         rotations = quaternion.from_euler_angles(0., yaws, 0.)
-        obs = [self.sim.get_observations_at(positions[t], rotations[t])
-               for t in range(sequence_length)]
+        seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
+                   for t in range(sequence_length)]
+        print(seq_obs[0].keys())
 
         # Preprocess observations
         (
@@ -219,7 +220,7 @@ class HabitatFloorMaps:
             seq_pose_delta,
             goal_category,
             goal_name
-        ) = self.obs_preprocessor.preprocess_sequence(obs)
+        ) = self.obs_preprocessor.preprocess_sequence(seq_obs)
 
         seq_dones = torch.tensor([False] * sequence_length)
         seq_update_global = torch.tensor([False] * sequence_length)
