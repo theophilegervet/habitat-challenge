@@ -231,7 +231,10 @@ class HabitatFloorMaps:
             sequence_length = positions.shape[0]
 
             # Sample rotations
-            yaws = np.random.random(sequence_length)
+            yaws = np.zeros(sequence_length)
+            # yaws = np.random.random(sequence_length) * 2 * np.pi
+            # TODO Should yaw be in [-pi, pi] instead of [0, 2 pi]?
+            #    => if x > pi, x = x - 2 * pi
             # TODO Is this necessary?
             # if i == 0:
             #     yaws[0] = 0.  # No initial rotation
