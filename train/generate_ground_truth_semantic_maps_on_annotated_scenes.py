@@ -308,11 +308,7 @@ class HabitatFloorMaps:
             self.semantic_map.origins = seq_origins[:, -1]
 
         # TODO Start by getting global map right, then index it
-        # sem_map = self.semantic_map.global_map.cpu().numpy()[0, 4:-1]
-        sem_map = np.swapaxes(
-            self.semantic_map.global_map.cpu().numpy()[0, 4:-1],
-            -2, -1
-        )
+        sem_map = self.semantic_map.global_map.cpu().numpy()[0, 4:-1]
 
         # navigable_map = self._get_floor_navigable_map(y)
         # sem_map = np.zeros((
@@ -371,6 +367,7 @@ def generate_scene_semantic_maps(scene_path: str,
     floor_maps = HabitatFloorMaps(sim, generation_method, config, device)
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
+        np.save(sem_map, f"scenes_{generation_method}/{scene_id}_{i}.npy")
         sem_map_vis = visualize_sem_map(sem_map)
         sem_map_vis.save(f"scenes_{generation_method}/{scene_id}_{i}.png", "PNG")
 
