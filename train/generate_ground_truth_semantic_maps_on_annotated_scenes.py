@@ -70,18 +70,36 @@ class HabitatFloorMaps:
             self.semantic_map_module = SemanticMapModule(config).to(self.device)
 
         # Sample navigable points
-        self.pts = self._sample_points()
+        pts = self._sample_points()
 
         # Bin points based on x and z values, so that
         # we can quickly pool them based on y-filtering
-        self.y = self.pts[:, 1]
+        self.y = pts[:, 1]
+        # (
+        #     self.xz_origin,  # in meters
+        #     self.xz_min,     # in map coordinates
+        #     self.xz_max,     # in map coordinates
+        #     self.xz_size,    # in map coordinates
+        #     self.xz          # in map coordinates
+        # ) = self._make_map(pts[:, [0, 2]])
         (
-            self.xz_origin,  # in meters
-            self.xz_min,     # in map coordinates
-            self.xz_max,     # in map coordinates
-            self.xz_size,    # in map coordinates
-            self.xz          # in map coordinates
-        ) = self._make_map(self.pts[:, [0, 2]])
+            self.xz_origin_cm,
+            self.xz_max_cm,
+            self.xz_origin_map,
+            self.xz_max_map,
+            self.map_size,
+            self.xz_centered_cm,
+            self.xz_centered_map
+        ) = self._make_map(pts[:, [0, 2]])
+
+        print(
+            self.xz_origin_cm,
+            self.xz_max_cm,
+            self.xz_origin_map,
+            self.xz_max_map,
+            self.map_size,
+        )
+        raise NotImplementedError
 
         # Determine floor heights
         self.floor_heights = self._get_floor_heights()
@@ -108,19 +126,42 @@ class HabitatFloorMaps:
         return pts
 
     def _make_map(self, xz):
-        # Determine map boundaries
-        min_ = np.floor(np.min(xz, axis=0) - self.padding).astype(int)
-        max_ = np.ceil(np.max(xz, axis=0) + self.padding).astype(int)
-        size = np.ceil((max_ - min_ + 1) / self.resolution).astype(int)
-        origin = min_ / 100.  # cm to m
-        min_ = (min_ / self.resolution).astype(int)
-        max_ = min_ + size - 1
+        xz_origin_cm = np.floor(np.min(xz, axis=0) - self.padding)
+        xz_max_cm = np.ceil(np.max(xz, axis=0) + self.padding)
 
-        # Recenter points
-        xz = (xz / self.resolution).astype(int)
-        xz = xz - min_
+        xz_origin_map = (xz_origin_cm / self.resolution).astype(int)
+        map_size = np.ceil((xz_max_cm - xz_origin_cm + 1) / self.resolution).astype(int)
+        xz_max_map = xz_origin_map + map_size - 1
 
-        return origin, min_, max_, size, xz
+        xz_centered_cm = xz - xz_origin_cm
+        xz_centered_map = (xz_centered_cm / self.resolution).astype(int)
+
+        return (
+            xz_origin_cm,
+            xz_max_cm,
+            xz_origin_map,
+            xz_max_map,
+            map_size,
+            xz_centered_cm,
+            xz_centered_map
+        )
+
+        # # Determine map boundaries
+        # min_ = np.floor(np.min(xz, axis=0) - self.padding).astype(int)
+        # max_ = np.ceil(np.max(xz, axis=0) + self.padding).astype(int)
+        #
+        #
+        #
+        # size = np.ceil((max_ - min_ + 1) / self.resolution).astype(int)
+        # origin = min_ / 100.  # cm to m
+        # min_ = (min_ / self.resolution).astype(int)
+        # max_ = min_ + size - 1
+        #
+        # # Recenter points
+        # xz = (xz / self.resolution).astype(int)
+        # xz = xz - min_
+        #
+        # return origin, min_, max_, size, xz
 
     def _get_floor_heights(self):
         floor_heights = []
@@ -208,10 +249,16 @@ class HabitatFloorMaps:
         # Batch frames
         for i in range(0, num_frames, batch_size):
             positions = all_positions[i:i + batch_size]
-
             sequence_length = positions.shape[0]
+
+            # Sample rotations
             yaws = np.random.random(sequence_length)
+            if i == 0:
+                # TODO
+                positions[0, [0, 2]] = 0.
+                yaws[0] = 0.
             rotations = quaternion.from_euler_angles(0., yaws, 0.)
+
             seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
                        for t in range(sequence_length)]
             for t in range(sequence_length):
