@@ -308,11 +308,11 @@ class HabitatFloorMaps:
             self.semantic_map.origins = seq_origins[:, -1]
 
         # TODO Start by getting global map right, then index it
-        sem_map = self.semantic_map.global_map.cpu().numpy()[0, 4:-1]
-        # sem_map = np.swapaxes(
-        #     self.semantic_map.global_map.cpu().numpy()[0, 4:-1],
-        #     -2, -1
-        # )
+        # sem_map = self.semantic_map.global_map.cpu().numpy()[0, 4:-1]
+        sem_map = np.swapaxes(
+            self.semantic_map.global_map.cpu().numpy()[0, 4:-1],
+            -2, -1
+        )
 
         # navigable_map = self._get_floor_navigable_map(y)
         # sem_map = np.zeros((
@@ -334,7 +334,7 @@ def visualize_sem_map(sem_map):
     def compress_sem_map(sem_map):
         c_map = np.zeros((sem_map.shape[1], sem_map.shape[2]))
         for i in range(sem_map.shape[0]):
-            c_map[sem_map[i] > 0.] = i+1
+            c_map[sem_map[i] > 0.] = i + 1
         return c_map
 
     c_map = compress_sem_map(sem_map)
