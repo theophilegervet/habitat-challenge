@@ -69,10 +69,11 @@ if __name__ == "__main__":
     while not env.episode_over:
         t += 1
         print(t)
-        action = agent.act(obs)
-        obs = env.step(action)
+        print(obs.keys())
         print(obs["compass"], obs["gps"])
         print(env.sim.get_agent_state())
         print()
+        action = agent.act(obs)
+        obs = env.step(action)
 
     print(env.get_metrics())
