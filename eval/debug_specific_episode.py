@@ -71,6 +71,8 @@ if __name__ == "__main__":
         print(t)
         print(obs.keys())
         print(obs["compass"], obs["gps"])
+        print("env.current_episode.start_position", env.current_episode.start_position)
+        print("env.current_episode.start_rotation", env.current_episode.start_rotation)
         print(env.sim.get_agent_state())
         print()
         action = agent.act(obs)
