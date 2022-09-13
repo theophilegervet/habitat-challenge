@@ -287,8 +287,8 @@ class HabitatFloorMaps:
             navigable_map.shape[1]
         ))
         sem_map[0] = navigable_map
-        x1 = self.semantic_map.global_h // 2 + self.xz_origin_map[0]
-        z1 = self.semantic_map.global_w // 2 + self.xz_origin_map[1]
+        x1 = self.semantic_map.global_h // 2 - self.xz_origin_map[0]
+        z1 = self.semantic_map.global_w // 2 - self.xz_origin_map[1]
         x2 = x1 + self.map_size[0]
         z2 = z1 + self.map_size[1]
         sem_map[1:] = np.flip(
@@ -322,7 +322,7 @@ def visualize_sem_map(sem_map):
 def generate_scene_semantic_maps(scene_path: str,
                                  generation_method="annotations_first_person"):
     scene_id = scene_path.split("/")[-1].split(".")[0]
-    if scene_id not in ["Nfvxx8J5NCo", "p53SfW6mjZe", "zt1RVoi7PcG"]:
+    if scene_id not in ["Nfvxx8J5NCo", "p53SfW6mjZe", "zt1RVoi7PcG"]:  # TODO
         return
 
     config, _ = get_config("submission/configs/generate_dataset_config.yaml")
