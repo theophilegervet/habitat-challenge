@@ -69,19 +69,6 @@ class HabitatFloorMaps:
             self.semantic_map = SemanticMapState(config, self.device)
             self.semantic_map_module = SemanticMapModule(config).to(self.device)
 
-            self.obs_preprocessor.reset()
-            self.semantic_map.init_map_and_pose()
-
-            self.obs_preprocessor.set_instance_id_to_category_id(
-                torch.tensor([
-                    mp3d_categories_mapping.get(
-                        hm3d_to_mp3d.get(obj.category.name().lower().strip()),
-                        self.obs_preprocessor.num_sem_categories - 1
-                    )
-                    for obj in self.sim.semantic_annotations().objects
-                ])
-            )
-
         # Sample navigable points
         self.pts = self._sample_points()
 
@@ -197,7 +184,20 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=10, batch_size=3):
+            self, y, num_frames=10, batch_size=5):
+        self.obs_preprocessor.reset()
+        self.semantic_map.init_map_and_pose()
+
+        self.obs_preprocessor.set_instance_id_to_category_id(
+            torch.tensor([
+                mp3d_categories_mapping.get(
+                    hm3d_to_mp3d.get(obj.category.name().lower().strip()),
+                    self.obs_preprocessor.num_sem_categories - 1
+                )
+                for obj in self.sim.semantic_annotations().objects
+            ])
+        )
+
         ids = np.logical_and(self.y > y - self.floor_thr,
                              self.y < y + self.floor_thr)
         positions = self.pts[ids] / 100.  # cm to m
@@ -265,11 +265,6 @@ class HabitatFloorMaps:
         z1 = self.semantic_map.global_w // 2 + self.xz_min[1]
         x2 = x1 + self.xz_size[0]
         z2 = z1 + self.xz_size[1]
-        # print("self.semantic_map.global_h // 2", self.semantic_map.global_h // 2)
-        # print("self.xz_min", self.xz_min)
-        # print("self.xz_size", self.xz_size)
-        # print(x1, x2, z1, z2)
-        # print(self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2].shape)
         sem_map[1:] = self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2]
         return sem_map
 
