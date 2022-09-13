@@ -69,17 +69,7 @@ if __name__ == "__main__":
     while not env.episode_over:
         t += 1
         print(t)
-        print(obs.keys())
-        print(obs["compass"], obs["gps"])
-        print("env.current_episode.start_position", env.current_episode.start_position)
-        print("env.current_episode.start_rotation", env.current_episode.start_rotation)
-        print(env.sim.get_agent_state())
-        print()
-        #action = agent.act(obs)
-        from habitat.sims.habitat_simulator.actions import HabitatSimActions
-        action = HabitatSimActions.TURN_RIGHT
+        action = agent.act(obs)
         obs = env.step(action)
-        if t == 3:
-            raise NotImplementedError
 
     print(env.get_metrics())

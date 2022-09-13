@@ -324,7 +324,7 @@ def generate_scene_semantic_maps(scene_path: str,
     config.defrost()
     if generation_method == "annotations_first_person":
         config.GROUND_TRUTH_SEMANTICS = 1
-    elif generation_method == "annotations_predicted":
+    elif generation_method == "predicted_first_person":
         config.GROUND_TRUTH_SEMANTICS = 0
     task_config = config.TASK_CONFIG
     task_config.SIMULATOR.SCENE = scene_path
