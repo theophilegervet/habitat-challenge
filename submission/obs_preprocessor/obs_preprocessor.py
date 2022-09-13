@@ -201,16 +201,18 @@ class ObsPreprocessor:
 
             # Also need depth filtering on ground-truth segmentation
             for i in range(semantic.shape[-1]):
-                print("depth[0, :, :, -1].shape", depth[0, :, :, -1].shape)
-                print("depth[0, :, :, -1][semantic[0, :, :, i] == 1].shape",
-                      depth[0, :, :, -1][semantic[0, :, :, i] == 1].shape)
-                depth_md = torch.median(depth[0, :, :, -1][semantic[0, :, :, i] == 1])
+                # print("depth[0, :, :, -1].shape", depth[0, :, :, -1].shape)
+                # print("depth[0, :, :, -1][semantic[0, :, :, i] == 1].shape",
+                #       depth[0, :, :, -1][semantic[0, :, :, i] == 1].shape)
+                depth_ = depth[0, :, :, -1]
+                semantic_ = semantic[0, :, :, i]
+                depth_md = torch.median(depth_[semantic_ == 1])
                 print("depth_md", depth_md)
                 if depth_md != 0:
-                    filter_mask = ((depth[0, :, :, -1] >= depth_md + 50) |
-                                   (depth[0, :, :, -1] <= depth_md - 50))
+                    filter_mask = ((depth_ >= depth_md + 50) |
+                                   (depth_ <= depth_md - 50))
                     print("filter_mask.shape", filter_mask.shape)
-                    semantic[0, :, :, i][filter_mask] = 0.
+                    semantic_[filter_mask] = 0.
             raise NotImplementedError
 
             semantic_vis = self._get_semantic_frame_vis(
