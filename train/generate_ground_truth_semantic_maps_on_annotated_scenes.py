@@ -200,7 +200,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=100, batch_size=10):
+            self, y, num_frames=10, batch_size=10):
         self.obs_preprocessor.reset()
         self.semantic_map.init_map_and_pose()
 
@@ -316,9 +316,9 @@ def visualize_sem_map(sem_map):
     return semantic_img
 
 
-def generate_scene_semantic_maps(scene_path: str,
-                                 generation_method="annotations_first_person"):
-    scene_id = scene_path.split("/")[-1].split(".")[0]
+def generate_scene_semantic_maps(scene_path: str, generation_method: str):
+    scene_dir, scene_file = scene_path.split("/")[-1]
+    scene_id = scene_file.split(".")[0]
 
     config, _ = get_config("submission/configs/generate_dataset_config.yaml")
     config.defrost()
@@ -337,20 +337,39 @@ def generate_scene_semantic_maps(scene_path: str,
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
         sem_map_vis = visualize_sem_map(sem_map)
-        # TODO Create dir automatically
-        # TODO Store semantic map array in clean directory structure
-        sem_map_vis.save(f"scenes_{generation_method}/{scene_id}_{i}.png", "PNG")
+        # TODO Compress semantic map as binary?
+        print(sem_map.dtype)
+        print(np.unique(sem_map))
+        np.save("sem_map_test.npy", sem_map)
+        sem_map_vis.save("sem_map_test.png", "PNG")
+        raise NotImplementedError
+        # np.save(f"{scene_dir}/{scene_id}_floor{i}_{generation_method}.npy", sem_map)
+        # sem_map_vis.save(f"{scene_dir}/{scene_id}_floor{i}_{generation_method}.png", "PNG")
 
     sim.close()
 
 
 for split in ["val"]:
-    # Select scenes with semantic annotations
+    # For scenes with semantic annotations, generate semantic maps
+    # from top-down bounding boxes
     scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*semantic.glb")
     scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
+    for scene in scenes:
+        generate_scene_semantic_maps(
+            scene,
+            generation_method="annotations_top_down"
+        )
+        break
+
+    # For scenes all scenes, generate semantic maps from first-person
+    # segmentation predictions
+    # scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+    # for scene in scenes:
+    #     generate_scene_semantic_maps(
+    #         scene,
+    #         generation_method="predicted_first_person"
+    #     )
 
     # with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
     #     for _ in pool.imap_unordered(generate_scene_ground_truth_maps, scenes):
     #         pbar.update()
-    for scene in scenes:
-        generate_scene_semantic_maps(scene)

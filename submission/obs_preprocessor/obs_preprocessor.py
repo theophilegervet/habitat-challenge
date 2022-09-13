@@ -207,9 +207,9 @@ class ObsPreprocessor:
                 if depth_md != 0:
                     filter_mask = ((depth_ >= depth_md + 50) |
                                    (depth_ <= depth_md - 50))
-                    pixels = int(semantic_[filter_mask].sum().item())
-                    if pixels > 0:
-                        print(f"Filtering out {pixels} pixels")
+                    # pixels = int(semantic_[filter_mask].sum().item())
+                    # if pixels > 0:
+                    #     print(f"Filtering out {pixels} pixels")
                     semantic[0, :, :, i][filter_mask] = 0.
 
             semantic_vis = self._get_semantic_frame_vis(
