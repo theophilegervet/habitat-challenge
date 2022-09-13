@@ -201,13 +201,14 @@ class ObsPreprocessor:
 
             # Also need depth filtering on ground-truth segmentation
             for i in range(semantic.shape[-1]):
-                print("depth[0].shape", depth[0].shape)
-                print("depth[0][semantic[0, :, :, i] == 1].shape",
-                      depth[0][semantic[0, :, :, i] == 1].shape)
-                depth_md = torch.median(depth[0][semantic[0, :, :, i] == 1])
+                print("depth[0, :, :, -1].shape", depth[0, :, :, -1].shape)
+                print("depth[0, :, :, -1][semantic[0, :, :, i] == 1].shape",
+                      depth[0, :, :, -1][semantic[0, :, :, i] == 1].shape)
+                depth_md = torch.median(depth[0, :, :, -1][semantic[0, :, :, i] == 1])
                 print("depth_md", depth_md)
                 if depth_md != 0:
-                    filter_mask = (depth[0] >= depth_md + 50) | (depth[0] <= depth_md - 50)
+                    filter_mask = ((depth[0, :, :, -1] >= depth_md + 50) |
+                                   (depth[0, :, :, -1] <= depth_md - 50))
                     print("filter_mask.shape", filter_mask.shape)
                     semantic[0, :, :, i][filter_mask] = 0.
 
