@@ -317,13 +317,15 @@ def visualize_sem_map(sem_map):
 
 
 def generate_scene_semantic_maps(scene_path: str,
-                                 generation_method="annotations_first_person"):
+                                 generation_method="annotations_predicted"):
     scene_id = scene_path.split("/")[-1].split(".")[0]
 
     config, _ = get_config("submission/configs/generate_dataset_config.yaml")
     config.defrost()
     if generation_method == "annotations_first_person":
         config.GROUND_TRUTH_SEMANTICS = 1
+    elif generation_method == "annotations_predicted":
+        config.GROUND_TRUTH_SEMANTICS = 0
     task_config = config.TASK_CONFIG
     task_config.SIMULATOR.SCENE = scene_path
     task_config.SIMULATOR.SCENE_DATASET = f"{SCENES_ROOT_PATH}/hm3d/hm3d_annotated_basis.scene_dataset_config.json"
