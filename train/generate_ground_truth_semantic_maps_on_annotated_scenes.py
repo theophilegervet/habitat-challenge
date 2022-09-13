@@ -334,7 +334,7 @@ def generate_scene_semantic_maps(scene_path: str,
                                  generation_method="annotations_first_person"):
     scene_id = scene_path.split("/")[-1].split(".")[0]
 
-    config, _ = get_config("submission/configs/ddppo_train_challenge_dataset_config.yaml")
+    config, _ = get_config("submission/configs/generate_dataset_config.yaml")
     config.defrost()
     if generation_method == "annotations_first_person":
         config.GROUND_TRUTH_SEMANTICS = 1
