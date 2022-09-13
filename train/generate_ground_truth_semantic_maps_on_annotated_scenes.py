@@ -243,7 +243,8 @@ class HabitatFloorMaps:
             seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
                        for t in range(sequence_length)]
             for t in range(sequence_length):
-                seq_obs[t]["gps"] = positions[t, [0, 2]]
+                seq_obs[t]["gps"] = np.array([positions[t, 0],
+                                              -positions[t, 2]])
                 seq_obs[t]["compass"] = [yaws[t]]
 
             # Preprocess observations
