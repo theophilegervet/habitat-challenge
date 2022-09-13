@@ -74,14 +74,7 @@ class HabitatFloorMaps:
 
         # Bin points based on x and z values, so that
         # we can quickly pool them based on y-filtering
-        self.y = pts[:, 1]
-        # (
-        #     self.xz_origin,  # in meters
-        #     self.xz_min,     # in map coordinates
-        #     self.xz_max,     # in map coordinates
-        #     self.xz_size,    # in map coordinates
-        #     self.xz          # in map coordinates
-        # ) = self._make_map(pts[:, [0, 2]])
+        self.y_cm = pts[:, 1]
         (
             self.xz_origin_cm,
             self.xz_max_cm,
@@ -137,29 +130,12 @@ class HabitatFloorMaps:
             xz_centered_map
         )
 
-        # # Determine map boundaries
-        # min_ = np.floor(np.min(xz, axis=0) - self.padding).astype(int)
-        # max_ = np.ceil(np.max(xz, axis=0) + self.padding).astype(int)
-        #
-        #
-        #
-        # size = np.ceil((max_ - min_ + 1) / self.resolution).astype(int)
-        # origin = min_ / 100.  # cm to m
-        # min_ = (min_ / self.resolution).astype(int)
-        # max_ = min_ + size - 1
-        #
-        # # Recenter points
-        # xz = (xz / self.resolution).astype(int)
-        # xz = xz - min_
-        #
-        # return origin, min_, max_, size, xz
-
     def _get_floor_heights(self):
         floor_heights = []
         hist = np.histogram(
-            np.asarray(self.y),
+            np.asarray(self.y_cm),
             bins=np.arange(
-                self.y.min(), self.y.max() + self.floor_thr, self.floor_thr
+                self.y_cm.min(), self.y_cm.max() + self.floor_thr, self.floor_thr
             )
         )
         for i in range(len(hist[0])):
@@ -168,8 +144,8 @@ class HabitatFloorMaps:
         return floor_heights
 
     def _get_floor_navigable_map(self, y):
-        ids = np.logical_and(self.y > y - self.floor_thr,
-                             self.y < y + self.floor_thr)
+        ids = np.logical_and(self.y_cm > y - self.floor_thr,
+                             self.y_cm < y + self.floor_thr)
         map = np.zeros((self.map_size[0], self.map_size[1]), dtype=int)
         np.add.at(
             map,
@@ -237,9 +213,14 @@ class HabitatFloorMaps:
             ])
         )
 
-        ids = np.logical_and(self.y > y - self.floor_thr,
-                             self.y < y + self.floor_thr)
-        positions = self.pts[ids] / 100.  # cm to m
+        xz_cm = self.xz_centered_cm + self.xz_origin_cm
+        positions = np.stack([xz_cm[:, 0], self.y_cm, xz_cm[:, 1]], axis=1)
+        print(positions.shape)
+        raise NotImplementedError
+        positions = positions / 100.  # cm to m
+        ids = np.logical_and(self.y_cm > y - self.floor_thr,
+                             self.y_cm < y + self.floor_thr)
+        positions = positions[ids]
 
         idxs = random.sample(range(len(positions)), num_frames)
         all_positions = positions[idxs]
@@ -336,7 +317,7 @@ def visualize_sem_map(sem_map):
 
 
 def generate_scene_semantic_maps(scene_path: str,
-                                 generation_method="annotations_top_down"):
+                                 generation_method="annotations_first_person"):
     scene_id = scene_path.split("/")[-1].split(".")[0]
 
     config, _ = get_config("submission/configs/ddppo_train_challenge_dataset_config.yaml")
@@ -354,7 +335,7 @@ def generate_scene_semantic_maps(scene_path: str,
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
         sem_map_vis = visualize_sem_map(sem_map)
-        sem_map_vis.save(f"scenes_{generation_method}_debug/{scene_id}_{i}.png", "PNG")
+        sem_map_vis.save(f"scenes_{generation_method}/{scene_id}_{i}.png", "PNG")
 
 
 for split in ["val"]:
