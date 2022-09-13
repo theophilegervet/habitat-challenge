@@ -67,7 +67,7 @@ def generate_scene_episodes(scene_path: str, num_episodes: int = 5000):
 
     config = habitat.get_config(str(
         Path(__file__).resolve().parent.parent /
-        "submission/dataset/ppo_custom_dataset_config.yaml"
+        "submission/dataset/custom_dataset_config.yaml"
     ))
     config.defrost()
     config.SIMULATOR.SCENE = scene_path

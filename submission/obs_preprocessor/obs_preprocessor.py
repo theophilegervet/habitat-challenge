@@ -16,8 +16,6 @@ from submission.utils.constants import (
     MIN_DEPTH_REPLACEMENT_VALUE,
     MAX_DEPTH_REPLACEMENT_VALUE
 )
-# from .detectron2_segmentation import Detectron2Segmentation
-from .mmdetection_segmentation import MMDetectionSegmentation
 
 
 class ObsPreprocessor:
@@ -38,17 +36,22 @@ class ObsPreprocessor:
         self.frame_width = config.ENVIRONMENT.frame_width
         self.min_depth = config.ENVIRONMENT.min_depth
         self.max_depth = config.ENVIRONMENT.max_depth
+        self.ground_truth_semantics = config.GROUND_TRUTH_SEMANTICS
 
-        # self.segmentation = Detectron2Segmentation(
-        #     sem_pred_prob_thr=0.9,
-        #     sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
-        #     visualize=True
-        # )
-        self.segmentation = MMDetectionSegmentation(
-            sem_pred_prob_thr=0.9,
-            device=self.device,
-            visualize=True
-        )
+        if not self.ground_truth_semantics:
+            # from .detectron2_segmentation import Detectron2Segmentation
+            # self.segmentation = Detectron2Segmentation(
+            #     sem_pred_prob_thr=0.9,
+            #     sem_gpu_id=(-1 if device == torch.device("cpu") else device.index),
+            #     visualize=True
+            # )
+
+            from .mmdetection_segmentation import MMDetectionSegmentation
+            self.segmentation = MMDetectionSegmentation(
+                sem_pred_prob_thr=0.9,
+                device=self.device,
+                visualize=True
+            )
 
         self.one_hot_encoding = torch.eye(
             self.num_sem_categories, device=self.device)
@@ -181,7 +184,9 @@ class ObsPreprocessor:
 
         depth = preprocess_depth(depth)
 
-        if "semantic" in obs[0] and self.instance_id_to_category_id is not None:
+        if (not self.ground_truth_semantics
+                and "semantic" in obs[0]
+                and self.instance_id_to_category_id is not None):
             # Ground-truth semantic segmentation (useful for debugging)
             # TODO Allow multiple environments with ground-truth segmentation
             assert "semantic" in obs[0]
