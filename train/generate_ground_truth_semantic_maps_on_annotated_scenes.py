@@ -367,7 +367,7 @@ def generate_scene_semantic_maps(scene_path: str,
     floor_maps = HabitatFloorMaps(sim, generation_method, config, device)
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
-        np.save(sem_map, f"scenes_{generation_method}/{scene_id}_{i}.npy")
+        np.save(f"scenes_{generation_method}/{scene_id}_{i}.npy", sem_map)
         sem_map_vis = visualize_sem_map(sem_map)
         sem_map_vis.save(f"scenes_{generation_method}/{scene_id}_{i}.png", "PNG")
 
