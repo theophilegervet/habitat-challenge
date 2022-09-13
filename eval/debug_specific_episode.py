@@ -71,17 +71,5 @@ if __name__ == "__main__":
         print(t)
         action = agent.act(obs)
         obs = env.step(action)
-        print(obs.keys())
-        print(obs["gps"], obs["compass"])
-        break
 
-    import random
-    import quaternion
-
-    position = env.sim.sample_navigable_point()
-    yaw = random.random()
-    rotation = quaternion.from_euler_angles(0., yaw, 0.)
-    obs = env.sim.get_observations_at(position, rotation)
-    print(f"position {position}, yaw {yaw}, rotation {rotation}")
-
-    # print(env.get_metrics())
+    print(env.get_metrics())

@@ -213,7 +213,7 @@ class HabitatFloorMaps:
                    for t in range(sequence_length)]
         for t in range(sequence_length):
             seq_obs[t]["gps"] = positions[t, [0, 2]]
-            seq_obs[t]["compass"] = yaws[t]
+            seq_obs[t]["compass"] = [yaws[t]]
 
         # Preprocess observations
         (
