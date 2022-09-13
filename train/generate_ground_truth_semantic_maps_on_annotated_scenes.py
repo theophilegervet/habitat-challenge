@@ -279,11 +279,11 @@ class HabitatFloorMaps:
                 self.semantic_map.origins,
             )
 
-            # print("positions", positions)
-            # print("seq_pose_delta", seq_pose_delta)
-            # print("seq_global_pose", seq_global_pose)
-            # print("seq_local_pose", seq_local_pose)
-            # raise NotImplementedError
+            print("positions", positions)
+            print("seq_pose_delta", seq_pose_delta)
+            print("seq_global_pose", seq_global_pose)
+            print("seq_local_pose", seq_local_pose)
+            raise NotImplementedError
 
             self.semantic_map.local_pose = seq_local_pose[:, -1]
             self.semantic_map.global_pose = seq_global_pose[:, -1]
