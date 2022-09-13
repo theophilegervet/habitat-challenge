@@ -197,7 +197,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=10, batch_size=2):
+            self, y, num_frames=10, batch_size=3):
         ids = np.logical_and(self.y > y - self.floor_thr,
                              self.y < y + self.floor_thr)
         positions = self.pts[ids] / 100.  # cm to m
