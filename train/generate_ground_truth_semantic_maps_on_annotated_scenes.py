@@ -213,29 +213,28 @@ class HabitatFloorMaps:
             ])
         )
 
+        # Regenerate original points on the floor
         xz_cm = self.xz_centered_cm + self.xz_origin_cm
         positions = np.stack([xz_cm[:, 0], self.y_cm, xz_cm[:, 1]], axis=1)
-        print(positions.shape)
-        raise NotImplementedError
         positions = positions / 100.  # cm to m
         ids = np.logical_and(self.y_cm > y - self.floor_thr,
                              self.y_cm < y + self.floor_thr)
         positions = positions[ids]
 
+        # Subsample num_frames points
         idxs = random.sample(range(len(positions)), num_frames)
         all_positions = positions[idxs]
 
-        # Batch frames
+        # Batch points
         for i in range(0, num_frames, batch_size):
             positions = all_positions[i:i + batch_size]
             sequence_length = positions.shape[0]
 
             # Sample rotations
             yaws = np.random.random(sequence_length)
-            if i == 0:
-                # TODO
-                positions[0, [0, 2]] = 0.
-                yaws[0] = 0.
+            # TODO Is this necessary?
+            # if i == 0:
+            #     yaws[0] = 0.  # No initial rotation
             rotations = quaternion.from_euler_angles(0., yaws, 0.)
 
             seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
