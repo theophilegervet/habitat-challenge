@@ -277,9 +277,6 @@ class HabitatFloorMaps:
             self.semantic_map.lmb = seq_lmb[:, -1]
             self.semantic_map.origins = seq_origins[:, -1]
 
-        # TODO Start by getting global map right, then index it
-        # sem_map = np.flip(self.semantic_map.global_map.cpu().numpy()[0, 4:-1], (1, 2))
-
         navigable_map = self._get_floor_navigable_map(y)
         sem_map = np.zeros((
             len(coco_categories.keys()),
@@ -322,8 +319,6 @@ def visualize_sem_map(sem_map):
 def generate_scene_semantic_maps(scene_path: str,
                                  generation_method="annotations_first_person"):
     scene_id = scene_path.split("/")[-1].split(".")[0]
-    if scene_id not in ["Nfvxx8J5NCo", "p53SfW6mjZe", "zt1RVoi7PcG"]:  # TODO
-        return
 
     config, _ = get_config("submission/configs/generate_dataset_config.yaml")
     config.defrost()
@@ -335,7 +330,7 @@ def generate_scene_semantic_maps(scene_path: str,
     config.freeze()
 
     sim = habitat.sims.make_sim("Sim-v0", config=task_config.SIMULATOR)
-    device = torch.device("cpu")  # TODO We can distribute this across GPUs
+    device = torch.device("cuda:0")  # TODO We can distribute this across GPUs
     floor_maps = HabitatFloorMaps(sim, generation_method, config, device)
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
