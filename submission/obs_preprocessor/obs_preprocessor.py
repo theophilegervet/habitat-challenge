@@ -207,13 +207,13 @@ class ObsPreprocessor:
                 depth_ = depth[0, :, :, -1]
                 semantic_ = semantic[0, :, :, i]
                 depth_md = torch.median(depth_[semantic_ == 1])
-                print("depth_md", depth_md)
+                # print("depth_md", depth_md)
                 if depth_md != 0:
                     filter_mask = ((depth_ >= depth_md + 50) |
                                    (depth_ <= depth_md - 50))
-                    print("filter_mask.shape", filter_mask.shape)
+                    # print("filter_mask.shape", filter_mask.shape)
                     semantic_[filter_mask] = 0.
-            raise NotImplementedError
+            # raise NotImplementedError
 
             semantic_vis = self._get_semantic_frame_vis(
                 rgb[0].cpu().numpy(), semantic[0].cpu().numpy())
