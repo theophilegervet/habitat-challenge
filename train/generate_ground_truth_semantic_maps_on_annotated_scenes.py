@@ -317,7 +317,8 @@ def visualize_sem_map(sem_map):
 
 
 def generate_scene_semantic_maps(scene_path: str, generation_method: str):
-    scene_dir, scene_file = scene_path.split("/")[-1]
+    scene_dir = "/".join(scene_path.split("/")[:-1])
+    scene_file = scene_path.split("/")[-1]
     scene_id = scene_file.split(".")[0]
 
     config, _ = get_config("submission/configs/generate_dataset_config.yaml")
