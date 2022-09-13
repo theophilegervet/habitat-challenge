@@ -84,6 +84,8 @@ def generate_scene_episodes(scene_path: str, num_episodes: int = 5000):
     for ep in dataset.episodes:
         ep.scene_id = ep.scene_id.split("scene_datasets/")[-1]
 
+    sim.close()
+
     # Store episodes with one file per scene
     scene_key = scene_path.split("/")[-1].split(".")[0]
     out_path = f"{DATASET_ROOT_PATH}/{split}/scenes/{scene_key}.json.gz"

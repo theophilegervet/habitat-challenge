@@ -200,7 +200,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=100, batch_size=30):
+            self, y, num_frames=100, batch_size=10):
         self.obs_preprocessor.reset()
         self.semantic_map.init_map_and_pose()
 
@@ -338,6 +338,8 @@ def generate_scene_semantic_maps(scene_path: str,
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
         sem_map_vis = visualize_sem_map(sem_map)
         sem_map_vis.save(f"scenes_{generation_method}/{scene_id}_{i}.png", "PNG")
+
+    sim.close()
 
 
 for split in ["val"]:
