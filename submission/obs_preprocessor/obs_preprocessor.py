@@ -141,9 +141,12 @@ class ObsPreprocessor:
         )
 
     def preprocess_goal(self, obs: List[Observations]) -> Tuple[Tensor, List[str]]:
-        goal = torch.tensor([
-            goal_id_to_coco_id[ob["objectgoal"][0]] for ob in obs])
-        goal_name = [goal_id_to_goal_name[ob["objectgoal"][0]] for ob in obs]
+        if "objectgoal" in obs:
+            goal = torch.tensor([
+                goal_id_to_coco_id[ob["objectgoal"][0]] for ob in obs])
+            goal_name = [goal_id_to_goal_name[ob["objectgoal"][0]] for ob in obs]
+        else:
+            goal, goal_name = None, None
         return goal, goal_name
 
     def preprocess_frame(self, obs: List[Observations]) -> Tuple[Tensor, np.ndarray]:

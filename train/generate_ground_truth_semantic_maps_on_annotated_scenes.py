@@ -217,11 +217,7 @@ class HabitatFloorMaps:
 
         # Preprocess observations
         (
-            seq_obs_preprocessed,
-            seq_semantic_frame,
-            seq_pose_delta,
-            goal_category,
-            goal_name
+            seq_obs_preprocessed, seq_semantic_frame, seq_pose_delta, _, _
         ) = self.obs_preprocessor.preprocess_sequence(seq_obs)
 
         seq_dones = torch.tensor([False] * sequence_length)
