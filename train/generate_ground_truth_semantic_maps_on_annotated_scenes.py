@@ -309,6 +309,10 @@ class HabitatFloorMaps:
 
         # TODO Start by getting global map right, then index it
         sem_map = self.semantic_map.global_map.cpu().numpy()[0, 4:-1]
+        # sem_map = np.swapaxes(
+        #     self.semantic_map.global_map.cpu().numpy()[0, 4:-1],
+        #     -2, -1
+        # )
 
         # navigable_map = self._get_floor_navigable_map(y)
         # sem_map = np.zeros((
@@ -336,7 +340,7 @@ def visualize_sem_map(sem_map):
     c_map = compress_sem_map(sem_map)
     color_palette = [
         1.0, 1.0, 1.0,     # empty space
-        0.95, 0.95, 0.95,  # explored area
+        # 0.95, 0.95, 0.95,  # explored area
         *coco_categories_color_palette
     ]
     color_palette = [int(x * 255.) for x in color_palette]
