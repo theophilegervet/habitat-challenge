@@ -77,7 +77,8 @@ if __name__ == "__main__":
         print()
         #action = agent.act(obs)
         from habitat.sims.habitat_simulator.actions import HabitatSimActions
-        action = HabitatSimActions.MOVE_FORWARD
+        action = HabitatSimActions.TURN_RIGHT
         obs = env.step(action)
+        raise NotImplementedError
 
     print(env.get_metrics())
