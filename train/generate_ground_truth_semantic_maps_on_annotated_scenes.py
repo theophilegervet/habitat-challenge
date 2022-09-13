@@ -200,7 +200,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=10, batch_size=10):
+            self, y, num_frames=100, batch_size=100):
         self.obs_preprocessor.reset()
         self.semantic_map.init_map_and_pose()
 
@@ -350,6 +350,8 @@ def visualize_sem_map(sem_map):
 def generate_scene_semantic_maps(scene_path: str,
                                  generation_method="annotations_first_person"):
     scene_id = scene_path.split("/")[-1].split(".")[0]
+    if scene_id not in ["Nfvxx8J5NCo", "p53SfW6mjZe", "zt1RVoi7PcG"]:
+        return
 
     config, _ = get_config("submission/configs/generate_dataset_config.yaml")
     config.defrost()
