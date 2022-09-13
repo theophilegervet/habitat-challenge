@@ -196,63 +196,68 @@ class HabitatFloorMaps:
 
         return sem_map
 
-    def _get_floor_semantic_map_from_first_person(self, y, num_frames=2):
+    def _get_floor_semantic_map_from_first_person(
+            self, y, num_frames=10, batch_size=3):
         ids = np.logical_and(self.y > y - self.floor_thr,
                              self.y < y + self.floor_thr)
         positions = self.pts[ids] / 100.  # cm to m
 
         idxs = random.sample(range(len(positions)), num_frames)
-        positions = positions[idxs]
+        all_positions = positions[idxs]
 
-        # TODO Batch positions
+        # Batch frames
+        for i in range(num_frames, batch_size):
+            positions = all_positions[i * batch_size:(i + 1) * batch_size]
+            print(positions)
 
-        sequence_length = positions.shape[0]
-        yaws = np.random.random(sequence_length)
-        rotations = quaternion.from_euler_angles(0., yaws, 0.)
-        seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
-                   for t in range(sequence_length)]
-        for t in range(sequence_length):
-            seq_obs[t]["gps"] = positions[t, [0, 2]]
-            seq_obs[t]["compass"] = [yaws[t]]
+            sequence_length = positions.shape[0]
+            yaws = np.random.random(sequence_length)
+            rotations = quaternion.from_euler_angles(0., yaws, 0.)
+            seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
+                       for t in range(sequence_length)]
+            for t in range(sequence_length):
+                seq_obs[t]["gps"] = positions[t, [0, 2]]
+                seq_obs[t]["compass"] = [yaws[t]]
 
-        # Preprocess observations
-        (
-            seq_obs_preprocessed, seq_semantic_frame, seq_pose_delta, _, _
-        ) = self.obs_preprocessor.preprocess_sequence(seq_obs)
+            # Preprocess observations
+            (
+                seq_obs_preprocessed, seq_semantic_frame, seq_pose_delta, _, _
+            ) = self.obs_preprocessor.preprocess_sequence(seq_obs)
 
-        seq_dones = torch.tensor([False] * sequence_length)
-        seq_update_global = torch.tensor([False] * sequence_length)
-        seq_update_global[-1] = True
+            seq_dones = torch.tensor([False] * sequence_length)
+            seq_update_global = torch.tensor([False] * sequence_length)
+            seq_update_global[-1] = True
 
-        # Update map with observations
-        (
-            seq_map_features,
-            self.semantic_map.local_map,
-            self.semantic_map.global_map,
-            seq_local_pose,
-            seq_global_pose,
-            seq_lmb,
-            seq_origins,
-        ) = self.semantic_map_module(
-            seq_obs_preprocessed.unsqueeze(0),
-            seq_pose_delta.unsqueeze(0).to(self.device),
-            seq_dones.unsqueeze(0).to(self.device),
-            seq_update_global.unsqueeze(0).to(self.device),
-            self.semantic_map.local_map,
-            self.semantic_map.global_map,
-            self.semantic_map.local_pose,
-            self.semantic_map.global_pose,
-            self.semantic_map.lmb,
-            self.semantic_map.origins,
-        )
+            # Update map with observations
+            (
+                seq_map_features,
+                self.semantic_map.local_map,
+                self.semantic_map.global_map,
+                seq_local_pose,
+                seq_global_pose,
+                seq_lmb,
+                seq_origins,
+            ) = self.semantic_map_module(
+                seq_obs_preprocessed.unsqueeze(0),
+                seq_pose_delta.unsqueeze(0).to(self.device),
+                seq_dones.unsqueeze(0).to(self.device),
+                seq_update_global.unsqueeze(0).to(self.device),
+                self.semantic_map.local_map,
+                self.semantic_map.global_map,
+                self.semantic_map.local_pose,
+                self.semantic_map.global_pose,
+                self.semantic_map.lmb,
+                self.semantic_map.origins,
+            )
 
-        self.semantic_map.local_pose = seq_local_pose[:, -1]
-        self.semantic_map.global_pose = seq_global_pose[:, -1]
-        self.semantic_map.lmb = seq_lmb[:, -1]
-        self.semantic_map.origins = seq_origins[:, -1]
+            self.semantic_map.local_pose = seq_local_pose[:, -1]
+            self.semantic_map.global_pose = seq_global_pose[:, -1]
+            self.semantic_map.lmb = seq_lmb[:, -1]
+            self.semantic_map.origins = seq_origins[:, -1]
 
-        # TODO Get this working locally (with detectron2 in habitat-sim env?)
-        print(self.semantic_map.global_map.shape)
+            # TODO Get this working locally (with detectron2 in habitat-sim env?)
+            print(self.semantic_map.global_map.shape)
+            print()
 
 
 def visualize_sem_map(sem_map):
