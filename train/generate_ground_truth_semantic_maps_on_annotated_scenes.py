@@ -211,11 +211,9 @@ class HabitatFloorMaps:
         rotations = quaternion.from_euler_angles(0., yaws, 0.)
         seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
                    for t in range(sequence_length)]
-        print()
-        print(type(seq_obs[0]))
-        seq_obs[0]["gps"] = positions[0, [0, 2]]
-        print(seq_obs[0]["gps"])
-        print()
+        for t in range(sequence_length):
+            seq_obs[t]["gps"] = positions[t, [0, 2]]
+            seq_obs[t]["compass"] = yaws[t]
 
         # Preprocess observations
         (
