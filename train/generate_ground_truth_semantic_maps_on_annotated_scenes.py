@@ -232,14 +232,7 @@ class HabitatFloorMaps:
             sequence_length = positions.shape[0]
 
             # Sample rotations
-            # yaws = np.zeros(sequence_length)
-            # yaws = np.ones(sequence_length) * np.pi / 2
             yaws = np.random.random(sequence_length) * 2 * np.pi
-            # TODO Should yaw be in [-pi, pi] instead of [0, 2 pi]?
-            #    => if x > pi, x = x - 2 * pi
-            # TODO Is this necessary?
-            # if i == 0:
-            #     yaws[0] = 0.  # No initial rotation
             rotations = quaternion.from_euler_angles(0., yaws, 0.)
 
             seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
@@ -285,20 +278,23 @@ class HabitatFloorMaps:
             self.semantic_map.origins = seq_origins[:, -1]
 
         # TODO Start by getting global map right, then index it
-        sem_map = np.flip(self.semantic_map.global_map.cpu().numpy()[0, 4:-1], (1, 2))
+        # sem_map = np.flip(self.semantic_map.global_map.cpu().numpy()[0, 4:-1], (1, 2))
 
-        # navigable_map = self._get_floor_navigable_map(y)
-        # sem_map = np.zeros((
-        #     len(coco_categories.keys()),
-        #     navigable_map.shape[0],
-        #     navigable_map.shape[1]
-        # ))
-        # sem_map[0] = navigable_map
-        # x1 = self.semantic_map.global_h // 2 + self.xz_origin_map[0]
-        # z1 = self.semantic_map.global_w // 2 + self.xz_origin_map[1]
-        # x2 = x1 + self.map_size[0]
-        # z2 = z1 + self.map_size[1]
-        # sem_map[1:] = self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2]
+        navigable_map = self._get_floor_navigable_map(y)
+        sem_map = np.zeros((
+            len(coco_categories.keys()),
+            navigable_map.shape[0],
+            navigable_map.shape[1]
+        ))
+        sem_map[0] = navigable_map
+        x1 = self.semantic_map.global_h // 2 + self.xz_origin_map[0]
+        z1 = self.semantic_map.global_w // 2 + self.xz_origin_map[1]
+        x2 = x1 + self.map_size[0]
+        z2 = z1 + self.map_size[1]
+        sem_map[1:] = np.flip(
+            self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2],
+            (1, 2)
+        )
 
         return sem_map
 
@@ -312,7 +308,7 @@ def visualize_sem_map(sem_map):
     c_map = compress_sem_map(sem_map)
     color_palette = [
         1.0, 1.0, 1.0,     # empty space
-        # 0.95, 0.95, 0.95,  # explored area   # TODO
+        0.95, 0.95, 0.95,  # explored area
         *coco_categories_color_palette
     ]
     color_palette = [int(x * 255.) for x in color_palette]
