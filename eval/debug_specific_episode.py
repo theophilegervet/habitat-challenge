@@ -79,6 +79,7 @@ if __name__ == "__main__":
         from habitat.sims.habitat_simulator.actions import HabitatSimActions
         action = HabitatSimActions.TURN_RIGHT
         obs = env.step(action)
-        raise NotImplementedError
+        if t == 3:
+            raise NotImplementedError
 
     print(env.get_metrics())
