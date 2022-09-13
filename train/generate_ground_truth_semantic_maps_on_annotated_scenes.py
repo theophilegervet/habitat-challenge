@@ -296,7 +296,7 @@ def visualize_sem_map(sem_map):
 
 
 def generate_scene_semantic_maps(scene_path: str,
-                                 generation_method="annotations_first_person"):
+                                 generation_method="annotations_top_down"):
     scene_id = scene_path.split("/")[-1].split(".")[0]
 
     config, _ = get_config("submission/configs/ddppo_train_challenge_dataset_config.yaml")
@@ -314,7 +314,7 @@ def generate_scene_semantic_maps(scene_path: str,
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
         sem_map_vis = visualize_sem_map(sem_map)
-        sem_map_vis.save(f"scenes/{scene_id}_{i}.png", "PNG")
+        sem_map_vis.save(f"scenes/{scene_id}_{i}_{generation_method}.png", "PNG")
 
 
 for split in ["val"]:
