@@ -317,7 +317,7 @@ def visualize_sem_map(sem_map):
 
 
 def generate_scene_semantic_maps(scene_path: str,
-                                 generation_method="annotations_predicted"):
+                                 generation_method="predicted_first_person"):
     scene_id = scene_path.split("/")[-1].split(".")[0]
 
     config, _ = get_config("submission/configs/generate_dataset_config.yaml")
