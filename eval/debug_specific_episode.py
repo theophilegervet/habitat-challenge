@@ -71,5 +71,8 @@ if __name__ == "__main__":
         print(t)
         action = agent.act(obs)
         obs = env.step(action)
+        print(obs["compass"], obs["gps"])
+        print(env.sim.get_agent_state())
+        print()
 
     print(env.get_metrics())
