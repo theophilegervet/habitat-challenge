@@ -208,7 +208,6 @@ class HabitatFloorMaps:
         # Batch frames
         for i in range(0, num_frames, batch_size):
             positions = all_positions[i:i + batch_size]
-            print(positions)
 
             sequence_length = positions.shape[0]
             yaws = np.random.random(sequence_length)
@@ -228,7 +227,7 @@ class HabitatFloorMaps:
             seq_update_global = torch.tensor([False] * sequence_length)
             seq_update_global[-1] = True
 
-            # Update map with observations
+            # Update semantic map with observations
             (
                 seq_map_features,
                 self.semantic_map.local_map,
@@ -255,9 +254,19 @@ class HabitatFloorMaps:
             self.semantic_map.lmb = seq_lmb[:, -1]
             self.semantic_map.origins = seq_origins[:, -1]
 
-            # TODO Get this working locally (with detectron2 in habitat-sim env?)
-            print(self.semantic_map.global_map.shape)
-            print()
+        navigable_map = self._get_floor_navigable_map(y)
+        sem_map = np.zeros((
+            len(coco_categories.keys()),
+            navigable_map.shape[0],
+            navigable_map.shape[1]
+        ))
+        sem_map[0] = navigable_map
+        x1 = self.semantic_map.global_h // 2 + self.xz_min[0]
+        z1 = self.semantic_map.global_w // 2 + self.xz_min[1]
+        x2 = x1 + self.xz_size[0]
+        z2 = z1 + self.xz_size[1]
+        sem_map[1:, x1:x2, z1:z2] = self.semantic_map.global_map.cpu().numpy()[0, 4:-1]
+        return sem_map
 
 
 def visualize_sem_map(sem_map):
