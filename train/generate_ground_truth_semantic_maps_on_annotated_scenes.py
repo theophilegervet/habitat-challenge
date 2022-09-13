@@ -279,18 +279,21 @@ class HabitatFloorMaps:
             self.semantic_map.lmb = seq_lmb[:, -1]
             self.semantic_map.origins = seq_origins[:, -1]
 
-        navigable_map = self._get_floor_navigable_map(y)
-        sem_map = np.zeros((
-            len(coco_categories.keys()),
-            navigable_map.shape[0],
-            navigable_map.shape[1]
-        ))
-        sem_map[0] = navigable_map
-        x1 = self.semantic_map.global_h // 2 + self.xz_origin_map[0]
-        z1 = self.semantic_map.global_w // 2 + self.xz_origin_map[1]
-        x2 = x1 + self.map_size[0]
-        z2 = z1 + self.map_size[1]
-        sem_map[1:] = self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2]
+        # navigable_map = self._get_floor_navigable_map(y)
+        # sem_map = np.zeros((
+        #     len(coco_categories.keys()),
+        #     navigable_map.shape[0],
+        #     navigable_map.shape[1]
+        # ))
+        # sem_map[0] = navigable_map
+        # x1 = self.semantic_map.global_h // 2 + self.xz_origin_map[0]
+        # z1 = self.semantic_map.global_w // 2 + self.xz_origin_map[1]
+        # x2 = x1 + self.map_size[0]
+        # z2 = z1 + self.map_size[1]
+        # sem_map[1:] = self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2]
+
+        sem_map = self.semantic_map.global_map.cpu().numpy()[0, 4:-1]
+
         return sem_map
 
 
