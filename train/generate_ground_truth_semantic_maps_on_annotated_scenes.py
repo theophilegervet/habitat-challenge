@@ -199,7 +199,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=100, batch_size=100):
+            self, y, num_frames=10, batch_size=10):
         self.obs_preprocessor.reset()
         self.semantic_map.init_map_and_pose()
 
@@ -231,7 +231,8 @@ class HabitatFloorMaps:
             sequence_length = positions.shape[0]
 
             # Sample rotations
-            yaws = np.zeros(sequence_length)
+            # yaws = np.zeros(sequence_length)
+            yaws = np.ones(sequence_length) * np.pi / 2
             # yaws = np.random.random(sequence_length) * 2 * np.pi
             # TODO Should yaw be in [-pi, pi] instead of [0, 2 pi]?
             #    => if x > pi, x = x - 2 * pi
@@ -243,8 +244,8 @@ class HabitatFloorMaps:
             seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
                        for t in range(sequence_length)]
             for t in range(sequence_length):
-                seq_obs[t]["gps"] = np.array([positions[t, 2],
-                                              -positions[t, 0]])
+                seq_obs[t]["gps"] = np.array([positions[t, 0],
+                                              -positions[t, 2]])
                 seq_obs[t]["compass"] = [yaws[t]]
 
             # Preprocess observations
