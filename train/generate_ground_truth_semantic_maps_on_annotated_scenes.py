@@ -243,8 +243,8 @@ class HabitatFloorMaps:
             seq_obs = [self.sim.get_observations_at(positions[t], rotations[t])
                        for t in range(sequence_length)]
             for t in range(sequence_length):
-                seq_obs[t]["gps"] = np.array([positions[t, 0],
-                                              -positions[t, 2]])
+                seq_obs[t]["gps"] = np.array([positions[t, 2],
+                                              -positions[t, 0]])
                 seq_obs[t]["compass"] = [yaws[t]]
 
             # Preprocess observations
@@ -260,7 +260,7 @@ class HabitatFloorMaps:
 
             # Update semantic map with observations
             (
-                seq_map_features,
+                _,
                 self.semantic_map.local_map,
                 self.semantic_map.global_map,
                 seq_local_pose,
