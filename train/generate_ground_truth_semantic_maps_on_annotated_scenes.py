@@ -206,7 +206,7 @@ class HabitatFloorMaps:
         all_positions = positions[idxs]
 
         # Batch frames
-        for i in range(0, num_frames // batch_size):
+        for i in range(0, num_frames // batch_size + 1):
             positions = all_positions[i * batch_size:(i + 1) * batch_size]
             print(positions)
 
