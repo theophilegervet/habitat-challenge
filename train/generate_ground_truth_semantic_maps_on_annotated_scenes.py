@@ -92,15 +92,6 @@ class HabitatFloorMaps:
             self.xz_centered_map
         ) = self._make_map(pts[:, [0, 2]])
 
-        print(
-            self.xz_origin_cm,
-            self.xz_max_cm,
-            self.xz_origin_map,
-            self.xz_max_map,
-            self.map_size,
-        )
-        raise NotImplementedError
-
         # Determine floor heights
         self.floor_heights = self._get_floor_heights()
 
@@ -179,8 +170,15 @@ class HabitatFloorMaps:
     def _get_floor_navigable_map(self, y):
         ids = np.logical_and(self.y > y - self.floor_thr,
                              self.y < y + self.floor_thr)
-        map = np.zeros((self.xz_size[0], self.xz_size[1]), dtype=int)
-        np.add.at(map, (self.xz[ids, 0], self.xz[ids, 1]), 1)
+        map = np.zeros((self.map_size[0], self.map_size[1]), dtype=int)
+        np.add.at(
+            map,
+            (
+                self.xz_centered_map[ids, 0],
+                self.xz_centered_map[ids, 1]
+            ),
+            1
+        )
         map[map > 0] = 1.
         return map
 
@@ -212,10 +210,10 @@ class HabitatFloorMaps:
             ]
             bbox = [int(x * 100. / self.resolution) for x in bbox]
             bbox = [
-                bbox[0] - self.xz_min[0],
-                bbox[1] - self.xz_min[1],
-                bbox[2] - self.xz_min[0],
-                bbox[3] - self.xz_min[1]
+                bbox[0] - self.xz_origin_map[0],
+                bbox[1] - self.xz_origin_map[1],
+                bbox[2] - self.xz_origin_map[0],
+                bbox[3] - self.xz_origin_map[1]
             ]
 
             if -0.25 < obj.aabb.center[1] - y / 100. < 1.5:
@@ -308,10 +306,10 @@ class HabitatFloorMaps:
             navigable_map.shape[1]
         ))
         sem_map[0] = navigable_map
-        x1 = self.semantic_map.global_h // 2 + self.xz_min[0]
-        z1 = self.semantic_map.global_w // 2 + self.xz_min[1]
-        x2 = x1 + self.xz_size[0]
-        z2 = z1 + self.xz_size[1]
+        x1 = self.semantic_map.global_h // 2 + self.xz_origin_map[0]
+        z1 = self.semantic_map.global_w // 2 + self.xz_origin_map[1]
+        x2 = x1 + self.map_size[0]
+        z2 = z1 + self.map_size[1]
         sem_map[1:] = self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2]
         return sem_map
 
@@ -356,7 +354,7 @@ def generate_scene_semantic_maps(scene_path: str,
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
         sem_map_vis = visualize_sem_map(sem_map)
-        sem_map_vis.save(f"scenes_{generation_method}/{scene_id}_{i}.png", "PNG")
+        sem_map_vis.save(f"scenes_{generation_method}_debug/{scene_id}_{i}.png", "PNG")
 
 
 for split in ["val"]:
