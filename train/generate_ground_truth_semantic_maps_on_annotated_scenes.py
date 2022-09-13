@@ -269,8 +269,9 @@ class HabitatFloorMaps:
         print("self.xz_min", self.xz_min)
         print("self.xz_size", self.xz_size)
         print(x1, x2, z1, z2)
+        print(self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2].shape)
         raise NotImplementedError
-        sem_map[1:, x1:x2, z1:z2] = self.semantic_map.global_map.cpu().numpy()[0, 4:-1]
+        sem_map[1:] = self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2]
         return sem_map
 
 
