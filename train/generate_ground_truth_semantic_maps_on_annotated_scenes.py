@@ -341,7 +341,7 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
         # TODO Compress semantic map as binary?
         print(sem_map.dtype)
         print(np.unique(sem_map))
-        np.save("sem_map_test.npy", sem_map)
+        np.save("sem_map_test.npy", sem_map.astype(bool))
         sem_map_vis.save("sem_map_test.png", "PNG")
         raise NotImplementedError
         # np.save(f"{scene_dir}/{scene_id}_floor{i}_{generation_method}.npy", sem_map)
