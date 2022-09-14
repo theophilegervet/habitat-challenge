@@ -354,10 +354,10 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
         with open("sem_map_info_test.json", "w") as f:
             json.dump(
                 {
-                    "floor_heights_cm": floor_maps.floor_heights,
-                    "xz_origin_cm": list(floor_maps.xz_origin_cm),
-                    "xz_origin_map": list(floor_maps.xz_origin_map),
-                    "map_size": list(floor_maps.map_size),
+                    "floor_heights_cm": [int(x) for x in floor_maps.floor_heights],
+                    "xz_origin_cm": [int(x) for x in floor_maps.xz_origin_cm],
+                    "xz_origin_map": [int(x) for x in floor_maps.xz_origin_map],
+                    "map_size": [int(x) for x in floor_maps.map_size],
                     "resolution_cm": floor_maps.resolution
                 },
                 f, indent=4
