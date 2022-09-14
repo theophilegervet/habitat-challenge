@@ -108,6 +108,7 @@ class HabitatFloorMaps:
                     )
                     valid_floor_heights.append(floor_height)
                 except:
+                    print("Exception in floor semantic map generation")
                     pass
             elif generation_method in ["annotations_first_person",
                                        "predicted_first_person"]:
@@ -119,6 +120,7 @@ class HabitatFloorMaps:
                     )
                     valid_floor_heights.append(floor_height)
                 except:
+                    print("Exception in floor semantic map generation")
                     pass
         self.floor_heights = floor_heights
         self.floor_semantic_maps = floor_semantic_maps
