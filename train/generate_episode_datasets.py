@@ -79,7 +79,7 @@ def generate_episode(sim,
     possible_start_positions = np.logical_and(m1, m2)
     possible_start_positions = np.logical_and(possible_start_positions, m3) * 1.0
     import cv2
-    print("fmm_dist", planner.fmm_dist.min(), planner.fmm_dist.max())
+    print("fmm_dist", planner.fmm_dist.min(), planner.fmm_dist.mean(), planner.fmm_dist.max())
     cv2.imwrite("goal_map.png", (goal_map * 255).astype(np.uint8))
     cv2.imwrite("navigable_map.png", (sem_map[0] * 255).astype(np.uint8))
     cv2.imwrite("possible_start_positions.png", (possible_start_positions * 255).astype(np.uint8))
