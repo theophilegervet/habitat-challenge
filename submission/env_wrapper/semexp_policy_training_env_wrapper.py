@@ -95,6 +95,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                 self.ground_truth_semantic_map_type = "predicted_first_person"
             else:
                 self.ground_truth_semantic_map_type = "annotations_top_down"
+            self.dense_goal_rew_coeff = config.TRAIN.RL.dense_goal_rew_coeff
         self.device = (torch.device("cpu") if config.NO_GPU else
                        torch.device(f"cuda:{self.habitat_env.sim.gpu_device}"))
         self.goal_update_steps = config.AGENT.POLICY.SEMANTIC.goal_update_steps
@@ -156,7 +157,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             self.gt_planner = None
             self.gt_map_resolution = None
             self.xz_origin_cm = None
-            self.prev_distance_to_goal = None
 
     def reset(self) -> dict:
         self.timestep = 0
@@ -192,7 +192,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         # If we are training on a dataset generated specifically for
         # semantic exploration policy training, create the ground-truth
-        # planner that allows us to compute dense rewards
+        # planner that allows us to compute dense distance to goal reward
         if self.dataset_type == "SemexpPolicyTraining":
             map_dir = (
                 scene_dir +
@@ -220,14 +220,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                 sem_map[self.goal_category + 1], selem) != True
             goal_map = 1 - goal_map
             self.gt_planner.set_multi_goal(goal_map)
-            self.prev_distance_to_goal = self._compute_distance_to_goal(
-                self.current_episode.start_position)
-
-            import cv2
-            cv2.imwrite("navigable_map_X.png", (sem_map[0] * 255).astype(np.uint8))
-            cv2.imwrite("goal_map_X.png", (goal_map * 255).astype(np.uint8))
-            print("self.prev_distance_to_goal", self.prev_distance_to_goal)
-            raise NotImplementedError
 
         if self.print_images:
             vis_inputs = {
@@ -261,6 +253,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
     def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
         self.timestep += 1
         prev_explored_area = self.semantic_map.global_map[0, 1].sum()
+        if self.dataset_type == "SemexpPolicyTraining":
+            prev_distance_to_goal = self._compute_distance_to_goal(
+                list(self.habitat_env.sim.get_agent_state().position))
 
         # Set high-level goal predicted by the policy
         goal_location = (expit(goal_action) * (self.semantic_map.local_h - 1)).astype(int)
@@ -294,11 +289,16 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             )
 
             # 4 - Check whether we found the goal
-            _, found_goal = self.policy.reach_goal_if_in_map(
-                map_features,
-                self.goal_category_tensor
-            )
-            found_goal = found_goal.item()
+            if self.dataset_type == "SemexpPolicyTraining":
+                # TODO Compute found_goal from distance to goal in
+                #  ground-truth map
+                found_goal = False
+            else:
+                _, found_goal = self.policy.reach_goal_if_in_map(
+                    map_features,
+                    self.goal_category_tensor
+                )
+                found_goal = found_goal.item()
 
             if found_goal:
                 break
@@ -328,23 +328,41 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         }
 
         # Intrinsic reward = increase in explored area (in m^2)
-        # Goal reward = binary found goal or not
+        # Sparse goal reward = binary found goal or not
+        # Dense goal reward = decrease in geodesic distance to goal
+
         curr_explored_area = self.semantic_map.global_map[0, 1].sum()
         intrinsic_reward = (curr_explored_area - prev_explored_area).item()
         intrinsic_reward *= (self.semantic_map.resolution / 100) ** 2
-        goal_reward = 1. if (found_goal and self.timestep > 1) else 0.
-        reward = goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
+
+        sparse_goal_reward = 1. if (found_goal and self.timestep > 1) else 0.
+
+        if self.dataset_type == "SemexpPolicyTraining":
+            curr_distance_to_goal = self._compute_distance_to_goal(
+                list(self.habitat_env.sim.get_agent_state().position))
+            dense_goal_reward = prev_distance_to_goal - curr_distance_to_goal
+
+            reward = (dense_goal_reward * self.dense_goal_rew_coeff +
+                      intrinsic_reward * self.intrinsic_rew_coeff)
+        else:
+            reward = sparse_goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
 
         info = {
             "timestep": self.timestep,
-            "goal_reward": goal_reward,
+            "sparse_goal_reward": sparse_goal_reward,
             "intrinsic_reward": intrinsic_reward * self.intrinsic_rew_coeff,
             "unscaled_intrinsic_reward": intrinsic_reward,
-            "discounted_goal_reward": goal_reward * (self.gamma ** self.timestep),
+            "discounted_sparse_goal_reward": sparse_goal_reward * (self.gamma ** self.timestep),
             "discounted_unscaled_intrinsic_reward": intrinsic_reward * (self.gamma ** self.timestep),
             "action_0": float(goal_action[0]),
             "action_1": float(goal_action[1]),
         }
+        if self.dataset_type == "SemexpPolicyTraining":
+            info["curr_distance_to_goal"] = curr_distance_to_goal
+            info["dense_goal_reward"] = dense_goal_reward * self.dense_goal_rew_coeff
+            info["unscaled_dense_goal_reward"] = dense_goal_reward
+            info["discounted_unscaled_dense_goal_reward"] = dense_goal_reward * (self.gamma ** self.timestep)
+
         self.infos.append(info)
 
         done = found_goal or self.timestep == self.max_steps - 1

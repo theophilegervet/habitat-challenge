@@ -10,3 +10,8 @@ config.freeze()
 # dataset = SemanticExplorationPolicyTrainingDataset(config=config.TASK_CONFIG.DATASET)
 env = SemanticExplorationPolicyTrainingEnvWrapper(config=config)
 obs = env.reset()
+goal_action = [10, 10]
+obs, reward, done, info = env.step(goal_action)
+print(reward)
+print(done)
+print(info)
