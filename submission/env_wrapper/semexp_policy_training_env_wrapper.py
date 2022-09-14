@@ -6,6 +6,7 @@ import torch.nn.functional as F
 import numpy as np
 from typing import Tuple, List, Optional
 from scipy.special import expit
+import skimage.morphology
 
 from habitat import Config, make_dataset
 from habitat.core.env import RLEnv
@@ -19,6 +20,7 @@ from ray.rllib.env.env_context import EnvContext
 
 from submission.obs_preprocessor.obs_preprocessor import ObsPreprocessor
 from submission.planner.planner import Planner
+from submission.planner.fmm_planner import FMMPlanner
 from submission.visualizer.visualizer import Visualizer
 from submission.semantic_map.semantic_map_state import SemanticMapState
 from submission.semantic_map.semantic_map_module import SemanticMapModule
@@ -85,23 +87,13 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         super().__init__(config=config.TASK_CONFIG)
 
-        # Keep only episodes with a goal on the same floor as the
-        #  starting position
-        new_episode_order = [
-            episode for episode in self.habitat_env._dataset.episodes
-            if len([
-                goal for goal in episode.goals
-                if abs(episode.start_position[1] - goal.position[1]) < 1.5
-            ]) > 0
-        ]
-        self.habitat_env._dataset.episodes = new_episode_order
-        self.habitat_env.episode_iterator = EpisodeIterator(
-            new_episode_order,
-            shuffle=False, group_by_scene=False,
-        )
-        self.habitat_env._current_episode = None
-
         assert config.NUM_ENVIRONMENTS == 1
+        self.dataset_type = config.TASK_CONFIG.DATASET.TYPE
+        if self.dataset_type == "SemexpPolicyTraining":
+            if "unannotated_scenes" in config.TASK_CONFIG.DATASET.DATA_PATH:
+                self.ground_truth_semantic_map_type = "predicted_first_person"
+            else:
+                self.ground_truth_semantic_map_type = "annotations_top_down"
         self.device = (torch.device("cpu") if config.NO_GPU else
                        torch.device(f"cuda:{self.habitat_env.sim.gpu_device}"))
         self.goal_update_steps = config.AGENT.POLICY.SEMANTIC.goal_update_steps
@@ -159,6 +151,12 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.goal_name = None
         self.infos = None
 
+        if self.dataset_type == "SemexpPolicyTraining":
+            self.gt_planner = None
+            self.gt_map_resolution = None
+            self.xz_origin_cm = None
+            self.prev_distance_to_goal = None
+
     def reset(self) -> dict:
         self.timestep = 0
         self.infos = []
@@ -170,6 +168,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         obs = super().reset()
         seq_obs = [obs]
 
+        scene_dir = "/".join(self.current_episode.scene_id.split("/")[:-1])
         self.scene_id = self.current_episode.scene_id.split("/")[-1].split(".")[0]
         self.episode_id = self.current_episode.episode_id
 
@@ -189,6 +188,44 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             self.goal_name
         ) = self._update_map(seq_obs, update_global=True)
         self.goal_category = self.goal_category_tensor.item()
+
+        # If we are training on a dataset generated specifically for
+        # semantic exploration policy training, create the ground-truth
+        # planner that allows us to compute dense rewards
+        if self.dataset_type == "SemexpPolicyTraining":
+            map_dir = (
+                scene_dir +
+                f"/floor_semantic_maps_{self.ground_truth_semantic_map_type}"
+            )
+            with open(f"{map_dir}/{self.scene_id}_info.json", "r") as f:
+                scene_info = json.load(f)
+            start_height_cm = self.current_episode.start_position[1] * 100.
+            floor_heights_cm = scene_info["floor_heights_cm"]
+            self.xz_origin_cm = scene_info["xz_origin_cm"]
+            self.gt_map_resolution = scene_info["map_generation_parameters"][
+                "resolution_cm"]
+            floor_idx = min(
+                range(len(floor_heights_cm)),
+                key=lambda idx: abs(floor_heights_cm[idx] - start_height_cm)
+            )
+            print("floor_heights_cm", floor_heights_cm)
+            print("start_height_cm", start_height_cm)
+            print("floor_idx", floor_idx)
+            raise NotImplementedError
+            sem_map = np.load(
+                f"{map_dir}/{self.scene_id}_floor{floor_idx}.npy")
+            selem = skimage.morphology.disk(2)
+            traversible = skimage.morphology.binary_dilation(
+                sem_map[0], selem) != True
+            traversible = 1 - traversible
+            self.gt_planner = FMMPlanner(traversible)
+            selem = skimage.morphology.disk(int(100 / self.gt_map_resolution))
+            goal_map = skimage.morphology.binary_dilation(
+                sem_map[self.goal_category + 1], selem) != True
+            goal_map = 1 - goal_map
+            self.gt_planner.set_multi_goal(goal_map)
+            self.prev_distance_to_goal = self._compute_distance_to_goal(
+                self.current_episode.start_position)
 
         if self.print_images:
             vis_inputs = {
@@ -213,6 +250,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "goal_category": self.goal_category
         }
         return obs
+
+    def _compute_distance_to_goal(self, position: List[float]) -> float:
+        map_x = int((position[0] * 100. - self.xz_origin_cm[0]) / self.gt_map_resolution)
+        map_z = int((position[2] * 100. - self.xz_origin_cm[1]) / self.gt_map_resolution)
+        return self.gt_planner.fmm_dist[map_x, map_z]
 
     def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
         self.timestep += 1
