@@ -337,6 +337,7 @@ def generate_scene_semantic_maps(scene_path: str,
     elif generation_method == "predicted_first_person":
         config.GROUND_TRUTH_SEMANTICS = 0
     task_config = config.TASK_CONFIG
+    task_config.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID = device.index
     task_config.SIMULATOR.SCENE = scene_path
     task_config.SIMULATOR.SCENE_DATASET = f"{SCENES_ROOT_PATH}/hm3d/hm3d_annotated_basis.scene_dataset_config.json"
     config.freeze()
@@ -404,8 +405,8 @@ if __name__ == "__main__":
             generation_method="predicted_first_person",
             device=torch.device("cuda:1")
         )
-        for scene in scenes:
-            generate_predicted_first_person(scene)
+        # for scene in scenes:
+        #     generate_predicted_first_person(scene)
         with multiprocessing.Pool(6) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
             for _ in pool.imap_unordered(generate_predicted_first_person, scenes):
                 pbar.update()
