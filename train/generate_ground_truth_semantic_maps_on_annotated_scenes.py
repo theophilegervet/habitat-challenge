@@ -204,7 +204,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=10, batch_size=1):
+            self, y, num_frames=2000, batch_size=1):
         self.obs_preprocessor.reset()
         self.semantic_map.init_map_and_pose()
 
@@ -391,11 +391,9 @@ if __name__ == "__main__":
             generation_method="annotations_top_down",
             device=torch.device("cuda:1")
         )
-        # for scene in scenes:
-        #     generate_annotations_top_down(scene)
-        # with multiprocessing.Pool(6) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-        #     for _ in pool.imap_unordered(generate_annotations_top_down, scenes):
-        #         pbar.update()
+        with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+            for _ in pool.imap_unordered(generate_annotations_top_down, scenes):
+                pbar.update()
 
         # For scenes all scenes, generate semantic maps from first-person
         # segmentation predictions
@@ -405,8 +403,6 @@ if __name__ == "__main__":
             generation_method="predicted_first_person",
             device=torch.device("cuda:1")
         )
-        # for scene in scenes:
-        #     generate_predicted_first_person(scene)
-        with multiprocessing.Pool(6) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+        with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
             for _ in pool.imap_unordered(generate_predicted_first_person, scenes):
                 pbar.update()
