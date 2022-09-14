@@ -85,8 +85,8 @@ def generate_episode(sim,
         start_position = sim.sample_navigable_point()
         if abs(start_position[1] - floor_height) > floor_thr:
             continue
-        map_x = (start_position[0] * 100. - xz_origin_cm[0]) / map_resolution
-        map_z = (start_position[2] * 100. - xz_origin_cm[1]) / map_resolution
+        map_x = int((start_position[0] * 100. - xz_origin_cm[0]) / map_resolution)
+        map_z = int((start_position[2] * 100. - xz_origin_cm[1]) / map_resolution)
 
         import cv2
         print("start_position", start_position)
