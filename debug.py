@@ -15,3 +15,8 @@ obs, reward, done, info = env.step(goal_action)
 print(reward)
 print(done)
 print(info)
+goal_action = [10, 10]
+obs, reward, done, info = env.step(goal_action)
+print(reward)
+print(done)
+print(info)
