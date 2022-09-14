@@ -53,8 +53,6 @@ def generate_episode(sim,
     # Sample a goal category present on the floor
     category_counts = sem_map.sum(2).sum(1)
     categories_present = [i for i in range(6) if category_counts[i + 1] > 0]
-    print(category_counts)
-    print(categories_present)
     if len(categories_present) == 0:
         print("No object goal category present on the floor")
         return
@@ -63,8 +61,6 @@ def generate_episode(sim,
         v: k for k, v in challenge_goal_name_to_goal_name.items()}
     challenge_goal_name = goal_name_to_challenge_goal_name[
         goal_id_to_goal_name[goal_idx]]
-    print(challenge_goal_name)
-    raise NotImplementedError
 
     # Sample a starting position from which we can reach this goal
     selem = skimage.morphology.disk(2)
@@ -82,6 +78,12 @@ def generate_episode(sim,
     m3 = planner.fmm_dist < 2000.0
     possible_start_positions = np.logical_and(m1, m2)
     possible_start_positions = np.logical_and(possible_start_positions, m3) * 1.0
+    import cv2
+    print("fmm_dist", planner.fmm_dist.min(), planner.fmm_dist.max())
+    cv2.imwrite("goal_map.png", (goal_map * 255).astype(np.uint8))
+    cv2.imwrite("navigable_map.png", (sem_map[0] * 255).astype(np.uint8))
+    cv2.imwrite("possible_start_positions.png", (possible_start_positions * 255).astype(np.uint8))
+    raise NotImplementedError
     if possible_start_positions.sum() == 0:
         print(f"No valid starting position for {challenge_goal_name}")
         return
