@@ -386,25 +386,25 @@ if __name__ == "__main__":
     for split in ["val"]:
         # For scenes with semantic annotations, generate semantic maps
         # from top-down bounding boxes
-        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*semantic.glb")
-        scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
-        generate_annotated_scene_semantic_maps = partial(
-            generate_scene_semantic_maps,
-            generation_method="annotations_top_down",
-            device=torch.device("cuda:0")
-        )
-        with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-            for _ in pool.imap_unordered(generate_annotated_scene_semantic_maps, scenes):
-                pbar.update()
-
-        # For all scenes, generate semantic maps from first-person
-        # segmentation predictions
-        # scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
-        # generate_unannotated_scene_semantic_maps = partial(
+        # scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*semantic.glb")
+        # scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
+        # generate_annotated_scene_semantic_maps = partial(
         #     generate_scene_semantic_maps,
-        #     generation_method="predicted_first_person",
+        #     generation_method="annotations_top_down",
         #     device=torch.device("cuda:1")
         # )
         # with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-        #     for _ in pool.imap_unordered(generate_unannotated_scene_semantic_maps, scenes):
+        #     for _ in pool.imap_unordered(generate_annotated_scene_semantic_maps, scenes):
         #         pbar.update()
+
+        # For all scenes, generate semantic maps from first-person
+        # segmentation predictions
+        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+        generate_unannotated_scene_semantic_maps = partial(
+            generate_scene_semantic_maps,
+            generation_method="predicted_first_person",
+            device=torch.device("cuda:1")
+        )
+        with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+            for _ in pool.imap_unordered(generate_unannotated_scene_semantic_maps, scenes):
+                pbar.update()
