@@ -74,7 +74,7 @@ def generate_episode(sim,
     planner.set_multi_goal(goal_map)
     m1 = sem_map[0] > 0
     # TODO Tune these thresholds, they are probably not at the right scale
-    m2 = planner.fmm_dist > 10.0
+    m2 = planner.fmm_dist > 30.0
     m3 = planner.fmm_dist < 2000.0
     possible_start_positions = np.logical_and(m1, m2)
     possible_start_positions = np.logical_and(possible_start_positions, m3) * 1.0
