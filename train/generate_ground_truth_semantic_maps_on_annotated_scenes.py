@@ -8,6 +8,7 @@ import os
 import quaternion
 import random
 import glob
+from functools import partial
 from pathlib import Path
 from PIL import Image
 import sys
@@ -203,7 +204,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=2000, batch_size=1):
+            self, y, num_frames=10, batch_size=1):
         self.obs_preprocessor.reset()
         self.semantic_map.init_map_and_pose()
 
@@ -230,7 +231,7 @@ class HabitatFloorMaps:
         all_positions = positions[idxs]
 
         # Batch points
-        for i in tqdm.tqdm(range(0, num_frames, batch_size)):
+        for i in range(0, num_frames, batch_size):
             positions = all_positions[i:i + batch_size]
             sequence_length = positions.shape[0]
 
@@ -319,7 +320,9 @@ def visualize_sem_map(sem_map):
     return semantic_img
 
 
-def generate_scene_semantic_maps(scene_path: str, generation_method: str):
+def generate_scene_semantic_maps(scene_path: str,
+                                 generation_method: str,
+                                 device: torch.device):
     scene_dir = "/".join(scene_path.split("/")[:-1])
     scene_file = scene_path.split("/")[-1]
     scene_id = scene_file.split(".")[0]
@@ -339,7 +342,6 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
     config.freeze()
 
     sim = habitat.sims.make_sim("Sim-v0", config=task_config.SIMULATOR)
-    device = torch.device("cuda:0")  # TODO We can distribute this across GPUs
     floor_maps = HabitatFloorMaps(sim, generation_method, config, device)
 
     print(f"Saving {generation_method} floor semantic maps for {scene_dir}")
@@ -383,23 +385,27 @@ if __name__ == "__main__":
         # from top-down bounding boxes
         scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*semantic.glb")
         scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
+        generate_annotations_top_down = partial(
+            generate_scene_semantic_maps,
+            generation_method="annotations_top_down",
+            device=torch.device("cuda:1")
+        )
         for scene in scenes:
-            generate_scene_semantic_maps(
-                scene,
-                generation_method="annotations_top_down"
-            )
+            generate_annotations_top_down(scene)
             break
 
         # For scenes all scenes, generate semantic maps from first-person
         # segmentation predictions
         scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+        generate_predicted_first_person = partial(
+            generate_scene_semantic_maps,
+            generation_method="predicted_first_person",
+            device=torch.device("cuda:1")
+        )
         for scene in scenes:
-            generate_scene_semantic_maps(
-                scene,
-                generation_method="predicted_first_person"
-            )
+            generate_predicted_first_person(scene)
             break
 
-        # with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+        # with multiprocessing.Pool(12) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
         #     for _ in pool.imap_unordered(generate_scene_ground_truth_maps, scenes):
         #         pbar.update()
