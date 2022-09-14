@@ -324,10 +324,12 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
     scene_file = scene_path.split("/")[-1]
     scene_id = scene_file.split(".")[0]
     map_dir = scene_dir + "/floor_semantic_maps"
-    shutil.rmtree(map_dir, ignore_errors=True)
-    os.makedirs(map_dir, exist_ok=True)
+    # shutil.rmtree(map_dir, ignore_errors=True)
+    # os.makedirs(map_dir, exist_ok=True)
 
+    print(map_dir)
     print(f"Generating {generation_method} floor semantic maps for {scene_id}")
+    raise NotImplementedError
 
     config, _ = get_config("submission/configs/generate_dataset_config.yaml")
     config.defrost()
