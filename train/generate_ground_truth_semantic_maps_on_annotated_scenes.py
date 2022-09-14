@@ -1,6 +1,7 @@
 import multiprocessing
 import tqdm
 import torch
+import json
 import numpy as np
 import quaternion
 import random
@@ -343,8 +344,19 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
         print(np.unique(sem_map))
         np.save("sem_map_test.npy", sem_map.astype(bool))
         sem_map_vis.save("sem_map_test.png", "PNG")
+        with open("sem_map_info_test.json", "w") as f:
+            json.dump(
+                {
+                    "floor_heights": floor_maps.floor_heights,
+                    "xz_origin_cm": floor_maps.xz_origin_cm,
+                    "xz_origin_map": floor_maps.xz_origin_map,
+                    "map_size": floor_maps.map_size,
+                    "resolution": floor_maps.resolution
+                },
+                f, indent=4
+            )
         raise NotImplementedError
-        # np.save(f"{scene_dir}/{scene_id}_floor{i}_{generation_method}.npy", sem_map)
+        # np.save(f"{scene_dir}/{scene_id}_floor{i}_{generation_method}.npy", sem_map.astype(bool))
         # sem_map_vis.save(f"{scene_dir}/{scene_id}_floor{i}_{generation_method}.png", "PNG")
 
     sim.close()
