@@ -344,6 +344,13 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
         print(np.unique(sem_map))
         np.save("sem_map_test.npy", sem_map.astype(bool))
         sem_map_vis.save("sem_map_test.png", "PNG")
+        print({
+                    "floor_heights": floor_maps.floor_heights,
+                    "xz_origin_cm": floor_maps.xz_origin_cm,
+                    "xz_origin_map": floor_maps.xz_origin_map,
+                    "map_size": floor_maps.map_size,
+                    "resolution": floor_maps.resolution
+                })
         with open("sem_map_info_test.json", "w") as f:
             json.dump(
                 {
