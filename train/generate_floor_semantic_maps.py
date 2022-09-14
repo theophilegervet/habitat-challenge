@@ -419,7 +419,10 @@ if __name__ == "__main__":
 
         # For all scenes, generate semantic maps from first-person
         # segmentation predictions
-        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+        # TODO We start with scenes with annotations to evaluate results
+        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*semantic.glb")
+        scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
+        # scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
         generate_unannotated_scene_semantic_maps = partial(
             generate_scene_semantic_maps,
             generation_method="predicted_first_person",

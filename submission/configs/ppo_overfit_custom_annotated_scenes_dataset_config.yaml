@@ -5,7 +5,7 @@ SIMULATOR_GPU_IDS: [0, 1] # IDs of GPUs to use for vectorized environments
 NO_GPU: 0                 # 1: ignore IDs above and run on CPU, 0: run on GPUs with IDs above
 NUM_ENVIRONMENTS: 1       # number of environments (per agent process)
 DUMP_LOCATION: data       # path to dump models and log
-EXP_NAME: debug           # experiment name
+EXP_NAME: ppo_overfit_custom_annotated_scenes_dataset  # experiment name
 MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
 VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
 PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
@@ -43,12 +43,11 @@ AGENT:
   POLICY:
     type: frontier             # one of "frontier" or "semantic"
     hint_follow_steps: 15      # how many steps to follow a hint of the object goal category
-    hint_in_frame: 0           # 1: look for hint in frame, 0: don't
+    hint_in_frame: 1           # 1: look for hint in frame, 0: don't
 
     SEMANTIC:
       goal_update_steps: 25    # frequency at which to update the high-level goal during inference
       inference_downscaling: 2 # ratio of map size for policy inference over map size used for planning
-      checkpoint_path: "/private/home/theop123/ray_results/ddppo_overfit_challenge/DDPPO_SemanticExplorationPolicyTrainingEnvWrapper_7d280_00000_0_2022-08-28_14-29-25/checkpoint_000400/checkpoint-400"
 
 EVAL_VECTORIZED:
   specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
@@ -61,7 +60,7 @@ EVAL_VECTORIZED:
 
 TRAIN:
   RL:
-    exp_name: debug             # experiment name
+    exp_name: ppo_overfit_custom_annotated_scenes_dataset  # experiment name
     algorithm: PPO              # one of "PPO" or "DDPPO"
     gamma: 0.9                  # discount factor of the MDP
     intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
@@ -80,29 +79,29 @@ TRAIN:
 
     PPO:
       # 2 x 32GB GPUs
-      num_workers: 5              # number of parallel workers
-      num_gpus: 0.33              # number of GPUs for driver process training the policy model
-      num_cpus_for_driver: 13     # number of CPUs for driver
-      num_gpus_per_worker: 0.33   # number of GPUs per worker collecting environment rollouts
-      num_cpus_per_worker: 13     # number of CPUs per worker
+      #num_workers: 5              # number of parallel workers
+      #num_gpus: 0.33              # number of GPUs for driver process training the policy model
+      #num_cpus_for_driver: 13     # number of CPUs for driver
+      #num_gpus_per_worker: 0.33   # number of GPUs per worker collecting environment rollouts
+      #num_cpus_per_worker: 13     # number of CPUs per worker
 
       # 8 x 32GB GPUs
-      #num_workers: 21
-      #num_gpus: 1
-      #num_cpus_for_driver: 13
-      #num_gpus_per_worker: 0.33
-      #num_cpus_per_worker: 3
+      num_workers: 21
+      num_gpus: 1
+      num_cpus_for_driver: 13
+      num_gpus_per_worker: 0.33
+      num_cpus_per_worker: 3
 
     DDPPO:
       # 2 x 32GB GPUs
-      num_workers: 6
-      num_gpus_per_worker: 0.33
-      num_cpus_per_worker: 13
+      #num_workers: 6
+      #num_gpus_per_worker: 0.33
+      #num_cpus_per_worker: 13
 
       # 8 x 32GB GPUs
-      #num_workers: 24
-      #num_gpus_per_worker: 0.33
-      #num_cpus_per_worker: 3
+      num_workers: 24
+      num_gpus_per_worker: 0.33
+      num_cpus_per_worker: 3
 
       # 4 x 8 x 32GB GPUs
       #num_workers: 96

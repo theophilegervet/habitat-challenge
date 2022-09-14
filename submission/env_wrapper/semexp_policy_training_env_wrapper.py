@@ -333,7 +333,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         intrinsic_reward = (curr_explored_area - prev_explored_area).item()
         intrinsic_reward *= (self.semantic_map.resolution / 100) ** 2
 
-        sparse_goal_reward = 1. if (found_goal and self.timestep > 1) else 0.
+        sparse_goal_reward = float(found_goal)
 
         if self.dataset_type == "SemexpPolicyTraining":
             dense_goal_reward = prev_distance_to_goal - curr_distance_to_goal
