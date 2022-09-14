@@ -327,8 +327,6 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
     shutil.rmtree(map_dir, ignore_errors=True)
     os.makedirs(map_dir, exist_ok=True)
 
-    print(f"Generating {generation_method} floor semantic maps for {scene_id}")
-
     config, _ = get_config("submission/configs/generate_dataset_config.yaml")
     config.defrost()
     if generation_method == "annotations_first_person":
@@ -343,6 +341,8 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
     sim = habitat.sims.make_sim("Sim-v0", config=task_config.SIMULATOR)
     device = torch.device("cuda:0")  # TODO We can distribute this across GPUs
     floor_maps = HabitatFloorMaps(sim, generation_method, config, device)
+
+    print(f"Saving {generation_method} floor semantic maps for {scene_path}")
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
         sem_map_vis = visualize_sem_map(sem_map)
