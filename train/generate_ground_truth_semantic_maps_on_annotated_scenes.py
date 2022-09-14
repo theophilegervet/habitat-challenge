@@ -342,7 +342,7 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
     device = torch.device("cuda:0")  # TODO We can distribute this across GPUs
     floor_maps = HabitatFloorMaps(sim, generation_method, config, device)
 
-    print(f"Saving {generation_method} floor semantic maps for {scene_path}")
+    print(f"Saving {generation_method} floor semantic maps for {scene_dir}")
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
         sem_map_vis = visualize_sem_map(sem_map)
@@ -362,7 +362,11 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
                 "xz_origin_cm": [int(x) for x in floor_maps.xz_origin_cm],
                 "xz_origin_map": [int(x) for x in floor_maps.xz_origin_map],
                 "map_size": [int(x) for x in floor_maps.map_size],
-                "resolution_cm": floor_maps.resolution
+                "map_generation_parameters": {
+                    "resolution_cm": floor_maps.resolution,
+                    "floor_threshold_cm": floor_maps.floor_thr,
+                    "padding_cm": floor_maps.padding
+                }
             },
             f, indent=4
         )
