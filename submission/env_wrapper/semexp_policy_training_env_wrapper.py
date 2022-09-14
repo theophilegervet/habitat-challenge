@@ -200,7 +200,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             with open(f"{map_dir}/{self.scene_id}_info.json", "r") as f:
                 scene_info = json.load(f)
             start_height_cm = self.current_episode.start_position[1] * 100.
-            start_height_cm = 300
             floor_heights_cm = scene_info["floor_heights_cm"]
             self.xz_origin_cm = scene_info["xz_origin_cm"]
             self.gt_map_resolution = scene_info["map_generation_parameters"][
@@ -209,12 +208,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                 range(len(floor_heights_cm)),
                 key=lambda idx: abs(floor_heights_cm[idx] - start_height_cm)
             )
-            print("floor_heights_cm", floor_heights_cm)
-            print("start_height_cm", start_height_cm)
-            print("floor_idx", floor_idx)
-            raise NotImplementedError
-            sem_map = np.load(
-                f"{map_dir}/{self.scene_id}_floor{floor_idx}.npy")
+            sem_map = np.load(f"{map_dir}/{self.scene_id}_floor{floor_idx}.npy")
             selem = skimage.morphology.disk(2)
             traversible = skimage.morphology.binary_dilation(
                 sem_map[0], selem) != True
@@ -227,6 +221,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             self.gt_planner.set_multi_goal(goal_map)
             self.prev_distance_to_goal = self._compute_distance_to_goal(
                 self.current_episode.start_position)
+            import cv2
+            cv2.imwrite("navigable_map_X.png", (sem_map[0] * 255).astype(np.uint8))
+            cv2.imwrite("goal_map_X.png", (goal_map * 255).astype(np.uint8))
+            print("self.prev_distance_to_goal", self.prev_distance_to_goal)
+            raise NotImplementedError
 
         if self.print_images:
             vis_inputs = {
