@@ -93,21 +93,35 @@ class HabitatFloorMaps:
         ) = self._make_map(pts[:, [0, 2]])
 
         # Determine floor heights
-        self.floor_heights = self._get_floor_heights()
+        floor_heights = self._get_floor_heights()
 
-        # Compute each floor's semantic map from object bounding
-        # box annotations
-        if generation_method == "annotations_top_down":
-            self.floor_semantic_maps = [
-                self._get_floor_semantic_map_from_top_down_annotations(floor_height)
-                for floor_height in self.floor_heights
-            ]
-        elif generation_method in ["annotations_first_person",
-                                   "predicted_first_person"]:
-            self.floor_semantic_maps = [
-                self._get_floor_semantic_map_from_first_person(floor_height)
-                for floor_height in self.floor_heights
-            ]
+        # Compute each floor's semantic map
+        floor_semantic_maps = []
+        valid_floor_heights = []
+        for floor_height in floor_heights:
+            if generation_method == "annotations_top_down":
+                try:
+                    floor_semantic_maps.append(
+                        self._get_floor_semantic_map_from_top_down_annotations(
+                            floor_height
+                        )
+                    )
+                    valid_floor_heights.append(floor_height)
+                except:
+                    pass
+            elif generation_method in ["annotations_first_person",
+                                       "predicted_first_person"]:
+                try:
+                    floor_semantic_maps.append(
+                        self._get_floor_semantic_map_from_first_person(
+                            floor_height
+                        )
+                    )
+                    valid_floor_heights.append(floor_height)
+                except:
+                    pass
+        self.floor_heights = floor_heights
+        self.floor_semantic_maps = floor_semantic_maps
 
     def _sample_points(self):
         pts = np.zeros((self.num_sampled_points, 3), dtype=np.float32)
@@ -334,7 +348,6 @@ def generate_scene_semantic_maps(scene_path: str,
     if overwrite is False and os.path.exists(f"{map_dir}/{scene_id}_info.json"):
         print(f"Already {generation_method} floor semantic maps for {scene_dir}")
         return
-    return
 
     shutil.rmtree(map_dir, ignore_errors=True)
     os.makedirs(map_dir, exist_ok=True)
