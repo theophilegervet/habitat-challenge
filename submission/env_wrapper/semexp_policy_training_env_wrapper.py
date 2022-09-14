@@ -329,7 +329,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         # Intrinsic reward = increase in explored area (in m^2)
         # Sparse goal reward = binary found goal or not
-        # Dense goal reward = decrease in geodesic distance to goal
+        # Dense goal reward = decrease in geodesic distance to goal (in map cells)
 
         curr_explored_area = self.semantic_map.global_map[0, 1].sum()
         intrinsic_reward = (curr_explored_area - prev_explored_area).item()
