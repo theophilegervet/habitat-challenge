@@ -201,6 +201,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                 scene_info = json.load(f)
             start_height_cm = self.current_episode.start_position[1] * 100.
             floor_heights_cm = scene_info["floor_heights_cm"]
+            floor_heights_cm = 300
             self.xz_origin_cm = scene_info["xz_origin_cm"]
             self.gt_map_resolution = scene_info["map_generation_parameters"][
                 "resolution_cm"]
