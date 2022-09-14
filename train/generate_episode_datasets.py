@@ -150,6 +150,7 @@ def generate_scene_episodes(scene_path: str,
         episode = generate_episode(sim, len(dataset.episodes), scene_info)
         if episode is not None:
             dataset.episodes.append(episode)
+        raise NotImplementedError
     for ep in dataset.episodes:
         ep.scene_id = ep.scene_id.split("scene_datasets/")[-1]
 
