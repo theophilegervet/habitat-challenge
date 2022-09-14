@@ -71,7 +71,7 @@ def generate_episode(sim,
     planner = FMMPlanner(traversible)
     selem = skimage.morphology.disk(int(100 / map_resolution))
     goal_map = skimage.morphology.binary_dilation(
-        sem_map[goal_idx + 1], selem) != True
+        sem_map[goal_id_to_coco_id[goal_idx] + 1], selem) != True
     goal_map = 1 - goal_map
     planner.set_multi_goal(goal_map)
     m1 = sem_map[0] > 0
