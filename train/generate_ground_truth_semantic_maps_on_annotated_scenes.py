@@ -230,7 +230,7 @@ class HabitatFloorMaps:
         all_positions = positions[idxs]
 
         # Batch points
-        for i in range(0, num_frames, batch_size):
+        for i in tqdm.tqdm(range(0, num_frames, batch_size)):
             positions = all_positions[i:i + batch_size]
             sequence_length = positions.shape[0]
 
