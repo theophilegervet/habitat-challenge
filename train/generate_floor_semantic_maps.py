@@ -391,7 +391,7 @@ if __name__ == "__main__":
         generate_annotated_scene_semantic_maps = partial(
             generate_scene_semantic_maps,
             generation_method="annotations_top_down",
-            device=torch.device("cuda:1")
+            device=torch.device("cuda:0")
         )
         with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
             for _ in pool.imap_unordered(generate_annotated_scene_semantic_maps, scenes):
