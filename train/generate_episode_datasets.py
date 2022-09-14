@@ -150,8 +150,6 @@ def generate_scene_episodes(scene_path: str,
         episode = generate_episode(sim, len(dataset.episodes), scene_info)
         if episode is not None:
             dataset.episodes.append(episode)
-        print(episode)
-        raise NotImplementedError  # TODO
     for ep in dataset.episodes:
         ep.scene_id = ep.scene_id.split("scene_datasets/")[-1]
 
@@ -193,7 +191,8 @@ if __name__ == "__main__":
         # with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
         #     for _ in pool.imap_unordered(generate_annotated_scene_episodes, scenes):
         #         pbar.update()
-        generate_annotated_scene_episodes(scenes[0])
+        for scene in tqdm.tqdm(scenes):
+            generate_annotated_scene_episodes(scenes)
         raise NotImplementedError  # TODO
 
         # For all scenes, generate episode dataset from semantic maps
