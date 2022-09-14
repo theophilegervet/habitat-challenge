@@ -1,3 +1,4 @@
+from typing import Optional
 import glob
 import gzip
 import json
@@ -8,6 +9,7 @@ import tqdm
 import numpy as np
 import quaternion
 from functools import partial
+import skimage.morphology
 import random
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -18,7 +20,11 @@ import habitat
 from habitat.tasks.nav.object_nav_task import ObjectGoalNavEpisode, ObjectGoal
 
 from submission.dataset.semexp_policy_training_dataset import SemanticExplorationPolicyTrainingDataset
-from submission.utils.constants import challenge_goal_name_to_goal_name
+from submission.planner.fmm_planner import FMMPlanner
+from submission.utils.constants import (
+    challenge_goal_name_to_goal_name,
+    goal_id_to_goal_name
+)
 
 
 SCENES_ROOT_PATH = (
@@ -34,27 +40,71 @@ DATASET_ROOT_PATH = (
 def generate_episode(sim,
                      episode_count: int,
                      scene_info: dict
-                     ) -> ObjectGoalNavEpisode:
-    print(scene_info.keys())
-    print(len(scene_info["floor_maps"]))
-    print(scene_info["floor_maps"][0].shape)
+                     ) -> Optional[ObjectGoalNavEpisode]:
+    """Attempt generating an episode and return None if failed."""
+    # Sample a floor
+    floor_idx = np.random.randint(len(scene_info["floor_maps"]))
+    floor_height = scene_info["floor_heights_cm"][floor_idx] / 100
+    sem_map = scene_info["floor_maps"][floor_idx]
+    map_origin = scene_info["xz_origin_map"]
+    map_resolution = scene_info["map_generation_parameters"]["resolution_cm"]
+    floor_thr = scene_info["map_generation_parameters"]["floor_threshold_cm"] / 100
+
+    # Sample a goal category present on the floor
+    category_counts = sem_map.sum(2).sum(1)
+    categories_present = [i for i in range(6) if category_counts[i + 1] > 0]
+    print(category_counts)
+    print(categories_present)
+    if len(categories_present) == 0:
+        print("No object goal category present on the floor")
+        return
+    goal_idx = np.random.choice(categories_present)
+    goal_name_to_challenge_goal_name = {
+        v: k for k, v in challenge_goal_name_to_goal_name.items()}
+    challenge_goal_name = goal_name_to_challenge_goal_name[
+        goal_id_to_goal_name[goal_idx]]
+    print(challenge_goal_name)
     raise NotImplementedError
 
-    # Position
-    start_position = sim.pathfinder.get_random_navigable_point()
-    attempt = 1
-    while sim.pathfinder.distance_to_closest_obstacle(start_position) < 1.0 and attempt < 50:
-        start_position = sim.pathfinder.get_random_navigable_point()
-        attempt += 1
+    # Sample a starting position from which we can reach this goal
+    selem = skimage.morphology.disk(2)
+    traversible = skimage.morphology.binary_dilation(sem_map[0], selem) != True
+    traversible = 1 - traversible
+    planner = FMMPlanner(traversible)
+    selem = skimage.morphology.disk(int(100 / map_resolution))
+    goal_map = skimage.morphology.binary_dilation(
+        sem_map[goal_idx + 1], selem) != True
+    goal_map = 1 - goal_map
+    planner.set_multi_goal(goal_map)
+    m1 = sem_map[0] > 0
+    # TODO Tune these thresholds, they are probably not at the right scale
+    m2 = planner.fmm_dist > 10.0
+    m3 = planner.fmm_dist < 2000.0
+    possible_start_positions = np.logical_and(m1, m2)
+    possible_start_positions = np.logical_and(possible_start_positions, m3) * 1.0
+    if possible_start_positions.sum() == 0:
+        print(f"No valid starting position for {challenge_goal_name}")
+        return
+    start_position_found = False
+    while not start_position_found:
+        start_position = sim.sample_navigable_point()
+        if abs(start_position[1] - floor_height) > floor_thr:
+            continue
+        # TODO Is this correct?
+        map_x = start_position[0] * 100. / map_resolution - map_origin[0]
+        map_z = start_position[2] * 100. / map_resolution - map_origin[1]
+        if possible_start_positions[map_x, map_z] == 1:
+            start_position_found = True
+        else:
+            continue
 
-    # Rotation
+    raise NotImplementedError
+
+    # Sample a starting orientation
     start_yaw = random.random() * 2 * np.pi
     start_rotation = quaternion.from_euler_angles(0, start_yaw, 0)
     start_rotation = quaternion.as_float_array(start_rotation)
     start_rotation = [0., start_rotation[0], 0., start_rotation[2]]
-
-    # Object goal
-    object_category = random.choice(list(challenge_goal_name_to_goal_name.keys()))
 
     return ObjectGoalNavEpisode(
         episode_id=str(episode_count),
@@ -102,9 +152,10 @@ def generate_scene_episodes(scene_path: str,
     # Create dataset and episodes
     dataset = SemanticExplorationPolicyTrainingDataset(
         config.DATASET, dataset_generation=True)
-    for episode_count in range(num_episodes):
-        episode = generate_episode(sim, episode_count, scene_info)
-        dataset.episodes.append(episode)
+    while len(dataset.episodes) < num_episodes:
+        episode = generate_episode(sim, len(dataset.episodes), scene_info)
+        if episode is not None:
+            dataset.episodes.append(episode)
         raise NotImplementedError  # TODO
     for ep in dataset.episodes:
         ep.scene_id = ep.scene_id.split("scene_datasets/")[-1]

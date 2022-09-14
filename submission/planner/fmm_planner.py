@@ -45,7 +45,7 @@ class FMMPlanner:
         self.du = int(self.step_size / (self.scale * 1.))
         self.fmm_dist = None
 
-    def set_multi_goal(self, goal_map: np.ndarray, timestep: int):
+    def set_multi_goal(self, goal_map: np.ndarray, timestep: int = None):
         """Set long-term goal(s) used to compute distance from a binary
         goal map.
         """
@@ -65,7 +65,7 @@ class FMMPlanner:
             cv2.imshow("Planner Distance", dist_vis)
             cv2.waitKey(1)
 
-        if self.print_images:
+        if self.print_images and timestep is not None:
             cv2.imwrite(
                 os.path.join(self.vis_dir, f"planner_snapshot_{timestep}.png"),
                 (dist_vis * 255).astype(int)
