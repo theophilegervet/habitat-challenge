@@ -46,7 +46,7 @@ def generate_episode(sim,
     floor_idx = np.random.randint(len(scene_info["floor_maps"]))
     floor_height = scene_info["floor_heights_cm"][floor_idx] / 100
     sem_map = scene_info["floor_maps"][floor_idx]
-    map_origin = scene_info["xz_origin_map"]
+    xz_origin_cm = scene_info["xz_origin_cm"]
     map_resolution = scene_info["map_generation_parameters"]["resolution_cm"]
     floor_thr = scene_info["map_generation_parameters"]["floor_threshold_cm"] / 100
 
@@ -73,17 +73,10 @@ def generate_episode(sim,
     goal_map = 1 - goal_map
     planner.set_multi_goal(goal_map)
     m1 = sem_map[0] > 0
-    # TODO Tune these thresholds, they are probably not at the right scale
-    m2 = planner.fmm_dist > 30.0
+    m2 = planner.fmm_dist > 10.0
     m3 = planner.fmm_dist < 2000.0
     possible_start_positions = np.logical_and(m1, m2)
     possible_start_positions = np.logical_and(possible_start_positions, m3) * 1.0
-    import cv2
-    print("fmm_dist", planner.fmm_dist.min(), planner.fmm_dist.mean(), planner.fmm_dist.max())
-    cv2.imwrite("goal_map.png", (goal_map * 255).astype(np.uint8))
-    cv2.imwrite("navigable_map.png", (sem_map[0] * 255).astype(np.uint8))
-    cv2.imwrite("possible_start_positions.png", (possible_start_positions * 255).astype(np.uint8))
-    raise NotImplementedError
     if possible_start_positions.sum() == 0:
         print(f"No valid starting position for {challenge_goal_name}")
         return
@@ -92,9 +85,17 @@ def generate_episode(sim,
         start_position = sim.sample_navigable_point()
         if abs(start_position[1] - floor_height) > floor_thr:
             continue
-        # TODO Is this correct?
-        map_x = start_position[0] * 100. / map_resolution - map_origin[0]
-        map_z = start_position[2] * 100. / map_resolution - map_origin[1]
+        map_x = (start_position[0] * 100. - xz_origin_cm[0]) / map_resolution
+        map_z = (start_position[2] * 100. - xz_origin_cm[1]) / map_resolution
+
+        import cv2
+        print("start_position", start_position)
+        print("floor_thr", floor_thr)
+        print("floor_height", floor_height)
+        print("map_x, map_z", map_x, map_z)
+        print("possible_start_positions[map_x, map_z]", possible_start_positions[map_x, map_z])
+        raise NotImplementedError
+
         if possible_start_positions[map_x, map_z] == 1:
             start_position_found = True
         else:
