@@ -390,9 +390,11 @@ if __name__ == "__main__":
             generation_method="annotations_top_down",
             device=torch.device("cuda:1")
         )
-        for scene in scenes:
-            generate_annotations_top_down(scene)
-            break
+        # for scene in scenes:
+        #     generate_annotations_top_down(scene)
+        with multiprocessing.Pool(6) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+            for _ in pool.imap_unordered(generate_annotations_top_down, scenes):
+                pbar.update()
 
         # For scenes all scenes, generate semantic maps from first-person
         # segmentation predictions
@@ -404,8 +406,6 @@ if __name__ == "__main__":
         )
         for scene in scenes:
             generate_predicted_first_person(scene)
-            break
-
-        # with multiprocessing.Pool(12) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-        #     for _ in pool.imap_unordered(generate_scene_ground_truth_maps, scenes):
-        #         pbar.update()
+        with multiprocessing.Pool(6) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+            for _ in pool.imap_unordered(generate_predicted_first_person, scenes):
+                pbar.update()
