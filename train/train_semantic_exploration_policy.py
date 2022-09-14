@@ -34,7 +34,7 @@ class LoggingCallback(DefaultCallbacks):
 
         for k in ["sparse_goal_reward", "discounted_sparse_goal_reward",
                   "intrinsic_reward", "unscaled_intrinsic_reward", "discounted_unscaled_intrinsic_reward",
-                  "curr_distance_to_goal", "dense_goal_reward", "unscaled_dense_goal_reward", "discounted_unscaled_dense_goal_reward"]:
+                  "dense_goal_reward", "unscaled_dense_goal_reward", "discounted_unscaled_dense_goal_reward"]:
             if k not in info:
                 continue
             if k not in episode.custom_metrics:

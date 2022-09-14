@@ -11,14 +11,12 @@ import skimage.morphology
 from habitat import Config, make_dataset
 from habitat.core.env import RLEnv
 from habitat.core.simulator import Observations
-from habitat.core.dataset import EpisodeIterator
 from habitat.sims.habitat_simulator.actions import HabitatSimActions
 from habitat.core.dataset import ALL_SCENES_MASK
 from gym.spaces import Dict as SpaceDict
 from gym.spaces import Box, Discrete
 from ray.rllib.env.env_context import EnvContext
 
-from submission.utils.constants import goal_id_to_coco_id
 from submission.obs_preprocessor.obs_preprocessor import ObsPreprocessor
 from submission.planner.planner import Planner
 from submission.planner.fmm_planner import FMMPlanner
@@ -290,9 +288,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
             # 4 - Check whether we found the goal
             if self.dataset_type == "SemexpPolicyTraining":
-                # TODO Compute found_goal from distance to goal in
-                #  ground-truth map
-                found_goal = False
+                curr_distance_to_goal = self._compute_distance_to_goal(
+                    list(self.habitat_env.sim.get_agent_state().position))
+                found_goal = (curr_distance_to_goal < 10.0)
             else:
                 _, found_goal = self.policy.reach_goal_if_in_map(
                     map_features,
@@ -338,8 +336,6 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         sparse_goal_reward = 1. if (found_goal and self.timestep > 1) else 0.
 
         if self.dataset_type == "SemexpPolicyTraining":
-            curr_distance_to_goal = self._compute_distance_to_goal(
-                list(self.habitat_env.sim.get_agent_state().position))
             dense_goal_reward = prev_distance_to_goal - curr_distance_to_goal
 
             reward = (dense_goal_reward * self.dense_goal_rew_coeff +
@@ -352,8 +348,8 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "sparse_goal_reward": sparse_goal_reward,
             "intrinsic_reward": intrinsic_reward * self.intrinsic_rew_coeff,
             "unscaled_intrinsic_reward": intrinsic_reward,
-            "discounted_sparse_goal_reward": sparse_goal_reward * (self.gamma ** self.timestep),
-            "discounted_unscaled_intrinsic_reward": intrinsic_reward * (self.gamma ** self.timestep),
+            "discounted_sparse_goal_reward": sparse_goal_reward * (self.gamma ** (self.timestep - 1)),
+            "discounted_unscaled_intrinsic_reward": intrinsic_reward * (self.gamma ** (self.timestep - 1)),
             "action_0": float(goal_action[0]),
             "action_1": float(goal_action[1]),
         }
@@ -361,7 +357,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             info["curr_distance_to_goal"] = curr_distance_to_goal
             info["dense_goal_reward"] = dense_goal_reward * self.dense_goal_rew_coeff
             info["unscaled_dense_goal_reward"] = dense_goal_reward
-            info["discounted_unscaled_dense_goal_reward"] = dense_goal_reward * (self.gamma ** self.timestep)
+            info["discounted_unscaled_dense_goal_reward"] = dense_goal_reward * (self.gamma ** (self.timestep - 1))
 
         self.infos.append(info)
 
