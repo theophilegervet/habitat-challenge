@@ -59,7 +59,7 @@ def generate_episode(sim,
     goal_idx = np.random.choice(categories_present)
     goal_name_to_challenge_goal_name = {
         v: k for k, v in challenge_goal_name_to_goal_name.items()}
-    challenge_goal_name = goal_name_to_challenge_goal_name[
+    object_category = goal_name_to_challenge_goal_name[
         goal_id_to_goal_name[goal_idx]]
 
     # Sample a starting position from which we can reach this goal
@@ -78,30 +78,21 @@ def generate_episode(sim,
     possible_start_positions = np.logical_and(m1, m2)
     possible_start_positions = np.logical_and(possible_start_positions, m3) * 1.0
     if possible_start_positions.sum() == 0:
-        print(f"No valid starting position for {challenge_goal_name}")
+        print(f"No valid starting position for {object_category}")
         return
     start_position_found = False
-    while not start_position_found:
+    attempts, attempt = 100, 0
+    while not start_position_found and attempt < attempts:
+        attempt += 1
         start_position = sim.sample_navigable_point()
         if abs(start_position[1] - floor_height) > floor_thr:
             continue
         map_x = int((start_position[0] * 100. - xz_origin_cm[0]) / map_resolution)
         map_z = int((start_position[2] * 100. - xz_origin_cm[1]) / map_resolution)
-
-        import cv2
-        print("start_position", start_position)
-        print("floor_thr", floor_thr)
-        print("floor_height", floor_height)
-        print("map_x, map_z", map_x, map_z)
-        print("possible_start_positions[map_x, map_z]", possible_start_positions[map_x, map_z])
-        raise NotImplementedError
-
         if possible_start_positions[map_x, map_z] == 1:
             start_position_found = True
         else:
             continue
-
-    raise NotImplementedError
 
     # Sample a starting orientation
     start_yaw = random.random() * 2 * np.pi
@@ -159,6 +150,7 @@ def generate_scene_episodes(scene_path: str,
         episode = generate_episode(sim, len(dataset.episodes), scene_info)
         if episode is not None:
             dataset.episodes.append(episode)
+        print(episode)
         raise NotImplementedError  # TODO
     for ep in dataset.episodes:
         ep.scene_id = ep.scene_id.split("scene_datasets/")[-1]
