@@ -92,6 +92,7 @@ def generate_scene_episodes(scene_path: str,
     scene_dir = "/".join(scene_path.split("/")[:-1])
     scene_key = scene_path.split("/")[-1].split(".")[0]
     map_dir = scene_dir + f"/floor_semantic_maps_{semantic_map_type}"
+    print(f"{map_dir}/{scene_key}_info.json")
     with open(f"{map_dir}/{scene_key}_info.json", "r") as f:
         scene_info = json.load(f)
     scene_info["floor_maps"] = []
