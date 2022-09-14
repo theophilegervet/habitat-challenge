@@ -215,17 +215,24 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             traversible = 1 - traversible
             self.gt_planner = FMMPlanner(traversible)
             selem = skimage.morphology.disk(int(100 / self.gt_map_resolution))
+
+            print("self.goal_category", self.goal_category)
+            print("self.goal_name", self.goal_name)
+            print("sem_map[self.goal_category + 1].sum()", sem_map[self.goal_category + 1].sum())
+            raise NotImplementedError
+
             goal_map = skimage.morphology.binary_dilation(
                 sem_map[self.goal_category + 1], selem) != True
             goal_map = 1 - goal_map
             self.gt_planner.set_multi_goal(goal_map)
             self.prev_distance_to_goal = self._compute_distance_to_goal(
                 self.current_episode.start_position)
-            import cv2
-            cv2.imwrite("navigable_map_X.png", (sem_map[0] * 255).astype(np.uint8))
-            cv2.imwrite("goal_map_X.png", (goal_map * 255).astype(np.uint8))
-            print("self.prev_distance_to_goal", self.prev_distance_to_goal)
-            raise NotImplementedError
+
+            # import cv2
+            # cv2.imwrite("navigable_map_X.png", (sem_map[0] * 255).astype(np.uint8))
+            # cv2.imwrite("goal_map_X.png", (goal_map * 255).astype(np.uint8))
+            # print("self.prev_distance_to_goal", self.prev_distance_to_goal)
+            # raise NotImplementedError
 
         if self.print_images:
             vis_inputs = {
