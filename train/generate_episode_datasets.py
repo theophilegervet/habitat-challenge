@@ -188,24 +188,21 @@ if __name__ == "__main__":
             # 20 annotated val scenes * 100 ep per scene = 2K eval ep
             num_episodes=40000 if split == "train" else 100
         )
-        # with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-        #     for _ in pool.imap_unordered(generate_annotated_scene_episodes, scenes):
-        #         pbar.update()
-        for scene in tqdm.tqdm(scenes):
-            generate_annotated_scene_episodes(scene)
-        raise NotImplementedError  # TODO
+        with multiprocessing.Pool(40) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+            for _ in pool.imap_unordered(generate_annotated_scene_episodes, scenes):
+                pbar.update()
 
         # For all scenes, generate episode dataset from semantic maps
         # built from from first-person segmentation predictions
-        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
-        generate_unannotated_scene_episodes = partial(
-            generate_scene_episodes,
-            dataset_type="unannotated_scenes",
-            split=split,
-            # 800 unannotated train scenes * 5K ep per scene = 4M train ep
-            # 100 unannotated val scenes * 20 ep per scene = 2K eval ep
-            num_episodes=5000 if split == "train" else 20
-        )
-        # with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+        # scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+        # generate_unannotated_scene_episodes = partial(
+        #     generate_scene_episodes,
+        #     dataset_type="unannotated_scenes",
+        #     split=split,
+        #     # 800 unannotated train scenes * 5K ep per scene = 4M train ep
+        #     # 100 unannotated val scenes * 20 ep per scene = 2K eval ep
+        #     num_episodes=5000 if split == "train" else 20
+        # )
+        # with multiprocessing.Pool(40) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
         #     for _ in pool.imap_unordered(generate_unannotated_scene_episodes, scenes):
         #         pbar.update()
