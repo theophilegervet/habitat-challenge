@@ -5,7 +5,7 @@ from typing import List, Dict
 import glob
 
 from habitat.config import Config
-from habitat.core.dataset import Dataset
+from habitat.core.dataset import Dataset, ALL_SCENES_MASK
 from habitat.core.registry import registry
 from habitat.tasks.nav.object_nav_task import ObjectGoalNavEpisode, ObjectGoal
 
@@ -47,6 +47,10 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
         split_dir = os.path.dirname(split_filepath)
         if os.path.exists(f"{split_dir}/scenes"):
             for scene_path in glob.glob(f"{split_dir}/scenes/*"):
+                scene_id = scene_path.split("/")[-1].split(".")[0]
+                if (ALL_SCENES_MASK not in config.CONTENT_SCENES
+                        and scene_id not in config.CONTENT_SCENES):
+                    continue
                 with gzip.open(scene_path, "rt") as f:
                     self.from_json(f.read(), scenes_dir=config.SCENES_DIR)
 
