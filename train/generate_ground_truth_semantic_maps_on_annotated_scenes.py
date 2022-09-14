@@ -392,12 +392,13 @@ if __name__ == "__main__":
 
         # For scenes all scenes, generate semantic maps from first-person
         # segmentation predictions
-        # scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
-        # for scene in scenes:
-        #     generate_scene_semantic_maps(
-        #         scene,
-        #         generation_method="predicted_first_person"
-        #     )
+        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+        for scene in scenes:
+            generate_scene_semantic_maps(
+                scene,
+                generation_method="predicted_first_person"
+            )
+            break
 
         # with multiprocessing.Pool(80) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
         #     for _ in pool.imap_unordered(generate_scene_ground_truth_maps, scenes):
