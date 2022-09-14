@@ -78,6 +78,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                                 for idx in range(rllib_config.num_workers)]
             config.TASK_CONFIG.DATASET.CONTENT_SCENES = scene_splits[
                 rllib_config.worker_index - 1]
+            print("scenes:::::", scenes)
+            print("scene_splits:::::", scene_splits)
+            print("config.TASK_CONFIG.DATASET.CONTENT_SCENES:::::", config.TASK_CONFIG.DATASET.CONTENT_SCENES)
 
             # Set random seed
             config.TASK_CONFIG.SEED = rllib_config.worker_index
