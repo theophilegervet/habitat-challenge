@@ -323,7 +323,7 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
     scene_dir = "/".join(scene_path.split("/")[:-1])
     scene_file = scene_path.split("/")[-1]
     scene_id = scene_file.split(".")[0]
-    map_dir = scene_dir + "/floor_semantic_maps"
+    map_dir = scene_dir + f"/floor_semantic_maps_{generation_method}"
     shutil.rmtree(map_dir, ignore_errors=True)
     os.makedirs(map_dir, exist_ok=True)
 
@@ -348,14 +348,14 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
         sem_map_vis = visualize_sem_map(sem_map)
 
         np.save(
-            f"{map_dir}/{scene_id}_floor{i}_{generation_method}.npy",
+            f"{map_dir}/{scene_id}_floor{i}.npy",
             sem_map.astype(bool)
         )
         sem_map_vis.save(
-            f"{map_dir}/{scene_id}_floor{i}_{generation_method}.png", "PNG"
+            f"{map_dir}/{scene_id}_floor{i}.png", "PNG"
         )
 
-    with open(f"{map_dir}/{scene_id}_info_{generation_method}.json", "w") as f:
+    with open(f"{map_dir}/{scene_id}_info.json", "w") as f:
         json.dump(
             {
                 "floor_heights_cm": [int(x) for x in floor_maps.floor_heights],
@@ -372,6 +372,7 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
         )
 
     sim.close()
+
 
 if __name__ == "__main__":
     os.environ["MAGNUM_LOG"] = "quiet"
