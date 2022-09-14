@@ -7,5 +7,5 @@ config, config_str = get_config("submission/configs/ddppo_train_custom_annotated
 config.defrost()
 config.TASK_CONFIG.DATASET.SPLIT = "val"
 config.freeze()
-dataset = SemanticExplorationPolicyTrainingDataset(config=config.TASK_CONFIG)
+dataset = SemanticExplorationPolicyTrainingDataset(config=config.TASK_CONFIG.DATASET)
 # env = SemanticExplorationPolicyTrainingEnvWrapper(config=config)
