@@ -156,7 +156,7 @@ def generate_scene_episodes(scene_path: str,
     sim.close()
 
     # Store episodes with one file per scene
-    out_path = f"{DATASET_ROOT_PATH}/{split}/scenes/{scene_key}.json.gz"
+    out_path = f"{DATASET_ROOT_PATH}/{dataset_type}/{split}/scenes/{scene_key}.json.gz"
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with gzip.open(out_path, "wt") as f:
         f.write(dataset.to_json())
