@@ -8,4 +8,5 @@ config.defrost()
 config.TASK_CONFIG.DATASET.SPLIT = "val"
 config.freeze()
 dataset = SemanticExplorationPolicyTrainingDataset(config=config.TASK_CONFIG.DATASET)
+print(len(dataset.episodes))
 # env = SemanticExplorationPolicyTrainingEnvWrapper(config=config)
