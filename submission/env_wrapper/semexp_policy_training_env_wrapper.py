@@ -18,6 +18,7 @@ from gym.spaces import Dict as SpaceDict
 from gym.spaces import Box, Discrete
 from ray.rllib.env.env_context import EnvContext
 
+from submission.utils.constants import goal_id_to_coco_id
 from submission.obs_preprocessor.obs_preprocessor import ObsPreprocessor
 from submission.planner.planner import Planner
 from submission.planner.fmm_planner import FMMPlanner
@@ -219,6 +220,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             print("self.goal_category", self.goal_category)
             print("self.goal_name", self.goal_name)
             print("sem_map[self.goal_category + 1].sum()", sem_map[self.goal_category + 1].sum())
+            print("sem_map[goal_id_to_coco_id[self.goal_category] + 1].sum()", sem_map[goal_id_to_coco_id[self.goal_category] + 1].sum())
             raise NotImplementedError
 
             goal_map = skimage.morphology.binary_dilation(
