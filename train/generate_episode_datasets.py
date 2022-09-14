@@ -23,7 +23,8 @@ from submission.dataset.semexp_policy_training_dataset import SemanticExploratio
 from submission.planner.fmm_planner import FMMPlanner
 from submission.utils.constants import (
     challenge_goal_name_to_goal_name,
-    goal_id_to_goal_name
+    goal_id_to_goal_name,
+    goal_id_to_coco_id
 )
 
 
@@ -52,7 +53,8 @@ def generate_episode(sim,
 
     # Sample a goal category present on the floor
     category_counts = sem_map.sum(2).sum(1)
-    categories_present = [i for i in range(6) if category_counts[i + 1] > 0]
+    categories_present = [i for i in goal_id_to_coco_id.keys()
+                          if category_counts[goal_id_to_coco_id[i] + 1] > 0]
     if len(categories_present) == 0:
         print("No object goal category present on the floor")
         return
