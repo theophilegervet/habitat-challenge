@@ -324,11 +324,18 @@ def visualize_sem_map(sem_map):
 
 def generate_scene_semantic_maps(scene_path: str,
                                  generation_method: str,
-                                 device: torch.device):
+                                 device: torch.device,
+                                 overwrite: bool = False):
     scene_dir = "/".join(scene_path.split("/")[:-1])
     scene_file = scene_path.split("/")[-1]
     scene_id = scene_file.split(".")[0]
     map_dir = scene_dir + f"/floor_semantic_maps_{generation_method}"
+
+    if overwrite is False and os.path.exists(f"{map_dir}/{scene_id}_info.json"):
+        print(f"Already {generation_method} floor semantic maps for {scene_dir}")
+        return
+    return
+
     shutil.rmtree(map_dir, ignore_errors=True)
     os.makedirs(map_dir, exist_ok=True)
 
