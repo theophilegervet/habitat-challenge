@@ -3,6 +3,8 @@ import tqdm
 import torch
 import json
 import numpy as np
+import shutil
+import os
 import quaternion
 import random
 import glob
@@ -321,6 +323,11 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
     scene_dir = "/".join(scene_path.split("/")[:-1])
     scene_file = scene_path.split("/")[-1]
     scene_id = scene_file.split(".")[0]
+    map_dir = scene_dir + "/floor_semantic_maps"
+    shutil.rmtree(map_dir, ignore_errors=True)
+    os.makedirs(map_dir, exist_ok=True)
+
+    print(f"Generating {generation_method} floor semantic maps for {scene_id}")
 
     config, _ = get_config("submission/configs/generate_dataset_config.yaml")
     config.defrost()
@@ -339,32 +346,26 @@ def generate_scene_semantic_maps(scene_path: str, generation_method: str):
 
     for i, sem_map in enumerate(floor_maps.floor_semantic_maps):
         sem_map_vis = visualize_sem_map(sem_map)
-        # TODO Compress semantic map as binary?
-        print(sem_map.dtype)
-        print(np.unique(sem_map))
-        np.save("sem_map_test.npy", sem_map.astype(bool))
-        sem_map_vis.save("sem_map_test.png", "PNG")
-        print({
-                    "floor_heights": floor_maps.floor_heights,
-                    "xz_origin_cm": floor_maps.xz_origin_cm,
-                    "xz_origin_map": floor_maps.xz_origin_map,
-                    "map_size": floor_maps.map_size,
-                    "resolution": floor_maps.resolution
-                })
-        with open("sem_map_info_test.json", "w") as f:
-            json.dump(
-                {
-                    "floor_heights_cm": [int(x) for x in floor_maps.floor_heights],
-                    "xz_origin_cm": [int(x) for x in floor_maps.xz_origin_cm],
-                    "xz_origin_map": [int(x) for x in floor_maps.xz_origin_map],
-                    "map_size": [int(x) for x in floor_maps.map_size],
-                    "resolution_cm": floor_maps.resolution
-                },
-                f, indent=4
-            )
-        raise NotImplementedError
-        # np.save(f"{scene_dir}/{scene_id}_floor{i}_{generation_method}.npy", sem_map.astype(bool))
-        # sem_map_vis.save(f"{scene_dir}/{scene_id}_floor{i}_{generation_method}.png", "PNG")
+
+        np.save(
+            f"{map_dir}/{scene_id}_floor{i}_{generation_method}.npy",
+            sem_map.astype(bool)
+        )
+        sem_map_vis.save(
+            f"{map_dir}/{scene_id}_floor{i}_{generation_method}.png", "PNG"
+        )
+
+    with open(f"{map_dir}/{scene_id}_info_{generation_method}.json", "w") as f:
+        json.dump(
+            {
+                "floor_heights_cm": [int(x) for x in floor_maps.floor_heights],
+                "xz_origin_cm": [int(x) for x in floor_maps.xz_origin_cm],
+                "xz_origin_map": [int(x) for x in floor_maps.xz_origin_map],
+                "map_size": [int(x) for x in floor_maps.map_size],
+                "resolution_cm": floor_maps.resolution
+            },
+            f, indent=4
+        )
 
     sim.close()
 
