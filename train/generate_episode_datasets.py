@@ -48,6 +48,7 @@ def generate_episode(sim,
     floor_height = scene_info["floor_heights_cm"][floor_idx] / 100
     sem_map = scene_info["floor_maps"][floor_idx]
     xz_origin_cm = scene_info["xz_origin_cm"]
+    map_size = scene_info["map_size"]
     map_resolution = scene_info["map_generation_parameters"]["resolution_cm"]
     floor_thr = scene_info["map_generation_parameters"]["floor_threshold_cm"] / 100
 
@@ -90,7 +91,9 @@ def generate_episode(sim,
         if abs(start_position[1] - floor_height) > floor_thr:
             continue
         map_x = int((start_position[0] * 100. - xz_origin_cm[0]) / map_resolution)
+        map_x = min(map_x, map_size[0])
         map_z = int((start_position[2] * 100. - xz_origin_cm[1]) / map_resolution)
+        map_z = min(map_z, map_size[1])
         if possible_start_positions[map_x, map_z] == 1:
             start_position_found = True
         else:
