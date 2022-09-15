@@ -100,16 +100,12 @@ class HabitatFloorMaps:
         valid_floor_heights = []
         for floor_height in floor_heights:
             if generation_method == "annotations_top_down":
-                try:
-                    floor_semantic_maps.append(
-                        self._get_floor_semantic_map_from_top_down_annotations(
-                            floor_height
-                        )
+                floor_semantic_maps.append(
+                    self._get_floor_semantic_map_from_top_down_annotations(
+                        floor_height
                     )
-                    valid_floor_heights.append(floor_height)
-                except:
-                    print("Exception in floor semantic map generation")
-                    pass
+                )
+                valid_floor_heights.append(floor_height)
             elif generation_method in ["annotations_first_person",
                                        "predicted_first_person"]:
                 # try:
@@ -436,6 +432,6 @@ if __name__ == "__main__":
             generation_method="predicted_first_person",
             device=torch.device("cuda:1")
         )
-        with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+        with multiprocessing.Pool(4) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
             for _ in pool.imap_unordered(generate_unannotated_scene_semantic_maps, scenes):
                 pbar.update()
