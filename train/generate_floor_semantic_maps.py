@@ -118,7 +118,6 @@ class HabitatFloorMaps:
                 except:
                     print("Exception in floor semantic map generation")
                     pass
-                valid_floor_heights.append(floor_height)
         self.floor_heights = valid_floor_heights
         self.floor_semantic_maps = floor_semantic_maps
 
