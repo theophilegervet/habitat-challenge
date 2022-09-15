@@ -44,6 +44,7 @@ def generate_episode(sim,
                      ) -> Optional[ObjectGoalNavEpisode]:
     """Attempt generating an episode and return None if failed."""
     # Sample a floor
+    assert len(scene_info["floor_maps"]) > 0
     floor_idx = np.random.randint(len(scene_info["floor_maps"]))
     floor_height = scene_info["floor_heights_cm"][floor_idx] / 100
     sem_map = scene_info["floor_maps"][floor_idx]
@@ -157,6 +158,7 @@ def generate_scene_episodes(scene_path: str,
             selected_floor_heights.append((scene_info["floor_heights_cm"][i]))
         scene_info["floor_maps"] = selected_sem_maps
         scene_info["floor_heights_cm"] = selected_floor_heights
+        assert len(scene_info["floor_maps"]) > 0
     except:
         print(f"Could not load floor semantic maps for scene {scene_key}")
         return
