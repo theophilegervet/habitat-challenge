@@ -180,19 +180,19 @@ if __name__ == "__main__":
     for split in ["val"]:
         # For scenes with semantic annotations, generate episode dataset
         # from semantic maps built from top-down bounding boxes
-        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*semantic.glb")
-        scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
-        generate_annotated_scene_episodes = partial(
-            generate_scene_episodes,
-            dataset_type="annotated_scenes",
-            split=split,
-            # 100 annotated train scenes * 40K ep per scene = 4M train ep
-            # 20 annotated val scenes * 100 ep per scene = 2K eval ep
-            num_episodes=40000 if split == "train" else 100
-        )
-        with multiprocessing.Pool(40) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-            for _ in pool.imap_unordered(generate_annotated_scene_episodes, scenes):
-                pbar.update()
+        # scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*semantic.glb")
+        # scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
+        # generate_annotated_scene_episodes = partial(
+        #     generate_scene_episodes,
+        #     dataset_type="annotated_scenes",
+        #     split=split,
+        #     # 100 annotated train scenes * 40K ep per scene = 4M train ep
+        #     # 20 annotated val scenes * 100 ep per scene = 2K eval ep
+        #     num_episodes=40000 if split == "train" else 100
+        # )
+        # with multiprocessing.Pool(40) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+        #     for _ in pool.imap_unordered(generate_annotated_scene_episodes, scenes):
+        #         pbar.update()
 
         # For all scenes, generate episode dataset from semantic maps
         # built from first-person segmentation predictions
