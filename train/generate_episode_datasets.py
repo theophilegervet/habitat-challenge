@@ -56,9 +56,7 @@ def generate_episode(sim,
     category_counts = sem_map.sum(2).sum(1)
     categories_present = [i for i in goal_id_to_coco_id.keys()
                           if category_counts[goal_id_to_coco_id[i] + 1] > 0]
-    if len(categories_present) == 0:
-        print("No object goal category present on the floor")
-        return
+    assert len(categories_present) > 0
     goal_idx = np.random.choice(categories_present)
     goal_name_to_challenge_goal_name = {
         v: k for k, v in challenge_goal_name_to_goal_name.items()}
@@ -145,10 +143,20 @@ def generate_scene_episodes(scene_path: str,
         with open(f"{map_dir}/{scene_key}_info.json", "r") as f:
             scene_info = json.load(f)
         assert len(scene_info["floor_heights_cm"]) > 0
-        scene_info["floor_maps"] = []
+        selected_sem_maps, selected_floor_heights = [], []
         for i in range(len(scene_info["floor_heights_cm"])):
             sem_map = np.load(f"{map_dir}/{scene_key}_floor{i}.npy")
-            scene_info["floor_maps"].append(sem_map)
+            category_counts = sem_map.sum(2).sum(1)
+            goal_categories_present = [
+                i for i in goal_id_to_coco_id.keys()
+                if category_counts[goal_id_to_coco_id[i] + 1] > 0
+            ]
+            if len(goal_categories_present) == 0:
+                continue
+            selected_sem_maps.append(sem_map)
+            selected_floor_heights.append((scene_info["floor_heights_cm"][i]))
+        scene_info["floor_maps"] = selected_sem_maps
+        scene_info["floor_heights_cm"] = selected_floor_heights
     except:
         print(f"Could not load floor semantic maps for scene {scene_key}")
         return
