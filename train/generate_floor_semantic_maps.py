@@ -253,6 +253,16 @@ class HabitatFloorMaps:
         # Subsample num_frames points
         idxs = random.sample(range(len(positions)), num_frames)
         all_positions = positions[idxs]
+        print()
+        print()
+        print("all_positions.max(axis=0)", all_positions.max(axis=0))
+        print("all_positions.min(axis=0)", all_positions.min(axis=0))
+        middle = all_positions.max(axis=0) - all_positions.min(axis=0)
+        print("middle", middle)
+        navigable_middle = all_positions[(np.abs(all_positions - middle)).argmin()]
+        print("navigable_middle", navigable_middle)
+        print()
+        print()
 
         # Batch points
         for i in range(0, num_frames, batch_size):
