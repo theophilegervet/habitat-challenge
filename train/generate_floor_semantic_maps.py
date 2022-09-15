@@ -316,6 +316,7 @@ class HabitatFloorMaps:
         z2 = self.semantic_map.global_w // 2 - self.xz_origin_map[1]
         x1 = x2 - self.map_size[0]
         z1 = z2 - self.map_size[1]
+        print("x1, x2, z1, z2", (x1, x2, z1, z2))
         sem_map[1:] = np.flip(
             self.semantic_map.global_map.cpu().numpy()[0, 4:-1, x1:x2, z1:z2],
             (1, 2)
