@@ -112,17 +112,23 @@ class HabitatFloorMaps:
                     pass
             elif generation_method in ["annotations_first_person",
                                        "predicted_first_person"]:
-                try:
-                    floor_semantic_maps.append(
-                        self._get_floor_semantic_map_from_first_person(
-                            floor_height
-                        )
+                # try:
+                #     floor_semantic_maps.append(
+                #         self._get_floor_semantic_map_from_first_person(
+                #             floor_height
+                #         )
+                #     )
+                #     valid_floor_heights.append(floor_height)
+                # except:
+                #     print("Exception in floor semantic map generation")
+                #     pass
+                floor_semantic_maps.append(
+                    self._get_floor_semantic_map_from_first_person(
+                        floor_height
                     )
-                    valid_floor_heights.append(floor_height)
-                except:
-                    print("Exception in floor semantic map generation")
-                    pass
-        self.floor_heights = floor_heights
+                )
+                valid_floor_heights.append(floor_height)
+        self.floor_heights = valid_floor_heights
         self.floor_semantic_maps = floor_semantic_maps
 
     def _sample_points(self):
@@ -222,7 +228,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=2000, batch_size=1):
+            self, y, num_frames=10, batch_size=1):
         self.obs_preprocessor.reset()
         self.semantic_map.init_map_and_pose()
 
@@ -341,7 +347,7 @@ def visualize_sem_map(sem_map):
 def generate_scene_semantic_maps(scene_path: str,
                                  generation_method: str,
                                  device: torch.device,
-                                 overwrite: bool = False):
+                                 overwrite: bool = True):
     scene_dir = "/".join(scene_path.split("/")[:-1])
     scene_file = scene_path.split("/")[-1]
     scene_id = scene_file.split(".")[0]
