@@ -26,7 +26,7 @@ AGENT:
   panorama_start: 1       # 1: turn around 360 degrees when starting an episode, 0: don't
 
   SEMANTIC_MAP:
-    map_size_cm: 4800        # global map size (in centimetres)
+    map_size_cm: 7200        # global map size (in centimetres)
     map_resolution: 5        # size of map bins (in centimeters)
     vision_range: 100        # diameter of local map region visible by the agent (in cells)
     global_downscaling: 1    # ratio of global over local map
