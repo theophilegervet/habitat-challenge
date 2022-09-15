@@ -206,7 +206,7 @@ if __name__ == "__main__":
             split=split,
             # 100 annotated train scenes * 40K ep per scene = 4M train ep
             # 20 annotated val scenes * 100 ep per scene = 2K eval ep
-            num_episodes=10 if split == "train" else 100
+            num_episodes=40000 if split == "train" else 100
         )
         with multiprocessing.Pool(40) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
             for _ in pool.imap_unordered(generate_annotated_scene_episodes, scenes):
