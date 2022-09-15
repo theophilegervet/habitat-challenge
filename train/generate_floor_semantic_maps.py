@@ -108,21 +108,16 @@ class HabitatFloorMaps:
                 valid_floor_heights.append(floor_height)
             elif generation_method in ["annotations_first_person",
                                        "predicted_first_person"]:
-                # try:
-                #     floor_semantic_maps.append(
-                #         self._get_floor_semantic_map_from_first_person(
-                #             floor_height
-                #         )
-                #     )
-                #     valid_floor_heights.append(floor_height)
-                # except:
-                #     print("Exception in floor semantic map generation")
-                #     pass
-                floor_semantic_maps.append(
-                    self._get_floor_semantic_map_from_first_person(
-                        floor_height
+                try:
+                    floor_semantic_maps.append(
+                        self._get_floor_semantic_map_from_first_person(
+                            floor_height
+                        )
                     )
-                )
+                    valid_floor_heights.append(floor_height)
+                except:
+                    print("Exception in floor semantic map generation")
+                    pass
                 valid_floor_heights.append(floor_height)
         self.floor_heights = valid_floor_heights
         self.floor_semantic_maps = floor_semantic_maps
@@ -224,7 +219,7 @@ class HabitatFloorMaps:
         return sem_map
 
     def _get_floor_semantic_map_from_first_person(
-            self, y, num_frames=10, batch_size=1):
+            self, y, num_frames=2000, batch_size=1):
         self.obs_preprocessor.reset()
         self.semantic_map.init_map_and_pose()
 
@@ -432,6 +427,6 @@ if __name__ == "__main__":
             generation_method="predicted_first_person",
             device=torch.device("cuda:1")
         )
-        with multiprocessing.Pool(4) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+        with multiprocessing.Pool(6) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
             for _ in pool.imap_unordered(generate_unannotated_scene_semantic_maps, scenes):
                 pbar.update()
