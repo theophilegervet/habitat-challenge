@@ -257,7 +257,7 @@ class HabitatFloorMaps:
         print()
         print("all_positions.max(axis=0)", all_positions.max(axis=0))
         print("all_positions.min(axis=0)", all_positions.min(axis=0))
-        middle = all_positions.max(axis=0) - all_positions.min(axis=0)
+        middle = (all_positions.max(axis=0) + all_positions.min(axis=0)) / 2
         print("middle", middle)
         navigable_middle = all_positions[(np.abs(all_positions - middle)).argmin()]
         print("navigable_middle", navigable_middle)
