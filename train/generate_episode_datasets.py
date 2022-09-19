@@ -143,7 +143,7 @@ def generate_scene_episodes(scene_path: str,
     map_dir = scene_dir + f"/floor_semantic_maps_{semantic_map_type}"
     with open(f"{map_dir}/{scene_key}_info.json", "r") as f:
         scene_info = json.load(f)
-    assert len(scene_info["floor_heights_cm"]) > 0
+    # assert len(scene_info["floor_heights_cm"]) > 0
     selected_sem_maps, selected_floor_heights = [], []
     for i in range(len(scene_info["floor_heights_cm"])):
         sem_map = np.load(f"{map_dir}/{scene_key}_floor{i}.npy")
