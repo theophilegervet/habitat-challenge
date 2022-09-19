@@ -137,50 +137,49 @@ def generate_scene_episodes(scene_path: str,
     sim = habitat.sims.make_sim("Sim-v0", config=config.SIMULATOR)
 
     # Load scene floor semantic maps
-    # try:
-    scene_dir = "/".join(scene_path.split("/")[:-1])
-    scene_key = scene_path.split("/")[-1].split(".")[0]
-    map_dir = scene_dir + f"/floor_semantic_maps_{semantic_map_type}"
-    with open(f"{map_dir}/{scene_key}_info.json", "r") as f:
-        scene_info = json.load(f)
-    # assert len(scene_info["floor_heights_cm"]) > 0
-    selected_sem_maps, selected_floor_heights = [], []
-    for i in range(len(scene_info["floor_heights_cm"])):
-        sem_map = np.load(f"{map_dir}/{scene_key}_floor{i}.npy")
-        category_counts = sem_map.sum(2).sum(1)
-        goal_categories_present = [
-            i for i in goal_id_to_coco_id.keys()
-            if category_counts[goal_id_to_coco_id[i] + 1] > 0
-        ]
-        if len(goal_categories_present) == 0:
-            continue
-        selected_sem_maps.append(sem_map)
-        selected_floor_heights.append((scene_info["floor_heights_cm"][i]))
-    scene_info["floor_maps"] = selected_sem_maps
-    scene_info["floor_heights_cm"] = selected_floor_heights
-    print(len(scene_info["floor_maps"]))
-    # assert len(scene_info["floor_maps"]) > 0
-    # except:
-    #     print(f"Could not load floor semantic maps for scene {scene_key}")
-    #     return
+    try:
+        scene_dir = "/".join(scene_path.split("/")[:-1])
+        scene_key = scene_path.split("/")[-1].split(".")[0]
+        map_dir = scene_dir + f"/floor_semantic_maps_{semantic_map_type}"
+        with open(f"{map_dir}/{scene_key}_info.json", "r") as f:
+            scene_info = json.load(f)
+        assert len(scene_info["floor_heights_cm"]) > 0
+        selected_sem_maps, selected_floor_heights = [], []
+        for i in range(len(scene_info["floor_heights_cm"])):
+            sem_map = np.load(f"{map_dir}/{scene_key}_floor{i}.npy")
+            category_counts = sem_map.sum(2).sum(1)
+            goal_categories_present = [
+                i for i in goal_id_to_coco_id.keys()
+                if category_counts[goal_id_to_coco_id[i] + 1] > 0
+            ]
+            if len(goal_categories_present) == 0:
+                continue
+            selected_sem_maps.append(sem_map)
+            selected_floor_heights.append((scene_info["floor_heights_cm"][i]))
+        scene_info["floor_maps"] = selected_sem_maps
+        scene_info["floor_heights_cm"] = selected_floor_heights
+        assert len(scene_info["floor_maps"]) > 0
+    except:
+        print(f"Could not load floor semantic maps for scene {scene_key}")
+        return
 
     # Create dataset and episodes
-    # dataset = SemanticExplorationPolicyTrainingDataset(
-    #     config.DATASET, dataset_generation=True)
-    # while len(dataset.episodes) < num_episodes:
-    #     episode = generate_episode(sim, len(dataset.episodes), scene_info)
-    #     if episode is not None:
-    #         dataset.episodes.append(episode)
-    # for ep in dataset.episodes:
-    #     ep.scene_id = ep.scene_id.split("scene_datasets/")[-1]
+    dataset = SemanticExplorationPolicyTrainingDataset(
+        config.DATASET, dataset_generation=True)
+    while len(dataset.episodes) < num_episodes:
+        episode = generate_episode(sim, len(dataset.episodes), scene_info)
+        if episode is not None:
+            dataset.episodes.append(episode)
+    for ep in dataset.episodes:
+        ep.scene_id = ep.scene_id.split("scene_datasets/")[-1]
 
     sim.close()
 
     # Store episodes with one file per scene
-    # out_path = f"{DATASET_ROOT_PATH}/{dataset_type}/{split}/scenes/{scene_key}.json.gz"
-    # os.makedirs(os.path.dirname(out_path), exist_ok=True)
-    # with gzip.open(out_path, "wt") as f:
-    #     f.write(dataset.to_json())
+    out_path = f"{DATASET_ROOT_PATH}/{dataset_type}/{split}/scenes/{scene_key}.json.gz"
+    os.makedirs(os.path.dirname(out_path), exist_ok=True)
+    with gzip.open(out_path, "wt") as f:
+        f.write(dataset.to_json())
 
 
 if __name__ == "__main__":
