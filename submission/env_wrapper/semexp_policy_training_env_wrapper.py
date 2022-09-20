@@ -54,7 +54,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
                     config.TASK_CONFIG.DATASET)
                 scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
                 if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
-                    scenes = [dataset.scene_from_scene_path(scene_id)
+                    scenes = [scene_id.split("/")[-1].split(".")[0]
                               for scene_id in dataset.scene_ids]
             else:
                 dataset = make_dataset(config.TASK_CONFIG.DATASET.TYPE)
