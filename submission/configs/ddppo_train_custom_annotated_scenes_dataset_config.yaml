@@ -61,7 +61,7 @@ EVAL_VECTORIZED:
 TRAIN:
   RL:
     exp_name: ddppo_train_custom_annotated_scenes_dataset  # experiment name
-    algorithm: DDPPO            # one of "PPO" or "DDPPO"
+    algorithm: PPO            # one of "PPO" or "DDPPO"
     gamma: 0.9                  # discount factor of the MDP
     intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area increase) scaling
     dense_goal_rew_coeff: 0.01  # dense goal reward (distance to goal decrease) scaling
@@ -86,11 +86,11 @@ TRAIN:
       #num_cpus_per_worker: 13     # number of CPUs per worker
 
       # 8 x 32GB GPUs
-      num_workers: 21
-      num_gpus: 1
-      num_cpus_for_driver: 13
-      num_gpus_per_worker: 0.33
-      num_cpus_per_worker: 3
+      #num_workers: 21
+      #num_gpus: 1
+      #num_cpus_for_driver: 13
+      #num_gpus_per_worker: 0.33
+      #num_cpus_per_worker: 3
 
     DDPPO:
       # 2 x 32GB GPUs
