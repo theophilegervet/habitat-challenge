@@ -417,12 +417,12 @@ if __name__ == "__main__":
 
         # For all scenes, generate semantic maps from first-person
         # segmentation predictions
-        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
-        generate_unannotated_scene_semantic_maps = partial(
-            generate_scene_semantic_maps,
-            generation_method="predicted_first_person",
-            device=torch.device("cuda:1")
-        )
-        with multiprocessing.Pool(5) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-            for _ in pool.imap_unordered(generate_unannotated_scene_semantic_maps, scenes):
-                pbar.update()
+        # scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+        # generate_unannotated_scene_semantic_maps = partial(
+        #     generate_scene_semantic_maps,
+        #     generation_method="predicted_first_person",
+        #     device=torch.device("cuda:1")
+        # )
+        # with multiprocessing.Pool(5) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+        #     for _ in pool.imap_unordered(generate_unannotated_scene_semantic_maps, scenes):
+        #         pbar.update()
