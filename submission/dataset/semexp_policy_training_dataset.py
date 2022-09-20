@@ -47,7 +47,11 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
         split_dir = os.path.dirname(split_filepath)
         if os.path.exists(f"{split_dir}/scenes"):
             for scene_path in glob.glob(f"{split_dir}/scenes/*"):
+                print("scene_path:::", scene_path)
+                print("config.CONTENT_SCENES:::", config.CONTENT_SCENES)
                 scene_id = scene_path.split("/")[-1].split(".")[0]
+                print("scene_id:::", scene_id)
+                print()
                 if (ALL_SCENES_MASK not in config.CONTENT_SCENES
                         and scene_id not in config.CONTENT_SCENES):
                     continue
