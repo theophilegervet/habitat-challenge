@@ -39,7 +39,6 @@ TASK:
 
 DATASET:
   TYPE: SemexpPolicyTraining
-  SPLIT: val
+  SPLIT: train
   DATA_PATH: "habitat-challenge-data/custom_objectgoal_hm3d/annotated_scenes/{split}/{split}.json.gz"
   SCENES_DIR: "habitat-challenge-data/data/scene_datasets/"
-  CONTENT_SCENES: ["*"]
