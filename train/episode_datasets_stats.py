@@ -26,5 +26,6 @@ if __name__ == "__main__":
             goal_counter[ep.object_category] += 1
 
         print(dataset_type)
+        print(len(dataset.episodes))
         print(dict(goal_counter))
         print()

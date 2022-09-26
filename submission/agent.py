@@ -48,6 +48,7 @@ class Agent(habitat.Agent):
 
         if config.NO_GPU:
             self.device = torch.device("cpu")
+            self.module = self._module
 
         else:
             self.device_id = config.AGENT_GPU_IDS[rank]

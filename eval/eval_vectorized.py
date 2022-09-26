@@ -34,8 +34,6 @@ class VectorizedEvaluator:
         os.makedirs(self.results_dir, exist_ok=True)
 
     def eval(self, split="val", num_episodes_per_env=10):
-        # train split = 80 scenes with 50K episodes each (4M total)
-        # val split = 20 scenes with 100 episodes each (2K total)
         assert split in ["train", "val"]
         self.config.defrost()
         self.config.TASK_CONFIG.DATASET.SPLIT = split

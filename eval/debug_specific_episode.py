@@ -40,10 +40,14 @@ def reset_to_episode(env: Env,
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/debug_config.yaml")
+    config, config_str = get_config("submission/configs/ddppo_train_challenge_dataset_config.yaml")
     config.defrost()
+    # config.TASK_CONFIG.DATASET.DATA_PATH = "habitat-challenge-data/objectgoal_mp3d/{split}/{split}.json.gz"
+    config.TASK_CONFIG.DATASET.SPLIT = "val"
     config.NUM_ENVIRONMENTS = 1
     config.PRINT_IMAGES = 1
+    config.VISUALIZE = 1
+    config.NO_GPU = 1
     config.freeze()
 
     agent = Agent(config=config, rank=0, ddp=False)
@@ -65,6 +69,9 @@ if __name__ == "__main__":
                 for obj in env.sim.semantic_annotations().objects
             ])
         )
+
+    # obs = env.reset()
+    # agent.reset()
 
     t = 0
     while not env.episode_over:
