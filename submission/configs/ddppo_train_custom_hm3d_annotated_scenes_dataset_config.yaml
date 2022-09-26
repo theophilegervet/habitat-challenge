@@ -99,9 +99,9 @@ TRAIN:
       #num_cpus_per_worker: 13
 
       # 8 x 32GB GPUs
-      #num_workers: 24
-      #num_gpus_per_worker: 0.33
-      #num_cpus_per_worker: 3
+      num_workers: 24
+      num_gpus_per_worker: 0.33
+      num_cpus_per_worker: 3
 
       # 4 x 8 x 32GB GPUs
       #num_workers: 96
@@ -109,9 +109,9 @@ TRAIN:
       #num_cpus_per_worker: 3
 
       # 8 x 8 x 32GB GPUs
-      num_workers: 192
-      num_gpus_per_worker: 0.33
-      num_cpus_per_worker: 3
+      #num_workers: 192
+      #num_gpus_per_worker: 0.33
+      #num_cpus_per_worker: 3
 
       num_envs_per_worker: 1
       remote_worker_envs: False
