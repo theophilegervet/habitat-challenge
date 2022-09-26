@@ -1,7 +1,7 @@
 # Usage:
 # python train/rllib_slurm_launch.py \
-#   --exp-name ddppo_annotated_scenes \
-#   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ddppo_train_custom_annotated_scenes_dataset_config.yaml" \
+#   --exp-name ddppo_hm3d \
+#   --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ddppo_train_custom_hm3d_annotated_scenes_dataset_config.yaml" \
 #   --load-env "" \
 #   --num-nodes 8 \
 #   --num-gpus 8 \
