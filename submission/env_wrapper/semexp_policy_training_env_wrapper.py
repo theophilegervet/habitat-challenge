@@ -15,7 +15,6 @@ from habitat.sims.habitat_simulator.actions import HabitatSimActions
 from habitat.core.dataset import ALL_SCENES_MASK
 from gym.spaces import Dict as SpaceDict
 from gym.spaces import Box, Discrete
-from ray.rllib.env.env_context import EnvContext
 
 from submission.obs_preprocessor.obs_preprocessor import ObsPreprocessor
 from submission.planner.planner import Planner
@@ -39,7 +38,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
     """
 
     def __init__(self,
-                 rllib_config: Optional[EnvContext] = None,
+                 rllib_config=None,
                  config: Optional[Config] = None
                  ):
         assert rllib_config is not None or config is not None
@@ -167,7 +166,14 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         obs = super().reset()
         seq_obs = [obs]
 
-        scene_dir = "/".join(self.current_episode.scene_id.split("/")[:-1])
+        if ("hm3d" in self.current_episode.scene_id or
+                "mp3d" in self.current_episode.scene_id):
+            scene_dir = "/".join(self.current_episode.scene_id.split("/")[:-1])
+        elif "gibson" in self.current_episode.scene_id:
+            scene_dir = ".".join(self.current_episode.scene_id.split(".")[:-1])
+        else:
+            raise NotImplementedError
+
         self.scene_id = self.current_episode.scene_id.split("/")[-1].split(".")[0]
         self.episode_id = self.current_episode.episode_id
 

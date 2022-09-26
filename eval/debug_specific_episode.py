@@ -43,12 +43,13 @@ if __name__ == "__main__":
     config, config_str = get_config("submission/configs/debug_config.yaml")
     config.defrost()
     config.NUM_ENVIRONMENTS = 1
+    config.PRINT_IMAGES = 1
     config.freeze()
 
     agent = Agent(config=config, rank=0, ddp=False)
     env = Env(config=config.TASK_CONFIG)
 
-    scene_id = "4ok3usBNeis"
+    scene_id = "ziup5kvtCCR"
     episode_id = "1"
 
     obs = reset_to_episode(env, scene_id, episode_id)

@@ -1,3 +1,4 @@
+import argparse
 import multiprocessing
 import tqdm
 import torch
@@ -40,6 +41,7 @@ SCENES_ROOT_PATH = (
 class HabitatFloorMaps:
     def __init__(self,
                  sim,
+                 dataset,
                  generation_method,
                  config,
                  device,
@@ -50,6 +52,7 @@ class HabitatFloorMaps:
         """
         Arguments:
             generation_method: how to generate semantic maps
+            dataset: one of ["hm3d", "mp3d", "gibson"]
             num_sampled_points: number of navigable points to sample to
              create floor maps
             resolution: map bin size (in cm)
@@ -63,6 +66,7 @@ class HabitatFloorMaps:
         ]
 
         self.sim = sim
+        self.dataset = dataset
         self.num_sampled_points = num_sampled_points
         self.resolution = resolution
         self.floor_thr = floor_thr
@@ -189,11 +193,21 @@ class HabitatFloorMaps:
         sem_map[0] = navigable_map
 
         for obj in self.sim.semantic_annotations().objects:
-            category_id = mp3d_categories_mapping.get(
-                hm3d_to_mp3d.get(
-                    obj.category.name().lower().strip()
+            if self.dataset == "hm3d":
+                category_id = mp3d_categories_mapping.get(
+                    hm3d_to_mp3d.get(
+                        obj.category.name().lower().strip()
+                    )
                 )
-            )
+            elif self.dataset == "mp3d":
+                category_id = mp3d_categories_mapping.get(
+                    obj.category.index()
+                )
+            elif self.dataset == "gibson":
+                category_id = coco_categories.get(
+                    obj.category.name()
+                ) if obj is not None else None
+
             if category_id is None:
                 continue
 
@@ -335,12 +349,17 @@ def visualize_sem_map(sem_map):
 
 
 def generate_scene_semantic_maps(scene_path: str,
+                                 dataset: str,
                                  generation_method: str,
                                  device: torch.device,
                                  overwrite: bool = True):
-    scene_dir = "/".join(scene_path.split("/")[:-1])
-    scene_file = scene_path.split("/")[-1]
-    scene_id = scene_file.split(".")[0]
+    if dataset in ["hm3d", "mp3d"]:
+        scene_dir = "/".join(scene_path.split("/")[:-1])
+        scene_file = scene_path.split("/")[-1]
+        scene_id = scene_file.split(".")[0]
+    elif dataset == "gibson":
+        scene_dir = ".".join(scene_path.split(".")[:-1])
+        scene_id = scene_dir.split("/")[-1]
     map_dir = scene_dir + f"/floor_semantic_maps_{generation_method}"
 
     if overwrite is False and os.path.exists(f"{map_dir}/{scene_id}_info.json"):
@@ -357,13 +376,19 @@ def generate_scene_semantic_maps(scene_path: str,
     elif generation_method == "predicted_first_person":
         config.GROUND_TRUTH_SEMANTICS = 0
     task_config = config.TASK_CONFIG
-    task_config.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID = device.index
+    if device.index is not None:
+        task_config.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID = device.index
     task_config.SIMULATOR.SCENE = scene_path
-    task_config.SIMULATOR.SCENE_DATASET = f"{SCENES_ROOT_PATH}/hm3d/hm3d_annotated_basis.scene_dataset_config.json"
+    if dataset == "hm3d":
+        task_config.SIMULATOR.SCENE_DATASET = f"{SCENES_ROOT_PATH}/hm3d/hm3d_annotated_basis.scene_dataset_config.json"
     config.freeze()
 
-    sim = habitat.sims.make_sim("Sim-v0", config=task_config.SIMULATOR)
-    floor_maps = HabitatFloorMaps(sim, generation_method, config, device)
+    try:
+        sim = habitat.sims.make_sim("Sim-v0", config=task_config.SIMULATOR)
+    except:
+        print(f"Could not create sim for {scene_dir}")
+        return
+    floor_maps = HabitatFloorMaps(sim, dataset, generation_method, config, device)
 
     print(f"Saving {generation_method} floor semantic maps for {scene_dir}")
 
@@ -401,28 +426,64 @@ if __name__ == "__main__":
     os.environ["MAGNUM_LOG"] = "quiet"
     os.environ["HABITAT_SIM_LOG"] = "quiet"
 
-    for split in ["train"]:
-        # For scenes with semantic annotations, generate semantic maps
-        # from top-down bounding boxes
-        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*semantic.glb")
-        scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
+    parser = argparse.ArgumentParser(
+        "Generate floor semantic maps for a scene dataset.")
+    parser.add_argument("--dataset", type=str,
+                        help="Dataset in ['hm3d', 'mp3d', 'gibson'].")
+    parser.add_argument("--split", type=str,
+                        help="Split in ['train', 'val'].")
+    parser.add_argument("--scene-type", type=str,
+                        help="Type of scene to process in ['annotated', 'unannotated'].")
+    parser.add_argument("--debug", action="store_true")
+    args = parser.parse_args()
+
+    assert args.dataset in ["hm3d", "mp3d", "gibson"]
+    assert args.split in ["train", "val"]
+    assert args.scene_type in ["annotated", "unannotated"]
+
+    device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu")
+
+    # For scenes with semantic annotations, generate semantic maps
+    # from top-down bounding boxes
+    if args.scene_type == "annotated":
+        if args.dataset == "hm3d":
+            scenes = glob.glob(f"{SCENES_ROOT_PATH}/{args.dataset}/{args.split}/*/*semantic.glb")
+            scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
+        elif args.dataset == "mp3d":
+            scenes = glob.glob(f"{SCENES_ROOT_PATH}/{args.dataset}/*/*.glb")
+        elif args.dataset == "gibson":
+            scenes = glob.glob(f"{SCENES_ROOT_PATH}/{args.dataset}/*.scn")
+            scenes = [scene.replace(".scn", ".glb") for scene in scenes]
+
         generate_annotated_scene_semantic_maps = partial(
             generate_scene_semantic_maps,
+            dataset=args.dataset,
             generation_method="annotations_top_down",
-            device=torch.device("cuda:1")
+            device=device
         )
-        with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-            for _ in pool.imap_unordered(generate_annotated_scene_semantic_maps, scenes):
-                pbar.update()
+        if args.debug:
+            generate_annotated_scene_semantic_maps(scenes[0])
+        else:
+            with multiprocessing.Pool(8) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+                for _ in pool.imap_unordered(generate_annotated_scene_semantic_maps, scenes):
+                    pbar.update()
 
-        # For all scenes, generate semantic maps from first-person
-        # segmentation predictions
-        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+    # For all scenes, generate semantic maps from first-person
+    # segmentation predictions
+    if args.scene_type == "unannotated":
+        if args.dataset in ["mp3d", "gibson"]:
+            raise NotImplementedError
+
+        scenes = glob.glob(f"{SCENES_ROOT_PATH}/{args.dataset}/{args.split}/*/*basis.glb")
         generate_unannotated_scene_semantic_maps = partial(
             generate_scene_semantic_maps,
+            dataset=args.dataset,
             generation_method="predicted_first_person",
-            device=torch.device("cuda:1")
+            device=device
         )
-        with multiprocessing.Pool(5) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-            for _ in pool.imap_unordered(generate_unannotated_scene_semantic_maps, scenes):
-                pbar.update()
+        if args.debug:
+            generate_unannotated_scene_semantic_maps(scenes[0])
+        else:
+            with multiprocessing.Pool(5) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+                for _ in pool.imap_unordered(generate_unannotated_scene_semantic_maps, scenes):
+                    pbar.update()

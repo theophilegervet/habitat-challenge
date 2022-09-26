@@ -1,12 +1,7 @@
 import torch
 import torch.nn.functional as F
 
-from ray.rllib.agents import ppo
-from ray.rllib.models import ModelCatalog
-
 from .policy import Policy
-from .semantic_exploration_policy_network import SemanticExplorationPolicyModelWrapper
-from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
 
 class SemanticExplorationPolicy(Policy):
@@ -31,6 +26,12 @@ class SemanticExplorationPolicy(Policy):
             self.local_map_size,
             self.local_map_size
         )
+
+        # Only import ray if this class is instantiated
+        from ray.rllib.agents import ppo
+        from ray.rllib.models import ModelCatalog
+        from .semantic_exploration_policy_network import SemanticExplorationPolicyModelWrapper
+        from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
         ModelCatalog.register_custom_model(
             "semexp_custom_model",

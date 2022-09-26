@@ -39,7 +39,11 @@ class SemanticExplorationPolicyTrainingDataset(Dataset):
             return
 
         # Read file for all split
-        split_filepath = config.DATA_PATH.format(split=config.SPLIT)
+        split_filepath = config.DATA_PATH.format(
+            split=config.SPLIT,
+            dataset_type=config.DATASET_TYPE,
+            scene_type=config.SCENE_TYPE
+        )
         with gzip.open(split_filepath, "rt") as f:
             self.from_json(f.read(), scenes_dir=config.SCENES_DIR)
 

@@ -39,9 +39,8 @@ TASK:
 
 DATASET:
   TYPE: SemexpPolicyTraining
-  SPLIT: val
-  DATA_PATH: "habitat-challenge-data/custom_objectgoal_hm3d/annotated_scenes/{split}/{split}.json.gz"
+  SPLIT: train
+  DATASET_TYPE: gibson
+  SCENE_TYPE: annotated
+  DATA_PATH: "habitat-challenge-data/custom_objectgoal_{dataset_type}/{scene_type}_scenes/{split}/{split}.json.gz"
   SCENES_DIR: "habitat-challenge-data/data/scene_datasets/"
-  # Val scenes
-  # ['4ok3usBNeis', '5cdEh9F2hJL', '6s7QHgap2fW', 'DYehNKdT76V', 'Dd4bFSTQ8gi', 'Nfvxx8J5NCo', 'QaLdnwvtxbs', 'TEEsavR23oF', 'XB4GS9ShBRE', 'bxsVRursffK', 'cvZr5TUy5C5', 'mL8ThkuaVTM', 'mv2HUxq3B53', 'p53SfW6mjZe', 'q3zU7Yy5E5s', 'qyAac8rV8Zk', 'svBbv1Pavdk', 'wcojb4TFT35', 'ziup5kvtCCR', 'zt1RVoi7PcG']
-  CONTENT_SCENES: ['4ok3usBNeis']

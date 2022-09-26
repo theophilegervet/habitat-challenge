@@ -1,3 +1,4 @@
+import argparse
 from typing import Optional
 import glob
 import gzip
@@ -28,13 +29,13 @@ from submission.utils.constants import (
 )
 
 
-SCENES_ROOT_PATH = (
+SCENES_ROOT_PATH = str(
     Path(__file__).resolve().parent.parent /
     "habitat-challenge-data/data/scene_datasets"
 )
-DATASET_ROOT_PATH = (
+DATASET_ROOT_PATH = str(
     Path(__file__).resolve().parent.parent /
-    "habitat-challenge-data/custom_objectgoal_hm3d"
+    "habitat-challenge-data/custom_objectgoal"
 )
 
 
@@ -116,30 +117,40 @@ def generate_episode(sim,
 
 def generate_scene_episodes(scene_path: str,
                             dataset_type: str,
+                            scene_type: str,
                             split: str,
                             num_episodes: int):
-    assert dataset_type in ["annotated_scenes", "unannotated_scenes"]
-    if dataset_type == "annotated_scenes":
+    assert scene_type in ["annotated_scenes", "unannotated_scenes"]
+    if scene_type == "annotated_scenes":
         semantic_map_type = "annotations_top_down"
     else:
         semantic_map_type = "predicted_first_person"
 
     config = habitat.get_config(str(
         Path(__file__).resolve().parent.parent /
-        f"submission/dataset/train_custom_{dataset_type}_dataset_config.yaml"
+        f"submission/dataset/train_custom_{dataset_type}_{scene_type}_dataset_config.yaml"
     ))
     config.defrost()
     config.SIMULATOR.SCENE = scene_path
-    config.SIMULATOR.SCENE_DATASET = f"{SCENES_ROOT_PATH}/hm3d/hm3d_annotated_basis.scene_dataset_config.json"
+    if dataset_type == "hm3d":
+        config.SIMULATOR.SCENE_DATASET = f"{SCENES_ROOT_PATH}/hm3d/hm3d_annotated_basis.scene_dataset_config.json"
     config.DATASET.SPLIT = split
     config.freeze()
 
-    sim = habitat.sims.make_sim("Sim-v0", config=config.SIMULATOR)
+    try:
+        sim = habitat.sims.make_sim("Sim-v0", config=config.SIMULATOR)
+    except:
+        print(f"Could not create sim for scene {scene_path}")
+        return
 
     # Load scene floor semantic maps
     try:
-        scene_dir = "/".join(scene_path.split("/")[:-1])
-        scene_key = scene_path.split("/")[-1].split(".")[0]
+        if dataset_type in ["hm3d", "mp3d"]:
+            scene_dir = "/".join(scene_path.split("/")[:-1])
+            scene_key = scene_path.split("/")[-1].split(".")[0]
+        elif dataset_type == "gibson":
+            scene_dir = ".".join(scene_path.split(".")[:-1])
+            scene_key = scene_dir.split("/")[-1]
         map_dir = scene_dir + f"/floor_semantic_maps_{semantic_map_type}"
         with open(f"{map_dir}/{scene_key}_info.json", "r") as f:
             scene_info = json.load(f)
@@ -176,7 +187,8 @@ def generate_scene_episodes(scene_path: str,
     sim.close()
 
     # Store episodes with one file per scene
-    out_path = f"{DATASET_ROOT_PATH}/{dataset_type}/{split}/scenes/{scene_key}.json.gz"
+    out_path = (f"{DATASET_ROOT_PATH}_{dataset_type}/{scene_type}/"
+                f"{split}/scenes/{scene_key}.json.gz")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with gzip.open(out_path, "wt") as f:
         f.write(dataset.to_json())
@@ -186,43 +198,75 @@ if __name__ == "__main__":
     os.environ["MAGNUM_LOG"] = "quiet"
     os.environ["HABITAT_SIM_LOG"] = "quiet"
 
+    parser = argparse.ArgumentParser("Generate episodes from floor semantic maps.")
+    parser.add_argument("--dataset", type=str, default="hm3d",
+                        help="Dataset in ['hm3d', 'mp3d', 'gibson'].")
+    parser.add_argument("--split", type=str, default="train",
+                        help="Split in ['train', 'val'].")
+    parser.add_argument("--scene-type", type=str, default="annotated",
+                        help="Type of scene to process in ['annotated', 'unannotated'].")
+    parser.add_argument("--debug", action="store_true")
+    args = parser.parse_args()
+
+    assert args.dataset in ["hm3d", "mp3d", "gibson"]
+    assert args.split in ["train", "val"]
+    assert args.scene_type in ["annotated", "unannotated"]
+    if args.dataset in ["mp3d", "gibson"]:
+        args.split = "train"
+
     # Dataset is stored in per-scene files, generate empty split files
-    for split in ["val", "train"]:
-        for dataset_type in ["annotated_scenes", "unannotated_scenes"]:
-            split_filepath = f"{DATASET_ROOT_PATH}/{dataset_type}/{split}/{split}.json.gz"
-            os.makedirs(os.path.dirname(split_filepath), exist_ok=True)
-            with gzip.open(split_filepath, "wt") as f:
-                json.dump(dict(episodes=[]), f)
+    split_filepath = (f"{DATASET_ROOT_PATH}_{args.dataset}/"
+                      f"{args.scene_type}_scenes/{args.split}/{args.split}.json.gz")
+    os.makedirs(os.path.dirname(split_filepath), exist_ok=True)
+    with gzip.open(split_filepath, "wt") as f:
+        json.dump(dict(episodes=[]), f)
 
     # Generate per-scene files
-    for split in ["train"]:
-        # For scenes with semantic annotations, generate episode dataset
-        # from semantic maps built from top-down bounding boxes
-        # scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*semantic.glb")
-        # scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
-        # generate_annotated_scene_episodes = partial(
-        #     generate_scene_episodes,
-        #     dataset_type="annotated_scenes",
-        #     split=split,
-        #     # 100 annotated train scenes * 40K ep per scene = 4M train ep
-        #     # 20 annotated val scenes * 100 ep per scene = 2K eval ep
-        #     num_episodes=40000 if split == "train" else 100
-        # )
-        # with multiprocessing.Pool(40) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-        #     for _ in pool.imap_unordered(generate_annotated_scene_episodes, scenes):
-        #         pbar.update()
+    # For scenes with semantic annotations, generate episode dataset
+    # from semantic maps built from top-down bounding boxes
+    if args.scene_type == "annotated":
+        if args.dataset == "hm3d":
+            scenes = glob.glob(f"{SCENES_ROOT_PATH}/{args.dataset}/{args.split}/*/*semantic.glb")
+            scenes = [scene.replace("semantic.glb", "basis.glb") for scene in scenes]
+        elif args.dataset == "mp3d":
+            scenes = glob.glob(f"{SCENES_ROOT_PATH}/{args.dataset}/*/*.glb")
+        elif args.dataset == "gibson":
+            scenes = glob.glob(f"{SCENES_ROOT_PATH}/{args.dataset}/*.scn")
+            scenes = [scene.replace(".scn", ".glb") for scene in scenes]
 
-        # For all scenes, generate episode dataset from semantic maps
-        # built from first-person segmentation predictions
-        scenes = glob.glob(f"{SCENES_ROOT_PATH}/hm3d/{split}/*/*basis.glb")
+        generate_annotated_scene_episodes = partial(
+            generate_scene_episodes,
+            dataset_type=args.dataset,
+            scene_type="annotated_scenes",
+            split=args.split,
+            # 4M train ep, 2K val ep
+            num_episodes=int(4e6) // len(scenes) if args.split == "train" else 2000 // len(scenes)
+        )
+        if args.debug:
+            generate_annotated_scene_episodes(scenes[0])
+        else:
+            with multiprocessing.Pool(40) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+                for _ in pool.imap_unordered(generate_annotated_scene_episodes, scenes):
+                    pbar.update()
+
+    # For all scenes, generate episode dataset from semantic maps
+    # built from first-person segmentation predictions
+    if args.scene_type == "unannotated":
+        if args.dataset in ["mp3d", "gibson"]:
+            raise NotImplementedError
+
+        scenes = glob.glob(f"{SCENES_ROOT_PATH}/{args.dataset}/{args.split}/*/*basis.glb")
         generate_unannotated_scene_episodes = partial(
             generate_scene_episodes,
-            dataset_type="unannotated_scenes",
-            split=split,
-            # 800 unannotated train scenes * 5K ep per scene = 4M train ep
-            # 100 unannotated val scenes * 20 ep per scene = 2K eval ep
-            num_episodes=5000 if split == "train" else 20
+            dataset_type=args.dataset,
+            scene_type="unannotated_scenes",
+            split=args.split,
+            # 4M train ep, 2K val ep
+            num_episodes=int(4e6) // len(scenes) if args.split == "train" else 2000 // len(scenes)
         )
-        with multiprocessing.Pool(40) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
-            for _ in pool.imap_unordered(generate_unannotated_scene_episodes, scenes):
-                pbar.update()
+        if args.debug:
+            generate_unannotated_scene_episodes(scenes[0])
+        else:
+            with multiprocessing.Pool(40) as pool, tqdm.tqdm(total=len(scenes)) as pbar:
+                for _ in pool.imap_unordered(generate_unannotated_scene_episodes, scenes):
+                    pbar.update()
