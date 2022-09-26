@@ -239,6 +239,12 @@ class VectorizedEvaluator:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
+        "--config_path",
+        type=str,
+        default="submission/configs/debug_config.yaml",
+        help="Path to config yaml",
+    )
+    parser.add_argument(
         "opts",
         default=None,
         nargs=argparse.REMAINDER,
@@ -251,7 +257,7 @@ if __name__ == "__main__":
     print("-" * 100)
 
     print("Config:")
-    config, config_str = get_config("submission/configs/eval_config.yaml", args.opts)
+    config, config_str = get_config(args.config_path, args.opts)
     evaluator = VectorizedEvaluator(config, config_str)
     print(config_str)
     print("-" * 100)
