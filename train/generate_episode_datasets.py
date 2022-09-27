@@ -119,7 +119,8 @@ def generate_scene_episodes(scene_path: str,
                             dataset_type: str,
                             scene_type: str,
                             split: str,
-                            num_episodes: int):
+                            num_episodes: int,
+                            overwrite: bool = False):
     assert scene_type in ["annotated_scenes", "unannotated_scenes"]
     if scene_type == "annotated_scenes":
         semantic_map_type = "annotations_top_down"
@@ -174,6 +175,12 @@ def generate_scene_episodes(scene_path: str,
         print(f"Could not load floor semantic maps for scene {scene_key}")
         return
 
+    out_path = (f"{DATASET_ROOT_PATH}_{dataset_type}/{scene_type}/"
+                f"{split}/scenes/{scene_key}.json.gz")
+    if overwrite is False and os.path.exists(out_path):
+        print(f"Already episodes for {scene_key}")
+        return
+
     # Create dataset and episodes
     dataset = SemanticExplorationPolicyTrainingDataset(
         config.DATASET, dataset_generation=True)
@@ -187,8 +194,6 @@ def generate_scene_episodes(scene_path: str,
     sim.close()
 
     # Store episodes with one file per scene
-    out_path = (f"{DATASET_ROOT_PATH}_{dataset_type}/{scene_type}/"
-                f"{split}/scenes/{scene_key}.json.gz")
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with gzip.open(out_path, "wt") as f:
         f.write(dataset.to_json())

@@ -3,7 +3,7 @@
 # Confusion matrix on HM3D, MP3D, Gibson
 sbatch eval/eval_vectorized.sh --config_path=submission/configs/eval_hm3d_config.yaml
 sbatch eval/eval_vectorized.sh --config_path=submission/configs/eval_mp3d_config.yaml
-#sbatch eval/eval_vectorized.sh --config_path=submission/configs/eval_gibson_config.yaml
+sbatch eval/eval_vectorized.sh --config_path=submission/configs/eval_gibson_config.yaml
 
 # Ablation study on HM3D
 #sbatch eval/eval_vectorized.sh --config_path=submission/configs/eval_hm3d_config.yaml EXP_NAME eval_standard
