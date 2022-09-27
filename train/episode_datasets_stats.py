@@ -8,7 +8,7 @@ from submission.dataset.semexp_policy_training_dataset import SemanticExploratio
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/ddppo_train_custom_annotated_scenes_dataset_config.yaml")
+    config, config_str = get_config("submission/configs/ddppo_train_custom_hm3d_annotated_scenes_dataset_config.yaml")
 
     for dataset_type in ["hm3d", "gibson", "mp3d"]:
         config.defrost()
