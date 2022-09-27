@@ -14,7 +14,7 @@ if __name__ == "__main__":
         config.defrost()
         config.TASK_CONFIG.DATASET.DATASET_TYPE = dataset_type
         config.TASK_CONFIG.DATASET.SCENE_TYPE = "annotated"
-        config.TASK_CONFIG.DATASET.SPLIT = "val"
+        config.TASK_CONFIG.DATASET.SPLIT = "train"
         config.freeze()
 
         dataset = SemanticExplorationPolicyTrainingDataset(config=config.TASK_CONFIG.DATASET)
