@@ -20,8 +20,6 @@ if __name__ == "__main__":
         dataset = SemanticExplorationPolicyTrainingDataset(config=config.TASK_CONFIG.DATASET)
 
         goal_counter = Counter()
-        euclidean_distances_to_goal = []
-
         for ep in dataset.episodes:
             goal_counter[ep.object_category] += 1
 
