@@ -5,7 +5,7 @@ SIMULATOR_GPU_IDS: [0, 1] # IDs of GPUs to use for vectorized environments
 NO_GPU: 0                 # 1: ignore IDs above and run on CPU, 0: run on GPUs with IDs above
 NUM_ENVIRONMENTS: 1       # number of environments (per agent process)
 DUMP_LOCATION: data       # path to dump models and log
-EXP_NAME: ddppo_train_challenge  # experiment name
+EXP_NAME: ddppo_train_challenge_hm3d  # experiment name
 MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
 VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
 PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
@@ -60,7 +60,7 @@ EVAL_VECTORIZED:
 
 TRAIN:
   RL:
-    exp_name: ddppo_train_challenge  # experiment name
+    exp_name: ddppo_train_challenge_hm3d  # experiment name
     algorithm: DDPPO              # one of "PPO" or "DDPPO"
     gamma: 0.9                  # discount factor of the MDP
     intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
@@ -70,7 +70,7 @@ TRAIN:
     checkpoint_freq: 100        # how many training iterations between checkpoints
     rollout_fragment_length: 20 # divide episodes into fragments of this many steps each
     sgd_epochs: 4               # number of SGD epochs (number of SGD iterations per minibatch)
-    restore: "/private/home/theop123/ray_results/ddppo_train_challenge/DDPPO_SemanticExplorationPolicyTrainingEnvWrapper_bd55e_00000_0_2022-09-08_03-55-24/checkpoint_000600/checkpoint-600"                   # checkpoint to resume training from (if any)
+    restore:                    # checkpoint to resume training from (if any)
 
     # -----------------------------
     # With MMDetection segmentation
