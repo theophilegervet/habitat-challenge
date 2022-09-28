@@ -24,14 +24,14 @@ do
 done
 
 # Train semantic exploration policy on HM3D, MP3D, Gibson
-#for DATASET in hm3d mp3d gibson
-#do
-#  python train/rllib_slurm_launch.py \
-#    --exp-name ddppo_train_custom_${DATASET}_annotated_scenes \
-#    --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ddppo_train_custom_${DATASET}_annotated_scenes_dataset_config.yaml" \
-#    --load-env "" \
-#    --num-nodes 8 \
-#    --num-gpus 8 \
-#    --partition learnfair \
-#    --external-redis
-#done
+for DATASET in hm3d mp3d gibson
+do
+  python train/rllib_slurm_launch.py \
+    --exp-name ddppo_train_custom_${DATASET}_annotated_scenes \
+    --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ddppo_train_custom_${DATASET}_annotated_scenes_dataset_config.yaml" \
+    --load-env "" \
+    --num-nodes 8 \
+    --num-gpus 8 \
+    --partition learnfair \
+    --external-redis
+done
