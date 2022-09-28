@@ -87,12 +87,13 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         assert config.NUM_ENVIRONMENTS == 1
         self.dataset_type = config.TASK_CONFIG.DATASET.TYPE
-        if self.dataset_type == "SemexpPolicyTraining":
-            if "unannotated_scenes" in config.TASK_CONFIG.DATASET.DATA_PATH:
-                self.ground_truth_semantic_map_type = "predicted_first_person"
-            else:
-                self.ground_truth_semantic_map_type = "annotations_top_down"
-            self.dense_goal_rew_coeff = config.TRAIN.RL.dense_goal_rew_coeff
+        # TODO Debugging
+        # if self.dataset_type == "SemexpPolicyTraining":
+        #     if "unannotated_scenes" in config.TASK_CONFIG.DATASET.DATA_PATH:
+        #         self.ground_truth_semantic_map_type = "predicted_first_person"
+        #     else:
+        #         self.ground_truth_semantic_map_type = "annotations_top_down"
+        #     self.dense_goal_rew_coeff = config.TRAIN.RL.dense_goal_rew_coeff
         self.device = (torch.device("cpu") if config.NO_GPU else
                        torch.device(f"cuda:{self.habitat_env.sim.gpu_device}"))
         self.goal_update_steps = config.AGENT.POLICY.SEMANTIC.goal_update_steps
@@ -150,10 +151,11 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         self.goal_name = None
         self.infos = None
 
-        if self.dataset_type == "SemexpPolicyTraining":
-            self.gt_planner = None
-            self.gt_map_resolution = None
-            self.xz_origin_cm = None
+        # TODO Debugging
+        # if self.dataset_type == "SemexpPolicyTraining":
+        #     self.gt_planner = None
+        #     self.gt_map_resolution = None
+        #     self.xz_origin_cm = None
 
     def reset(self) -> dict:
         self.timestep = 0
@@ -197,36 +199,37 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
         # If we are training on a dataset generated specifically for
         # semantic exploration policy training, create the ground-truth
         # planner that allows us to compute dense distance to goal reward
-        if self.dataset_type == "SemexpPolicyTraining":
-            map_dir = (
-                scene_dir +
-                f"/floor_semantic_maps_{self.ground_truth_semantic_map_type}"
-            )
-            with open(f"{map_dir}/{self.scene_id}_info.json", "r") as f:
-                scene_info = json.load(f)
-            start_height_cm = self.current_episode.start_position[1] * 100.
-            floor_heights_cm = scene_info["floor_heights_cm"]
-            self.xz_origin_cm = scene_info["xz_origin_cm"]
-            self.gt_map_resolution = scene_info["map_generation_parameters"][
-                "resolution_cm"]
-            floor_idx = min(
-                range(len(floor_heights_cm)),
-                key=lambda idx: abs(floor_heights_cm[idx] - start_height_cm)
-            )
-            sem_map = np.load(f"{map_dir}/{self.scene_id}_floor{floor_idx}.npy")
-            selem = skimage.morphology.disk(2)
-            traversible = skimage.morphology.binary_dilation(
-                sem_map[0], selem) != True
-            traversible = 1 - traversible
-            self.gt_planner = FMMPlanner(traversible)
-            selem = skimage.morphology.disk(int(100 / self.gt_map_resolution))
-            goal_map = skimage.morphology.binary_dilation(
-                sem_map[self.goal_category + 1], selem) != True
-            goal_map = 1 - goal_map
-            if goal_map.sum() == 0:
-                # TODO Why does this happen?
-                return self.reset()
-            self.gt_planner.set_multi_goal(goal_map)
+        # TODO Debugging
+        # if self.dataset_type == "SemexpPolicyTraining":
+        #     map_dir = (
+        #         scene_dir +
+        #         f"/floor_semantic_maps_{self.ground_truth_semantic_map_type}"
+        #     )
+        #     with open(f"{map_dir}/{self.scene_id}_info.json", "r") as f:
+        #         scene_info = json.load(f)
+        #     start_height_cm = self.current_episode.start_position[1] * 100.
+        #     floor_heights_cm = scene_info["floor_heights_cm"]
+        #     self.xz_origin_cm = scene_info["xz_origin_cm"]
+        #     self.gt_map_resolution = scene_info["map_generation_parameters"][
+        #         "resolution_cm"]
+        #     floor_idx = min(
+        #         range(len(floor_heights_cm)),
+        #         key=lambda idx: abs(floor_heights_cm[idx] - start_height_cm)
+        #     )
+        #     sem_map = np.load(f"{map_dir}/{self.scene_id}_floor{floor_idx}.npy")
+        #     selem = skimage.morphology.disk(2)
+        #     traversible = skimage.morphology.binary_dilation(
+        #         sem_map[0], selem) != True
+        #     traversible = 1 - traversible
+        #     self.gt_planner = FMMPlanner(traversible)
+        #     selem = skimage.morphology.disk(int(100 / self.gt_map_resolution))
+        #     goal_map = skimage.morphology.binary_dilation(
+        #         sem_map[self.goal_category + 1], selem) != True
+        #     goal_map = 1 - goal_map
+        #     if goal_map.sum() == 0:
+        #         # TODO Why does this happen?
+        #         return self.reset()
+        #     self.gt_planner.set_multi_goal(goal_map)
 
         if self.print_images:
             vis_inputs = {
@@ -260,9 +263,10 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
     def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
         self.timestep += 1
         prev_explored_area = self.semantic_map.global_map[0, 1].sum()
-        if self.dataset_type == "SemexpPolicyTraining":
-            prev_distance_to_goal = self._compute_distance_to_goal(
-                list(self.habitat_env.sim.get_agent_state().position))
+        # TODO Debugging
+        # if self.dataset_type == "SemexpPolicyTraining":
+        #     prev_distance_to_goal = self._compute_distance_to_goal(
+        #         list(self.habitat_env.sim.get_agent_state().position))
 
         # Set high-level goal predicted by the policy
         goal_location = (expit(goal_action) * (self.semantic_map.local_h - 1)).astype(int)
@@ -296,16 +300,22 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             )
 
             # 4 - Check whether we found the goal
-            if self.dataset_type == "SemexpPolicyTraining":
-                curr_distance_to_goal = self._compute_distance_to_goal(
-                    list(self.habitat_env.sim.get_agent_state().position))
-                found_goal = (curr_distance_to_goal < 10.0)
-            else:
-                _, found_goal = self.policy.reach_goal_if_in_map(
-                    map_features,
-                    self.goal_category_tensor
-                )
-                found_goal = found_goal.item()
+            # TODO Debugging
+            # if self.dataset_type == "SemexpPolicyTraining":
+            #     curr_distance_to_goal = self._compute_distance_to_goal(
+            #         list(self.habitat_env.sim.get_agent_state().position))
+            #     found_goal = (curr_distance_to_goal < 10.0)
+            # else:
+            #     _, found_goal = self.policy.reach_goal_if_in_map(
+            #         map_features,
+            #         self.goal_category_tensor
+            #     )
+            #     found_goal = found_goal.item()
+            _, found_goal = self.policy.reach_goal_if_in_map(
+                map_features,
+                self.goal_category_tensor
+            )
+            found_goal = found_goal.item()
 
             if found_goal:
                 break
@@ -344,13 +354,15 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         sparse_goal_reward = float(found_goal)
 
-        if self.dataset_type == "SemexpPolicyTraining":
-            dense_goal_reward = prev_distance_to_goal - curr_distance_to_goal
-
-            reward = (dense_goal_reward * self.dense_goal_rew_coeff +
-                      intrinsic_reward * self.intrinsic_rew_coeff)
-        else:
-            reward = sparse_goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
+        # TODO Debugging
+        # if self.dataset_type == "SemexpPolicyTraining":
+        #     dense_goal_reward = prev_distance_to_goal - curr_distance_to_goal
+        #
+        #     reward = (dense_goal_reward * self.dense_goal_rew_coeff +
+        #               intrinsic_reward * self.intrinsic_rew_coeff)
+        # else:
+        #     reward = sparse_goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
+        reward = sparse_goal_reward + intrinsic_reward * self.intrinsic_rew_coeff
 
         info = {
             "timestep": self.timestep,
@@ -362,11 +374,12 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "action_0": float(goal_action[0]),
             "action_1": float(goal_action[1]),
         }
-        if self.dataset_type == "SemexpPolicyTraining":
-            info["curr_distance_to_goal"] = curr_distance_to_goal
-            info["dense_goal_reward"] = dense_goal_reward * self.dense_goal_rew_coeff
-            info["unscaled_dense_goal_reward"] = dense_goal_reward
-            info["discounted_unscaled_dense_goal_reward"] = dense_goal_reward * (self.gamma ** (self.timestep - 1))
+        # TODO Debugging
+        # if self.dataset_type == "SemexpPolicyTraining":
+        #     info["curr_distance_to_goal"] = curr_distance_to_goal
+        #     info["dense_goal_reward"] = dense_goal_reward * self.dense_goal_rew_coeff
+        #     info["unscaled_dense_goal_reward"] = dense_goal_reward
+        #     info["discounted_unscaled_dense_goal_reward"] = dense_goal_reward * (self.gamma ** (self.timestep - 1))
 
         self.infos.append(info)
 
