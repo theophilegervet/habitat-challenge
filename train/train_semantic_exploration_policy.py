@@ -58,11 +58,11 @@ if __name__ == "__main__":
         help="Path to config yaml",
     )
     args = parser.parse_args()
-    ray_dir = Path.cwd() / args.DUMP_LOCATION / "ray"
 
     print("-" * 100)
     print("Config:")
     config, config_str = get_config(args.config_path)
+    ray_dir = Path.cwd() / config.DUMP_LOCATION / "ray"
     print(config_str)
     print("-" * 100)
     print()
