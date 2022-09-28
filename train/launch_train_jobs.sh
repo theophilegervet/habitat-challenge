@@ -11,8 +11,7 @@
 #    --external-redis
 
 # Overfit semantic exploration policy on one scene of HM3D, MP3D, Gibson
-#for DATASET in hm3d mp3d gibson
-for DATASET in mp3d gibson
+for DATASET in hm3d mp3d gibson
 do
   python train/rllib_slurm_launch.py \
     --exp-name ppo_overfit_custom_${DATASET}_annotated_scenes \

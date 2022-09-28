@@ -58,6 +58,7 @@ if __name__ == "__main__":
         help="Path to config yaml",
     )
     args = parser.parse_args()
+    ray_dir = Path.cwd() / args.DUMP_LOCATION / "ray"
 
     print("-" * 100)
     print("Config:")
@@ -73,16 +74,20 @@ if __name__ == "__main__":
     print(f"redis_password: {redis_password}")
     if ip_head is not None and redis_password is not None:
         try:
-            ray.init(address=ip_head, _redis_password=redis_password)
+            ray.init(
+                address=ip_head,
+                _redis_password=redis_password,
+                _temp_dir=ray_dir
+            )
         except:
             print("Could not initialize cluster with "
                   "ray.init(address=ip_head, _redis_password=redis_password). "
                   "Initializing it with ray.init()")
             print()
             traceback.print_exc()
-            ray.init()
+            ray.init(_temp_dir=ray_dir)
     else:
-        ray.init()
+        ray.init(_temp_dir=ray_dir)
     print(f"ray.nodes(): {ray.nodes()}")
     print(f"ray.cluster_resources(): {ray.cluster_resources()}")
     print("-" * 100)
