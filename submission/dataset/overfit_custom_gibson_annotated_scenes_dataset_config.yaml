@@ -39,7 +39,7 @@ TASK:
 
 DATASET:
   TYPE: SemexpPolicyTraining
-  SPLIT: val
+  SPLIT: train
   DATASET_TYPE: gibson
   SCENE_TYPE: annotated
   DATA_PATH: "habitat-challenge-data/custom_objectgoal_{dataset_type}/{scene_type}_scenes/{split}/{split}.json.gz"
