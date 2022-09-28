@@ -223,7 +223,9 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             goal_map = skimage.morphology.binary_dilation(
                 sem_map[self.goal_category + 1], selem) != True
             goal_map = 1 - goal_map
-            assert goal_map.sum() > 0
+            if goal_map.sum() == 0:
+                # TODO Why does this happen?
+                return self.reset()
             self.gt_planner.set_multi_goal(goal_map)
 
         if self.print_images:
