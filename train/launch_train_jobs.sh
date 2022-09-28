@@ -14,7 +14,7 @@ python train/rllib_slurm_launch.py \
 for DATASET in hm3d mp3d gibson
 do
   python train/rllib_slurm_launch.py \
-    --exp-name ppo_overfit_custom_$DATASET_annotated_scenes \
+    --exp-name ppo_overfit_custom_${DATASET}_annotated_scenes \
     --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ppo_overfit_custom_${DATASET}_annotated_scenes_dataset_config.yaml" \
     --load-env "" \
     --num-nodes 1 \
@@ -27,7 +27,7 @@ done
 for DATASET in hm3d mp3d gibson
 do
   python train/rllib_slurm_launch.py \
-    --exp-name ddppo_train_custom_$DATASET_annotated_scenes \
+    --exp-name ddppo_train_custom_${DATASET}_annotated_scenes \
     --command "python train/train_semantic_exploration_policy.py --config_path submission/configs/ddppo_train_custom_${DATASET}_annotated_scenes_dataset_config.yaml" \
     --load-env "" \
     --num-nodes 8 \
