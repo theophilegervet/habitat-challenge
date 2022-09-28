@@ -62,7 +62,7 @@ if __name__ == "__main__":
     print("-" * 100)
     print("Config:")
     config, config_str = get_config(args.config_path)
-    ray_dir = Path.cwd() / config.DUMP_LOCATION / "ray"
+    ray_dir = "/private/home/theop123/ray"
     print(config_str)
     print("-" * 100)
     print()
