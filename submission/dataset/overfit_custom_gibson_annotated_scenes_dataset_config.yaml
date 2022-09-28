@@ -39,9 +39,9 @@ TASK:
 
 DATASET:
   TYPE: SemexpPolicyTraining
-  SPLIT: train
-  DATASET_TYPE: hm3d
+  SPLIT: val
+  DATASET_TYPE: gibson
   SCENE_TYPE: annotated
   DATA_PATH: "habitat-challenge-data/custom_objectgoal_{dataset_type}/{scene_type}_scenes/{split}/{split}.json.gz"
   SCENES_DIR: "habitat-challenge-data/data/scene_datasets/"
-  CONTENT_SCENES: ['1S7LAXRdDqK']
+  CONTENT_SCENES: ['Adairsville']
