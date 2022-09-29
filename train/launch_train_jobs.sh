@@ -19,8 +19,8 @@ do
     --load-env "" \
     --num-nodes 1 \
     --num-gpus 8 \
-    --partition learnfair \
-    --external-redis
+    --partition learnfair # \
+    #--external-redis
 done
 
 # Train semantic exploration policy on HM3D, MP3D, Gibson with PPO and 1 node
@@ -32,8 +32,8 @@ do
     --load-env "" \
     --num-nodes 1 \
     --num-gpus 8 \
-    --partition learnfair \
-    --external-redis
+    --partition learnfair # \
+    #--external-redis
 done
 
 # Train semantic exploration policy on HM3D, MP3D, Gibson with DDPPO and 8 nodes
