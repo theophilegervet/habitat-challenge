@@ -1,0 +1,162 @@
+BASE_TASK_CONFIG_PATH: submission/dataset/train_custom_gibson_annotated_scenes_dataset_config.yaml
+
+AGENT_GPU_IDS: [0]        # IDs of GPUs to use for agent with DistributedDataParallel — each GPU corresponds to one agent process
+SIMULATOR_GPU_IDS: [0, 1] # IDs of GPUs to use for vectorized environments
+NO_GPU: 0                 # 1: ignore IDs above and run on CPU, 0: run on GPUs with IDs above
+NUM_ENVIRONMENTS: 1       # number of environments (per agent process)
+DUMP_LOCATION: data       # path to dump models and log
+EXP_NAME: ppo_train_gibson_annotated_scenes # experiment name
+MIXED_PRECISION: 0        # 1: mixed precision inference, 0: fp32
+VISUALIZE: 0              # 1: render observation and predicted semantic map, 0: no visualization
+PRINT_IMAGES: 0           # 1: save visualization as images, 0: no image saving
+GROUND_TRUTH_SEMANTICS: 0 # 1: use ground-truth semantics (for debugging / ablations)
+
+ENVIRONMENT:
+  num_sem_categories: 16  # number of semantic segmentation categories
+  turn_angle: 30.0        # agent turn angle (in degrees)
+  frame_height: 480       # first-person frame height (in pixels)
+  frame_width: 640        # first-person frame width (in pixels)
+  camera_height: 0.88     # camera sensor height (in metres)
+  hfov: 79.0              # horizontal field of view (in degrees)
+  min_depth: 0.5          # minimum depth for depth sensor (in metres)
+  max_depth: 5.0          # maximum depth for depth sensor (in metres)
+
+AGENT:
+  max_steps: 498          # maximum number of steps before stopping an episode
+  panorama_start: 1       # 1: turn around 360 degrees when starting an episode, 0: don't
+
+  SEMANTIC_MAP:
+    map_size_cm: 4800        # global map size (in centimetres)
+    map_resolution: 5        # size of map bins (in centimeters)
+    vision_range: 100        # diameter of local map region visible by the agent (in cells)
+    global_downscaling: 2    # ratio of global over local map
+    du_scale: 4              # frame downscaling before projecting to point cloud
+    cat_pred_threshold: 5.0  # number of depth points to be in bin to classify it as a certain semantic category
+    exp_pred_threshold: 1.0  # number of depth points to be in bin to consider it as explored
+    map_pred_threshold: 1.0  # number of depth points to be in bin to consider it as obstacle
+
+  PLANNER:
+    collision_threshold: 0.20       # distance under which we consider there's a collision
+    obs_denoise_selem_radius: 0     # radius (in cells) of obstacle noise removal structuring element
+    obs_dilation_selem_radius: 3    # radius (in cells) of obstacle dilation structuring element
+
+  POLICY:
+    type: frontier             # one of "frontier" or "semantic"
+    hint_follow_steps: 15      # how many steps to follow a hint of the object goal category
+    hint_in_frame: 1           # 1: look for hint in frame, 0: don't
+
+    SEMANTIC:
+      goal_update_steps: 25    # frequency at which to update the high-level goal during inference
+      inference_downscaling: 2 # ratio of map size for policy inference over map size used for planning
+
+EVAL_VECTORIZED:
+  specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
+  specific_category: 0      # "chair": eval only on chair episodes, 0: eval on all episodes
+  goal_on_same_floor: 0     # 1: restrict to episodes with a goal on the same floor as the starting position
+  split: val                # eval split
+  num_episodes_per_env: 100 # number of eval episodes per environment
+  record_videos: 0          # 1: record videos from printed images, 0: don't
+  record_planner_videos: 0  # 1: record planner videos (if record videos), 0: don't
+
+TRAIN:
+  RL:
+    exp_name: ppo_train_gibson_annotated_scenes  # experiment name
+    algorithm: PPO              # one of "PPO" or "DDPPO"
+    gamma: 0.9                  # discount factor of the MDP
+    intrinsic_rew_coeff: 0.005  # intrinsic reward (explored area) scaling
+    dense_goal_rew_coeff: 0.01  # dense goal reward (distance to goal decrease) scaling
+    lr: 0.00005                 # learning rate
+    entropy_coeff: 0.001        # entropy regularization scaling
+    clip_param: 0.2             # how far the new policy can go from the old policy while improving the objective
+    checkpoint_freq: 100        # how many training iterations between checkpoints
+    rollout_fragment_length: 20 # divide episodes into fragments of this many steps each
+    sgd_epochs: 4               # number of SGD epochs (number of SGD iterations per minibatch)
+    restore:                    # checkpoint to resume training from (if any)
+
+    # -----------------------------
+    # With MMDetection segmentation
+    # -----------------------------
+
+    PPO:
+      # 2 x 32GB GPUs
+      #num_workers: 5              # number of parallel workers
+      #num_gpus: 0.33              # number of GPUs for driver process training the policy model
+      #num_cpus_for_driver: 13     # number of CPUs for driver
+      #num_gpus_per_worker: 0.33   # number of GPUs per worker collecting environment rollouts
+      #num_cpus_per_worker: 13     # number of CPUs per worker
+
+      # 8 x 32GB GPUs
+      num_workers: 21
+      num_gpus: 1
+      num_cpus_for_driver: 13
+      num_gpus_per_worker: 0.33
+      num_cpus_per_worker: 3
+
+    DDPPO:
+      # 2 x 32GB GPUs
+      #num_workers: 6
+      #num_gpus_per_worker: 0.33
+      #num_cpus_per_worker: 13
+
+      # 8 x 32GB GPUs
+      num_workers: 24
+      num_gpus_per_worker: 0.33
+      num_cpus_per_worker: 3
+
+      # 4 x 8 x 32GB GPUs
+      #num_workers: 96
+      #num_gpus_per_worker: 0.33
+      #num_cpus_per_worker: 3
+
+      # 8 x 8 x 32GB GPUs
+      #num_workers: 192
+      #num_gpus_per_worker: 0.33
+      #num_cpus_per_worker: 3
+
+      num_envs_per_worker: 1
+      remote_worker_envs: False
+      remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
+
+    # ----------------------------
+    # With Detectron2 segmentation
+    # ----------------------------
+
+    #PPO:
+    #  # 2 x 32GB GPUs
+    #  num_workers: 9              # number of parallel workers
+    #  num_gpus: 0.2               # number of GPUs for driver process training the policy model
+    #  num_cpus_for_driver: 9      # number of CPUs for driver
+    #  num_gpus_per_worker: 0.2    # number of GPUs per worker collecting environment rollouts
+    #  num_cpus_per_worker: 7      # number of CPUs per worker
+    #
+    #  # 8 x 32GB GPUs
+    #  #num_workers: 35
+    #  #num_gpus: 1
+    #  #num_cpus_for_driver: 9
+    #  #num_gpus_per_worker: 0.2
+    #  #num_cpus_per_worker: 2
+    #
+    #DDPPO:
+    #  # 2 x 32GB GPUs
+    #  num_workers: 9
+    #  num_gpus_per_worker: 0.2
+    #  num_cpus_per_worker: 8
+    #
+    #  # 8 x 32GB GPUs
+    #  #num_workers: 39
+    #  #num_gpus_per_worker: 0.2
+    #  #num_cpus_per_worker: 2
+    #
+    #  # 4 x 8 x 32GB GPUs
+    #  #num_workers: 159
+    #  #num_gpus_per_worker: 0.2
+    #  #num_cpus_per_worker: 2
+    #
+    #  # 8 x 8 x 32GB GPUs
+    #  #num_workers: 319
+    #  #num_gpus_per_worker: 0.2
+    #  #num_cpus_per_worker: 2
+    #
+    #  num_envs_per_worker: 1
+    #  remote_worker_envs: False
+    #  remote_env_batch_wait_ms: 0 # how long workers wait for after one environment is ready if num_envs_per_worker > 1
