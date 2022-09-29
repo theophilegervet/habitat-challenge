@@ -62,7 +62,6 @@ if __name__ == "__main__":
     print("-" * 100)
     print("Config:")
     config, config_str = get_config(args.config_path)
-    ray_dir = "/private/home/theop123/ray"
     print(config_str)
     print("-" * 100)
     print()
@@ -72,22 +71,23 @@ if __name__ == "__main__":
     redis_password = os.environ.get("redis_password")
     print(f"ip_head: {ip_head}")
     print(f"redis_password: {redis_password}")
-    if ip_head is not None and redis_password is not None:
-        try:
-            ray.init(
-                address=ip_head,
-                _redis_password=redis_password,
-                _temp_dir=ray_dir
-            )
-        except:
-            print("Could not initialize cluster with "
-                  "ray.init(address=ip_head, _redis_password=redis_password). "
-                  "Initializing it with ray.init()")
-            print()
-            traceback.print_exc()
-            ray.init(_temp_dir=ray_dir)
-    else:
-        ray.init(_temp_dir=ray_dir)
+    # TODO Debugging
+    # if ip_head is not None and redis_password is not None:
+    #     try:
+    #         ray.init(
+    #             address=ip_head,
+    #             _redis_password=redis_password,
+    #         )
+    #     except:
+    #         print("Could not initialize cluster with "
+    #               "ray.init(address=ip_head, _redis_password=redis_password). "
+    #               "Initializing it with ray.init()")
+    #         print()
+    #         traceback.print_exc()
+    #         ray.init()
+    # else:
+    #     ray.init()
+    ray.init()
     print(f"ray.nodes(): {ray.nodes()}")
     print(f"ray.cluster_resources(): {ray.cluster_resources()}")
     print("-" * 100)
