@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Confusion matrix on HM3D, MP3D, Gibson
-DATASETS = (hm3d mp3d gibson)
+DATASETS = ("hm3d" "mp3d" "gibson")
 CHECKPOINTS = (
   "/private/home/theop123/ray_results/ppo_train_hm3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_bcfe1_00000_0_2022-09-30_03-00-40/checkpoint_000500/checkpoint-500"
   "/private/home/theop123/ray_results/ppo_train_mp3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_bcae0_00000_0_2022-10-01_08-00-07/checkpoint_000200/checkpoint-200"
