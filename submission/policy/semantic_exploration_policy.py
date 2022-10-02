@@ -37,13 +37,14 @@ class SemanticExplorationPolicy(Policy):
             "semexp_custom_model",
             SemanticExplorationPolicyModelWrapper
         )
-        config.defrost()
-        config.NUM_ENVIRONMENTS = 1
-        config.freeze()
+        env_config = config.copy()
+        env_config.defrost()
+        env_config.NUM_ENVIRONMENTS = 1
+        env_config.freeze()
         ppo_config = ppo.DEFAULT_CONFIG.copy()
         ppo_config.update({
             "env": SemanticExplorationPolicyTrainingEnvWrapper,
-            "env_config": {"config": config},
+            "env_config": {"config": env_config},
             "model": {
                 "custom_model": "semexp_custom_model",
                 "custom_model_config": {
