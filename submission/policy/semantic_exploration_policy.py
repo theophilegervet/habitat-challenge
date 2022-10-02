@@ -37,7 +37,7 @@ class SemanticExplorationPolicy(Policy):
             "semexp_custom_model",
             SemanticExplorationPolicyModelWrapper
         )
-        env_config = config.copy()
+        env_config = config.clone()
         env_config.defrost()
         env_config.NUM_ENVIRONMENTS = 1
         env_config.freeze()
