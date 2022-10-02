@@ -11,6 +11,7 @@ for i in ${!DATASETS[@]}; do
   for j in ${!DATASETS[@]}; do
     echo ${DATASETS[$i]}
     echo ${CHECKPOINTS[$j]}
+    echo eval_${DATASETS[$j]}_ckpt_on_${DATASETS[$i]}
   done
 done
 
