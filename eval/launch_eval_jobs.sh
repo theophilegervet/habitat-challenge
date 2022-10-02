@@ -9,12 +9,15 @@ CHECKPOINTS = (
 )
 for i in ${!DATASETS[@]}; do
   for j in ${!DATASETS[@]}; do
-    sbatch eval/eval_vectorized.sh --config_path=submission/configs/eval_${DATASETS[$i]}_config.yaml \
-      AGENT.POLICY.type semantic \
-      AGENT.POLICY.SEMANTIC.checkpoint_path ${CHECKPOINTS[$j]} \
-      EXP_NAME eval_${DATASETS[$j]}_ckpt_on_${DATASETS[$i]}
+    echo ${DATASETS[$i]}
+    echo ${CHECKPOINTS[$j]}
   done
 done
+
+#sbatch eval/eval_vectorized.sh --config_path=submission/configs/eval_${DATASETS[$i]}_config.yaml \
+#      AGENT.POLICY.type semantic \
+#      AGENT.POLICY.SEMANTIC.checkpoint_path ${CHECKPOINTS[$j]} \
+#      EXP_NAME eval_${DATASETS[$j]}_ckpt_on_${DATASETS[$i]}
 
 # Ablation study on HM3D
 #sbatch eval/eval_vectorized.sh --config_path=submission/configs/eval_hm3d_config.yaml EXP_NAME eval_standard
