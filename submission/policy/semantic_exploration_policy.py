@@ -37,6 +37,9 @@ class SemanticExplorationPolicy(Policy):
             "semexp_custom_model",
             SemanticExplorationPolicyModelWrapper
         )
+        config.defrost()
+        config.NUM_ENVIRONMENTS = 1
+        config.freeze()
         ppo_config = ppo.DEFAULT_CONFIG.copy()
         ppo_config.update({
             "env": SemanticExplorationPolicyTrainingEnvWrapper,
