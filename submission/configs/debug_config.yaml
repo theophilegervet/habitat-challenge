@@ -48,7 +48,7 @@ AGENT:
     SEMANTIC:
       goal_update_steps: 25    # frequency at which to update the high-level goal during inference
       inference_downscaling: 2 # ratio of map size for policy inference over map size used for planning
-      checkpoint_path: "/private/home/theop123/ray_results/ddppo_overfit_challenge/DDPPO_SemanticExplorationPolicyTrainingEnvWrapper_7d280_00000_0_2022-08-28_14-29-25/checkpoint_000400/checkpoint-400"
+      checkpoint_path:
 
 EVAL_VECTORIZED:
   specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
@@ -72,7 +72,7 @@ TRAIN:
     checkpoint_freq: 100        # how many training iterations between checkpoints
     rollout_fragment_length: 20 # divide episodes into fragments of this many steps each
     sgd_epochs: 4               # number of SGD epochs (number of SGD iterations per minibatch)
-    restore:                    # checkpoint to resume training from (if any)
+    restore: /private/home/theop123/ray_results/ppo_train_hm3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_bcfe1_00000_0_2022-09-30_03-00-40/checkpoint_000800/checkpoint-800                   # checkpoint to resume training from (if any)
 
     # -----------------------------
     # With MMDetection segmentation
