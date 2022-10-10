@@ -19,8 +19,8 @@
 # Eval different HM3D checkpoints
 CHECKPOINT_NAMES=("700" "800" "900" "1100" "1300" "1500")
 CHECKPOINTS=(
-  "/private/home/theop123/ray_results/ppo_train_hm3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_bcfe1_00000_0_2022-09-30_03-00-40/checkpoint_000700/checkpoint_700"
-  "/private/home/theop123/ray_results/ppo_train_hm3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_bcfe1_00000_0_2022-09-30_03-00-40/checkpoint_000800/checkpoint_800"
+  "/private/home/theop123/ray_results/ppo_train_hm3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_bcfe1_00000_0_2022-09-30_03-00-40/checkpoint_000700/checkpoint-700"
+  "/private/home/theop123/ray_results/ppo_train_hm3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_bcfe1_00000_0_2022-09-30_03-00-40/checkpoint_000800/checkpoint-800"
   "/private/home/theop123/ray_results/ppo_train_hm3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_d3d73_00000_0_2022-10-03_11-40-18/checkpoint_000900/checkpoint-900"
   "/private/home/theop123/ray_results/ppo_train_hm3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_d3d73_00000_0_2022-10-03_11-40-18/checkpoint_001100/checkpoint-1100"
   "/private/home/theop123/ray_results/ppo_train_hm3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_d3d73_00000_0_2022-10-03_11-40-18/checkpoint_001300/checkpoint-1300"
@@ -29,7 +29,7 @@ CHECKPOINTS=(
 for i in ${!CHECKPOINTS[@]}; do
   sbatch eval/eval_vectorized.sh --config_path=submission/configs/eval_hm3d_config.yaml \
     AGENT.POLICY.type semantic \
-    AGENT.POLICY.SEMANTIC.checkpoint_path ${CHECKPOINTS[$j]} \
+    AGENT.POLICY.SEMANTIC.checkpoint_path ${CHECKPOINTS[$i]} \
     EXP_NAME eval_hm3d_ckpt_${CHECKPOINT_NAMES[$i]}
 done
 
