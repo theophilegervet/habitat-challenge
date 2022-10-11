@@ -45,8 +45,8 @@ if __name__ == "__main__":
     # config.TASK_CONFIG.DATASET.DATA_PATH = "habitat-challenge-data/objectgoal_mp3d/{split}/{split}.json.gz"
     config.TASK_CONFIG.DATASET.SPLIT = "val"
     config.NUM_ENVIRONMENTS = 1
-    config.PRINT_IMAGES = 1
-    config.VISUALIZE = 1
+    # config.PRINT_IMAGES = 1
+    # config.VISUALIZE = 1
     config.NO_GPU = 1
     config.freeze()
 
