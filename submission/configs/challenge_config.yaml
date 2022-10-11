@@ -48,7 +48,7 @@ AGENT:
     SEMANTIC:
       goal_update_steps: 25    # frequency at which to update the high-level goal during inference
       inference_downscaling: 2 # ratio of map size for policy inference over map size used for planning
-      checkpoint_path: /private/home/theop123/ray_results/ppo_train_hm3d_annotated_scenes/PPO_SemanticExplorationPolicyTrainingEnvWrapper_bcfe1_00000_0_2022-09-30_03-00-40/checkpoint_000800/checkpoint-800
+      checkpoint_path: submission/policy/checkpoint-800
 
 EVAL_VECTORIZED:
   specific_episodes: 0      # 1: eval on specific episodes (for debugging), 0: eval on split normally
