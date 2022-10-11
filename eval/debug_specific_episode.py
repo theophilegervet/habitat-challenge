@@ -40,7 +40,7 @@ def reset_to_episode(env: Env,
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/ddppo_train_challenge_dataset_config.yaml")
+    config, config_str = get_config("submission/configs/challenge_config.yaml")
     config.defrost()
     # config.TASK_CONFIG.DATASET.DATA_PATH = "habitat-challenge-data/objectgoal_mp3d/{split}/{split}.json.gz"
     config.TASK_CONFIG.DATASET.SPLIT = "val"
