@@ -48,7 +48,7 @@ class SemanticExplorationPolicy(Policy):
         ppo_config = ppo.DEFAULT_CONFIG.copy()
         ppo_config.update({
             "env": SemanticExplorationPolicyInferenceEnv,
-            "env_config": {"config": env_config, "inference": True},
+            "env_config": {"config": env_config},
             "model": {
                 "custom_model": "semexp_custom_model",
                 "custom_model_config": {
@@ -117,7 +117,8 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
     on Ray does not seem possible.
     """
 
-    def __init__(self, config: Config):
+    def __init__(self, rllib_config):
+        config = rllib_config["config"]
         self.resolution = config.AGENT.SEMANTIC_MAP.map_resolution
         self.global_map_size_cm = config.AGENT.SEMANTIC_MAP.map_size_cm
         self.global_downscaling = config.AGENT.SEMANTIC_MAP.global_downscaling
