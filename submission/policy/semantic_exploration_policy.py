@@ -1,5 +1,10 @@
+import gym
+from gym.spaces import Dict as SpaceDict
+from gym.spaces import Box, Discrete
 import torch
+import numpy as np
 import torch.nn.functional as F
+from habitat import Config
 
 from .policy import Policy
 
@@ -31,7 +36,6 @@ class SemanticExplorationPolicy(Policy):
         from ray.rllib.agents import ppo
         from ray.rllib.models import ModelCatalog
         from .semantic_exploration_policy_network import SemanticExplorationPolicyModelWrapper
-        from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
         ModelCatalog.register_custom_model(
             "semexp_custom_model",
@@ -43,7 +47,7 @@ class SemanticExplorationPolicy(Policy):
         env_config.freeze()
         ppo_config = ppo.DEFAULT_CONFIG.copy()
         ppo_config.update({
-            "env": SemanticExplorationPolicyTrainingEnvWrapper,
+            "env": SemanticExplorationPolicyInferenceEnv,
             "env_config": {"config": env_config, "inference": True},
             "model": {
                 "custom_model": "semexp_custom_model",
@@ -60,7 +64,7 @@ class SemanticExplorationPolicy(Policy):
         })
         algo = ppo.PPOTrainer(
             config=ppo_config,
-            env=SemanticExplorationPolicyTrainingEnvWrapper
+            env=SemanticExplorationPolicyInferenceEnv
         )
         algo.restore(config.AGENT.POLICY.SEMANTIC.checkpoint_path)
         policy = algo.get_policy()
@@ -99,3 +103,56 @@ class SemanticExplorationPolicy(Policy):
                 goal_map[e, goal_location[e, 0], goal_location[e, 1]] = 1
 
         return goal_map
+
+
+class SemanticExplorationPolicyInferenceEnv(gym.Env):
+    """
+    This environment is a lightweight environment to let us load
+    a trained checkpoint of the semantic exploration policy without
+    needing to instantiate the full training environment wrapper.
+    This is needed because the full training environment wrapper
+    needs access to a dataset that we don't have in the inference
+    Docker. It would be great to not need this but currently loading
+    a checkpoint at inference time without introducing a dependency
+    on Ray does not seem possible.
+    """
+
+    def __init__(self, config: Config):
+        self.resolution = config.AGENT.SEMANTIC_MAP.map_resolution
+        self.global_map_size_cm = config.AGENT.SEMANTIC_MAP.map_size_cm
+        self.global_downscaling = config.AGENT.SEMANTIC_MAP.global_downscaling
+        self.local_map_size_cm = self.global_map_size_cm // self.global_downscaling
+        global_map_size = self.global_map_size_cm // self.resolution
+        self.global_h, self.global_w = global_map_size, global_map_size
+        local_map_size = self.local_map_size_cm // self.resolution
+        self.local_h, self.local_w = local_map_size, local_map_size
+        self.inference_downscaling = config.AGENT.POLICY.SEMANTIC.inference_downscaling
+        self.num_sem_categories = config.ENVIRONMENT.num_sem_categories
+
+        self.observation_space = SpaceDict({
+            "map_features": Box(
+                low=0.,
+                high=1.,
+                shape=(
+                    8 + self.num_sem_categories,
+                    self.local_h // self.inference_downscaling,
+                    self.local_w // self.inference_downscaling
+                ),
+                dtype=np.float32
+            ),
+            "local_pose": Box(
+                low=-np.inf,
+                high=np.inf,
+                shape=(3,),
+                dtype=np.float32,
+            ),
+            "goal_category": Discrete(6),
+        })
+
+        # Action space is logit pre sigmoid normalization to [0, 1]
+        self.action_space = Box(
+            low=-np.inf,
+            high=np.inf,
+            shape=(2,),
+            dtype=np.float32,
+        )

@@ -45,45 +45,43 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
 
         if config is None:
             config = rllib_config["config"]
+            config.defrost()
 
-            if rllib_config.get("inference") in [None, False]:
-                config.defrost()
-
-                # Select scenes
-                if config.TASK_CONFIG.DATASET.TYPE == "SemexpPolicyTraining":
-                    dataset = SemanticExplorationPolicyTrainingDataset(
+            # Select scenes
+            if config.TASK_CONFIG.DATASET.TYPE == "SemexpPolicyTraining":
+                dataset = SemanticExplorationPolicyTrainingDataset(
+                    config.TASK_CONFIG.DATASET)
+                scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
+                if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
+                    scenes = [scene_id.split("/")[-1].split(".")[0]
+                              for scene_id in dataset.scene_ids]
+            else:
+                dataset = make_dataset(config.TASK_CONFIG.DATASET.TYPE)
+                scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
+                if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
+                    scenes = dataset.get_scenes_to_load(
                         config.TASK_CONFIG.DATASET)
-                    scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
-                    if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
-                        scenes = [scene_id.split("/")[-1].split(".")[0]
-                                  for scene_id in dataset.scene_ids]
-                else:
-                    dataset = make_dataset(config.TASK_CONFIG.DATASET.TYPE)
-                    scenes = config.TASK_CONFIG.DATASET.CONTENT_SCENES
-                    if ALL_SCENES_MASK in config.TASK_CONFIG.DATASET.CONTENT_SCENES:
-                        scenes = dataset.get_scenes_to_load(
-                            config.TASK_CONFIG.DATASET)
-                del dataset
-                if len(scenes) == 1:
-                    # Same scene for all workers
-                    scene_splits = [[scenes[0]] for _ in range(rllib_config.num_workers)]
-                elif len(scenes) >= rllib_config.num_workers:
-                    # Scenes distributed among workers
-                    scene_splits = [[] for _ in range(rllib_config.num_workers)]
-                    for idx, scene in enumerate(scenes):
-                        scene_splits[idx % len(scene_splits)].append(scene)
-                    assert sum(map(len, scene_splits)) == len(scenes)
-                else:  # 1 < len(scenes) < rllib_config.num_workers
-                    # Workers distributed among scenes
-                    scene_splits = [[scenes[idx % len(scenes)]]
-                                    for idx in range(rllib_config.num_workers)]
-                config.TASK_CONFIG.DATASET.CONTENT_SCENES = scene_splits[
-                    rllib_config.worker_index - 1]
+            del dataset
+            if len(scenes) == 1:
+                # Same scene for all workers
+                scene_splits = [[scenes[0]] for _ in range(rllib_config.num_workers)]
+            elif len(scenes) >= rllib_config.num_workers:
+                # Scenes distributed among workers
+                scene_splits = [[] for _ in range(rllib_config.num_workers)]
+                for idx, scene in enumerate(scenes):
+                    scene_splits[idx % len(scene_splits)].append(scene)
+                assert sum(map(len, scene_splits)) == len(scenes)
+            else:  # 1 < len(scenes) < rllib_config.num_workers
+                # Workers distributed among scenes
+                scene_splits = [[scenes[idx % len(scenes)]]
+                                for idx in range(rllib_config.num_workers)]
+            config.TASK_CONFIG.DATASET.CONTENT_SCENES = scene_splits[
+                rllib_config.worker_index - 1]
 
-                # Set random seed
-                config.TASK_CONFIG.SEED = rllib_config.worker_index
+            # Set random seed
+            config.TASK_CONFIG.SEED = rllib_config.worker_index
 
-                config.freeze()
+            config.freeze()
 
         super().__init__(config=config.TASK_CONFIG)
 
