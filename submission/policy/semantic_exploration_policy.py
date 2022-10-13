@@ -1,4 +1,3 @@
-from typing import Tuple
 import gym
 from gym.spaces import Dict as SpaceDict
 from gym.spaces import Box, Discrete
@@ -36,7 +35,6 @@ class SemanticExplorationPolicy(Policy):
         from ray.rllib.agents import ppo
         from ray.rllib.models import ModelCatalog
         from .semantic_exploration_policy_network import SemanticExplorationPolicyModelWrapper
-        from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
         ModelCatalog.register_custom_model(
             "semexp_custom_model",
@@ -49,7 +47,6 @@ class SemanticExplorationPolicy(Policy):
         ppo_config = ppo.DEFAULT_CONFIG.copy()
         ppo_config.update({
             "env": SemanticExplorationPolicyInferenceEnv,
-            #"env": SemanticExplorationPolicyTrainingEnvWrapper,
             "env_config": {"config": env_config},
             "model": {
                 "custom_model": "semexp_custom_model",
@@ -67,7 +64,6 @@ class SemanticExplorationPolicy(Policy):
         algo = ppo.PPOTrainer(
             config=ppo_config,
             env=SemanticExplorationPolicyInferenceEnv
-            #env=SemanticExplorationPolicyTrainingEnvWrapper
         )
         algo.restore(config.AGENT.POLICY.SEMANTIC.checkpoint_path)
         policy = algo.get_policy()
@@ -175,23 +171,4 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
         }
 
     def reset(self) -> dict:
-        obs = self._get_dummy_obs()
-        print()
-        print("__RESET__")
-        for k, v in obs.items():
-            print(k)
-            try:
-                print(v.shape)
-                print(v.dtype)
-            except:
-                pass
-            print(v)
-        print()
-        return obs
-
-    # def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
-    #     obs = self._get_dummy_obs()
-    #     reward = 0.
-    #     done = False
-    #     info = {}
-    #     return obs, reward, done, info
+        return self._get_dummy_obs()
