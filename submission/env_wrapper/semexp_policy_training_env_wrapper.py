@@ -251,7 +251,7 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "goal_category": self.goal_category
         }
         print()
-        print("RESET")
+        print("__RESET__")
         for k, v in obs.items():
             print(k)
             try:
