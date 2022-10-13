@@ -4,7 +4,6 @@ from gym.spaces import Box, Discrete
 import torch
 import numpy as np
 import torch.nn.functional as F
-from habitat import Config
 
 from .policy import Policy
 
@@ -109,11 +108,13 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
     """
     This environment is a lightweight environment to let us load
     a trained checkpoint of the semantic exploration policy without
-    needing to instantiate the full training environment wrapper.
-    This is needed because the full training environment wrapper
-    needs access to a dataset that we don't have in the inference
-    Docker. It would be great to not need this but currently loading
-    a checkpoint at inference time without introducing a dependency
+    needing to instantiate the full training environment.
+
+    This is needed because the full training environment needs access
+    to a dataset that we don't have in the inference Docker.
+
+    It would be great to not need this, but currently loading a
+    checkpoint at inference time without introducing a dependency
     on Ray does not seem possible.
     """
 
@@ -157,3 +158,15 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
             shape=(2,),
             dtype=np.float32,
         )
+
+    def reset(self):
+        obs = {
+            "map_features": np.zeros((
+                8 + self.num_sem_categories,
+                self.local_h // self.inference_downscaling,
+                self.local_w // self.inference_downscaling
+            )),
+            "local_pose": np.zeros(3),
+            "goal_category": 0
+        }
+        return obs
