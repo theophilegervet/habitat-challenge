@@ -250,6 +250,16 @@ class SemanticExplorationPolicyTrainingEnvWrapper(RLEnv):
             "local_pose": local_pose[0].cpu().numpy(),
             "goal_category": self.goal_category
         }
+        print()
+        print("RESET")
+        for k, v in obs.items():
+            print(k)
+            try:
+                print(v.shape)
+            except:
+                pass
+            print(v)
+        print()
         return obs
 
     def _compute_distance_to_goal(self, position: List[float]) -> float:
