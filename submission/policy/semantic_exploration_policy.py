@@ -175,7 +175,19 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
         }
 
     def reset(self) -> dict:
-        return self._get_dummy_obs()
+        obs = self._get_dummy_obs()
+        print()
+        print("__RESET__")
+        for k, v in obs.items():
+            print(k)
+            try:
+                print(v.shape)
+                print(v.dtype)
+            except:
+                pass
+            print(v)
+        print()
+        return obs
 
     def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
         obs = self._get_dummy_obs()
