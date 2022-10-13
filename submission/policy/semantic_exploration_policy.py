@@ -47,8 +47,8 @@ class SemanticExplorationPolicy(Policy):
         env_config.freeze()
         ppo_config = ppo.DEFAULT_CONFIG.copy()
         ppo_config.update({
-            #"env": SemanticExplorationPolicyInferenceEnv,
-            "env": SemanticExplorationPolicyTrainingEnvWrapper,
+            "env": SemanticExplorationPolicyInferenceEnv,
+            #"env": SemanticExplorationPolicyTrainingEnvWrapper,
             "env_config": {"config": env_config},
             "model": {
                 "custom_model": "semexp_custom_model",
@@ -65,8 +65,8 @@ class SemanticExplorationPolicy(Policy):
         })
         algo = ppo.PPOTrainer(
             config=ppo_config,
-            #env=SemanticExplorationPolicyInferenceEnv
-            env=SemanticExplorationPolicyTrainingEnvWrapper
+            env=SemanticExplorationPolicyInferenceEnv
+            #env=SemanticExplorationPolicyTrainingEnvWrapper
         )
         algo.restore(config.AGENT.POLICY.SEMANTIC.checkpoint_path)
         policy = algo.get_policy()
@@ -172,4 +172,14 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
             "local_pose": np.zeros(3),
             "goal_category": 0
         }
+        print()
+        print("__RESET__")
+        for k, v in obs.items():
+            print(k)
+            try:
+                print(v.shape)
+            except:
+                pass
+            print(v)
+        print()
         return obs
