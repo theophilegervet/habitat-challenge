@@ -189,9 +189,9 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
         print()
         return obs
 
-    def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
-        obs = self._get_dummy_obs()
-        reward = 0.
-        done = False
-        info = {}
-        return obs, reward, done, info
+    # def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
+    #     obs = self._get_dummy_obs()
+    #     reward = 0.
+    #     done = False
+    #     info = {}
+    #     return obs, reward, done, info
