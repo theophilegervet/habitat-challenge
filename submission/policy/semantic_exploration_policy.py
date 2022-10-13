@@ -169,8 +169,8 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
                 8 + self.num_sem_categories,
                 self.local_h // self.inference_downscaling,
                 self.local_w // self.inference_downscaling
-            )),
-            "local_pose": np.zeros(3),
+            ), dtype=np.float32),
+            "local_pose": np.zeros(3, dtype=np.float32),
             "goal_category": 0
         }
 
