@@ -1,3 +1,4 @@
+from typing import Tuple
 import gym
 from gym.spaces import Dict as SpaceDict
 from gym.spaces import Box, Discrete
@@ -162,8 +163,8 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
             dtype=np.float32,
         )
 
-    def reset(self) -> dict:
-        obs = {
+    def _get_dummy_obs(self) -> dict:
+        return {
             "map_features": np.zeros((
                 8 + self.num_sem_categories,
                 self.local_h // self.inference_downscaling,
@@ -172,14 +173,13 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
             "local_pose": np.zeros(3),
             "goal_category": 0
         }
-        print()
-        print("__RESET__")
-        for k, v in obs.items():
-            print(k)
-            try:
-                print(v.shape)
-            except:
-                pass
-            print(v)
-        print()
-        return obs
+
+    def reset(self) -> dict:
+        return self._get_dummy_obs()
+
+    def step(self, goal_action: np.ndarray) -> Tuple[dict, float, bool, dict]:
+        obs = self._get_dummy_obs()
+        reward = 0.
+        done = False
+        info = {}
+        return obs, reward, done, info
