@@ -35,6 +35,7 @@ class SemanticExplorationPolicy(Policy):
         from ray.rllib.agents import ppo
         from ray.rllib.models import ModelCatalog
         from .semantic_exploration_policy_network import SemanticExplorationPolicyModelWrapper
+        from submission.env_wrapper.semexp_policy_training_env_wrapper import SemanticExplorationPolicyTrainingEnvWrapper
 
         ModelCatalog.register_custom_model(
             "semexp_custom_model",
@@ -46,7 +47,8 @@ class SemanticExplorationPolicy(Policy):
         env_config.freeze()
         ppo_config = ppo.DEFAULT_CONFIG.copy()
         ppo_config.update({
-            "env": SemanticExplorationPolicyInferenceEnv,
+            #"env": SemanticExplorationPolicyInferenceEnv,
+            "env": SemanticExplorationPolicyTrainingEnvWrapper,
             "env_config": {"config": env_config},
             "model": {
                 "custom_model": "semexp_custom_model",
@@ -63,7 +65,8 @@ class SemanticExplorationPolicy(Policy):
         })
         algo = ppo.PPOTrainer(
             config=ppo_config,
-            env=SemanticExplorationPolicyInferenceEnv
+            #env=SemanticExplorationPolicyInferenceEnv
+            env=SemanticExplorationPolicyTrainingEnvWrapper
         )
         algo.restore(config.AGENT.POLICY.SEMANTIC.checkpoint_path)
         policy = algo.get_policy()
@@ -159,7 +162,7 @@ class SemanticExplorationPolicyInferenceEnv(gym.Env):
             dtype=np.float32,
         )
 
-    def reset(self):
+    def reset(self) -> dict:
         obs = {
             "map_features": np.zeros((
                 8 + self.num_sem_categories,
