@@ -55,7 +55,7 @@ class EvalEnvWrapper(Env):
                 episode for episode in self._dataset.episodes
                 if len([
                     goal for goal in episode.goals
-                    if abs(episode.start_position[1] - goal.position[1]) < 1.0 # 1.5
+                    if episode.start_position[1] - 0.25 < goal.position[1] < episode.start_position[1] + 1.5
                 ]) > 0
             ]
             self._dataset.episodes = new_episode_order
