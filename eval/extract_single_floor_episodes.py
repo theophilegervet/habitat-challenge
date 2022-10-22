@@ -36,7 +36,7 @@ if __name__ == "__main__":
         episode for episode in env._dataset.episodes
         if len([
             goal for goal in episode.goals
-            if abs(episode.start_position[1] - goal.position[1]) < 1.0  # 1.5
+            if episode.start_position[1] - 0.25 < goal.position[1] < episode.start_position[1] + 1.5
         ]) > 0
     ]
     same_floor_episodes = len(env._dataset.episodes)
