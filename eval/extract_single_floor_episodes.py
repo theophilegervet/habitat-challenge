@@ -9,7 +9,7 @@ from submission.utils.config_utils import get_config
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/eval_config.yaml")
+    config, config_str = get_config("submission/configs/eval_hm3d_config.yaml")
 
     env = Env(config=config.TASK_CONFIG)
     obs = env.reset()
