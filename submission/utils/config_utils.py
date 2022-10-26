@@ -38,6 +38,8 @@ def get_config(path: str, opts: Optional[list] = None) -> Tuple[Config, str]:
         for i in range(0, len(opts), 2):
             dict = config_dict
             keys = opts[i].split(".")
+            if "TASK_CONFIG" in keys:
+                continue
             value = opts[i + 1]
             for key in keys[:-1]:
                 dict = dict[key]
