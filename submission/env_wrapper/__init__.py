@@ -105,7 +105,9 @@ def make_vector_envs_on_specific_episodes(
     # TODO We drop scenes with the logic to distribute scenes to
     #  GPUs below - fix this
     num_envs_per_gpu = num_envs // num_gpus
-    num_envs = num_envs_per_gpu * num_gpus
+    config.defrost()
+    config.NUM_ENVIRONMENTS = num_envs_per_gpu * num_gpus
+    config.freeze()
 
     configs = []
     episode_ids = []
@@ -113,7 +115,6 @@ def make_vector_envs_on_specific_episodes(
         for j in range(num_envs_per_gpu):
             proc_config = config.clone()
             proc_config.defrost()
-            proc_config.NUM_ENVIRONMENTS = num_envs
             proc_id = (i * num_envs_per_gpu) + j
             task_config = proc_config.TASK_CONFIG
             task_config.SEED += proc_id
