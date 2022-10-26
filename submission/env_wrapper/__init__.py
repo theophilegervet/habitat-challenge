@@ -102,29 +102,20 @@ def make_vector_envs_on_specific_episodes(
     num_gpus = len(gpus)
     num_envs = len(scenes)  # One environment per scene
 
-    # TODO We drop scenes with the logic to distribute scenes to
-    #  GPUs below - fix this
-    num_envs_per_gpu = num_envs // num_gpus
-    config.defrost()
-    config.NUM_ENVIRONMENTS = num_envs_per_gpu * num_gpus
-    config.freeze()
-
     configs = []
     episode_ids = []
-    for i in range(num_gpus):
-        for j in range(num_envs_per_gpu):
-            proc_config = config.clone()
-            proc_config.defrost()
-            proc_id = (i * num_envs_per_gpu) + j
-            task_config = proc_config.TASK_CONFIG
-            task_config.SEED += proc_id
-            task_config.DATASET.CONTENT_SCENES = [scenes[proc_id]]
-            if not proc_config.NO_GPU:
-                task_config.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID = gpus[i]
-            task_config.ENVIRONMENT.ITERATOR_OPTIONS.MAX_SCENE_REPEAT_STEPS = -1
-            proc_config.freeze()
-            configs.append(proc_config)
-            episode_ids.append(scene2episodes[scenes[proc_id]])
+    for proc_id in range(num_envs):
+        proc_config = config.clone()
+        proc_config.defrost()
+        task_config = proc_config.TASK_CONFIG
+        task_config.SEED += proc_id
+        task_config.DATASET.CONTENT_SCENES = [scenes[proc_id]]
+        if not proc_config.NO_GPU:
+            task_config.SIMULATOR.HABITAT_SIM_V0.GPU_DEVICE_ID = gpus[proc_id % num_gpus]
+        task_config.ENVIRONMENT.ITERATOR_OPTIONS.MAX_SCENE_REPEAT_STEPS = -1
+        proc_config.freeze()
+        configs.append(proc_config)
+        episode_ids.append(scene2episodes[scenes[proc_id]])
 
     envs = VectorEnv(
         make_env_fn=make_env_on_specific_episodes_fn,
