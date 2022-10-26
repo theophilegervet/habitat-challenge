@@ -101,7 +101,8 @@ def make_vector_envs_on_specific_episodes(
     gpus = _get_env_gpus(config, rank=0)
     num_gpus = len(gpus)
     num_envs = len(scenes)  # One environment per scene
-    assert (num_envs >= num_gpus and num_envs % num_gpus == 0)
+    # TODO We might drop scenes with the logic to distribute scenes to
+    #  GPUs below
     num_envs_per_gpu = num_envs // num_gpus
 
     configs = []
