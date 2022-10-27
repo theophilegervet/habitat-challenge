@@ -67,7 +67,8 @@ class Visualizer:
                   semantic_frame: np.ndarray,
                   goal_name: str,
                   goal_category: int,
-                  timestep: int):
+                  timestep: int,
+                  visualize_goal: bool = False):
         """Visualize frame input and semantic map.
 
         Args:
@@ -116,10 +117,11 @@ class Visualizer:
         semantic_map[visited_mask] = 3
 
         # Goal
-        selem = skimage.morphology.disk(4)
-        goal_mat = 1 - skimage.morphology.binary_dilation(goal_map, selem) != True
-        goal_mask = goal_mat == 1
-        semantic_map[goal_mask] = 3
+        if visualize_goal:
+            selem = skimage.morphology.disk(4)
+            goal_mat = 1 - skimage.morphology.binary_dilation(goal_map, selem) != True
+            goal_mask = goal_mat == 1
+            semantic_map[goal_mask] = 3
 
         # Semantic categories
         semantic_map_vis = Image.new("P", (semantic_map.shape[1], semantic_map.shape[0]))

@@ -147,6 +147,7 @@ coco_categories_color_palette = [
     0.748199999999999,  # bottle
 ]
 
+# TODO Change goal color
 map_color_palette = [
     1.0,
     1.0,
