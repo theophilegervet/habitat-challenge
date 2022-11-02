@@ -55,7 +55,7 @@ if __name__ == "__main__":
         print("episode.start_position[1] * 100.", episode.start_position[1] * 100.)
         print('scene_info["floor_heights_cm"]', scene_info["floor_heights_cm"])
         print()
-        if abs(episode.start_position[1] * 100. - scene_info["floor_heights_cm"][0]) < 0.5:
+        if abs(episode.start_position[1] * 100. - scene_info["floor_heights_cm"][0]) < 50:
             first_floor_episodes.append(episode)
 
     print("Total episodes:", num_total_episodes)
