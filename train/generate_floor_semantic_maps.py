@@ -384,15 +384,15 @@ def generate_scene_semantic_maps(scene_path: str,
     if dataset == "hm3d":
         task_config.SIMULATOR.SCENE_DATASET = f"{SCENES_ROOT_PATH}/hm3d/hm3d_annotated_basis.scene_dataset_config.json"
     config.freeze()
-
+    print(0)
     try:
         sim = habitat.sims.make_sim("Sim-v0", config=task_config.SIMULATOR)
     except:
         print(f"Could not create sim for {scene_dir}")
         return
-    print(0)
-    floor_maps = HabitatFloorMaps(sim, dataset, generation_method, config, device)
     print(1)
+    floor_maps = HabitatFloorMaps(sim, dataset, generation_method, config, device)
+    print(2)
 
     print(f"Saving {generation_method} floor semantic maps for {scene_dir}")
 
@@ -423,7 +423,7 @@ def generate_scene_semantic_maps(scene_path: str,
             f, indent=4
         )
 
-    print(2)
+    print(3)
     sim.close()
 
 
