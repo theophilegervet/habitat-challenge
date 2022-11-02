@@ -52,9 +52,6 @@ if __name__ == "__main__":
         scene_id = episode.scene_id.split("/")[-1].split(".")[0]
         with open(f"{map_dir}/{scene_id}_info.json", "r") as f:
             scene_info = json.load(f)
-        print("episode.start_position[1] * 100.", episode.start_position[1] * 100.)
-        print('scene_info["floor_heights_cm"]', scene_info["floor_heights_cm"])
-        print()
         if abs(episode.start_position[1] * 100. - scene_info["floor_heights_cm"][0]) < 50:
             first_floor_episodes.append(episode)
 

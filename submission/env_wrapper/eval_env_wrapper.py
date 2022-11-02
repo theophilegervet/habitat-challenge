@@ -1,4 +1,5 @@
 import torch
+import json
 from typing import Tuple, Optional, List
 
 from habitat import Config
@@ -51,16 +52,23 @@ class EvalEnvWrapper(Env):
         # Keep only episodes with a goal on the same floor as the
         #  starting position
         if config.EVAL_VECTORIZED.goal_on_same_floor:
-            new_episode_order = [
-                episode for episode in self._dataset.episodes
-                if len([
+            new_episodes = []
+            for episode in self._dataset.episodes:
+                scene_dir = "/".join(episode.scene_id.split("/")[:-1])
+                map_dir = scene_dir + "/floor_semantic_maps_annotations_top_down"
+                scene_id = episode.scene_id.split("/")[-1].split(".")[0]
+                with open(f"{map_dir}/{scene_id}_info.json", "r") as f:
+                    scene_info = json.load(f)
+                start_on_first_floor = abs(episode.start_position[1] * 100. - scene_info["floor_heights_cm"][0]) < 50
+                goal_on_same_floor = len([
                     goal for goal in episode.goals
                     if episode.start_position[1] - 0.25 < goal.position[1] < episode.start_position[1] + 1.5
                 ]) > 0
-            ]
-            self._dataset.episodes = new_episode_order
+                if start_on_first_floor and goal_on_same_floor:
+                    new_episodes.append(episode)
+            self._dataset.episodes = new_episodes
             self.episode_iterator = EpisodeIterator(
-                new_episode_order,
+                new_episodes,
                 shuffle=False, group_by_scene=False,
             )
             self._current_episode = None
