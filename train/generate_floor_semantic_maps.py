@@ -390,7 +390,9 @@ def generate_scene_semantic_maps(scene_path: str,
     except:
         print(f"Could not create sim for {scene_dir}")
         return
+    print(0)
     floor_maps = HabitatFloorMaps(sim, dataset, generation_method, config, device)
+    print(1)
 
     print(f"Saving {generation_method} floor semantic maps for {scene_dir}")
 
@@ -421,6 +423,7 @@ def generate_scene_semantic_maps(scene_path: str,
             f, indent=4
         )
 
+    print(2)
     sim.close()
 
 
