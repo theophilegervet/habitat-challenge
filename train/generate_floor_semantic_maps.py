@@ -45,7 +45,7 @@ class HabitatFloorMaps:
                  generation_method,
                  config,
                  device,
-                 num_sampled_points=100000,
+                 num_sampled_points=1000,
                  resolution=5,
                  floor_thr=50,
                  padding=125):
