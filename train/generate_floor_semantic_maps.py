@@ -446,7 +446,8 @@ if __name__ == "__main__":
     assert args.split in ["train", "val"]
     assert args.scene_type in ["annotated", "unannotated"]
 
-    device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu")
+    # device = torch.device("cuda:1") if torch.cuda.is_available() else torch.device("cpu")
+    device = torch.device("cpu")
 
     # For scenes with semantic annotations, generate semantic maps
     # from top-down bounding boxes
