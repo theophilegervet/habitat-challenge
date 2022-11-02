@@ -353,7 +353,8 @@ def generate_scene_semantic_maps(scene_path: str,
                                  generation_method: str,
                                  device: torch.device,
                                  overwrite: bool = True):
-    print(f"Generating floor semantic maps for {scene_path}")
+    print(f"Generating {generation_method} floor semantic maps "
+          f"for {scene_path} on {device}")
     if dataset in ["hm3d", "mp3d"]:
         scene_dir = "/".join(scene_path.split("/")[:-1])
         scene_file = scene_path.split("/")[-1]
