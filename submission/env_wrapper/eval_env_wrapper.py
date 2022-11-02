@@ -66,6 +66,8 @@ class EvalEnvWrapper(Env):
                 ]) > 0
                 if start_on_first_floor and goal_on_same_floor:
                     new_episodes.append(episode)
+            print(f"From {len(self._dataset.episodes)} total episodes for this "
+                  f"environment to {len(new_episodes)} on the same floor")
             self._dataset.episodes = new_episodes
             self.episode_iterator = EpisodeIterator(
                 new_episodes,
