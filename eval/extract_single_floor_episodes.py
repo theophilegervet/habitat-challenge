@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 from pathlib import Path
+import os
 import json
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -10,6 +11,9 @@ from submission.utils.config_utils import get_config
 
 
 if __name__ == "__main__":
+    os.environ["MAGNUM_LOG"] = "quiet"
+    os.environ["HABITAT_SIM_LOG"] = "quiet"
+
     config, config_str = get_config("submission/configs/eval_hm3d_config.yaml")
 
     env = Env(config=config.TASK_CONFIG)
@@ -48,6 +52,9 @@ if __name__ == "__main__":
         scene_id = episode.scene_id.split("/")[-1].split(".")[0]
         with open(f"{map_dir}/{scene_id}_info.json", "r") as f:
             scene_info = json.load(f)
+        print("episode.start_position[1] * 100.", episode.start_position[1] * 100.)
+        print('scene_info["floor_heights_cm"][0]', scene_info["floor_heights_cm"][0])
+        print()
         if abs(episode.start_position[1] * 100. - scene_info["floor_heights_cm"][0]) < 0.5:
             first_floor_episodes.append(episode)
 
