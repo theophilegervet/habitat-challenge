@@ -31,7 +31,7 @@ if __name__ == "__main__":
     ax.hist(episode_start_to_goal_height_distances, bins=100)
     plt.show()
 
-    total_episodes = len(env._dataset.episodes)
+    num_total_episodes = len(env._dataset.episodes)
     env._dataset.episodes = [
         episode for episode in env._dataset.episodes
         if len([
@@ -39,7 +39,7 @@ if __name__ == "__main__":
             if episode.start_position[1] - 0.25 < goal.position[1] < episode.start_position[1] + 1.5
         ]) > 0
     ]
-    same_floor_episodes = len(env._dataset.episodes)
+    num_same_floor_episodes = len(env._dataset.episodes)
 
     first_floor_episodes = []
     for episode in env._dataset.episodes:
@@ -48,8 +48,11 @@ if __name__ == "__main__":
         scene_id = episode.scene_id.split("/")[-1].split(".")[0]
         with open(f"{map_dir}/{scene_id}_info.json", "r") as f:
             scene_info = json.load(f)
-            print(scene_info)
+        if abs(episode.start_position[1] * 100. - scene_info["floor_heights_cm"][0]) < 0.5:
+            first_floor_episodes.append(episode)
 
-    print("Total episodes:", total_episodes)
-    print("Same floor episodes:", same_floor_episodes)
-    print(f"Different floor episodes {(total_episodes - same_floor_episodes) / total_episodes * 100:.2f}%")
+    print("Total episodes:", num_total_episodes)
+    print("Same floor episodes:", num_same_floor_episodes)
+    print("First floor episodes:", len(first_floor_episodes))
+    print(f"Different floor episodes {(num_total_episodes - num_same_floor_episodes) / num_total_episodes * 100:.2f}%")
+    print(f"Not first floor episodes {(num_total_episodes - len(first_floor_episodes)) / num_total_episodes * 100:.2f}%")
