@@ -1,5 +1,6 @@
 import torch
 import json
+import os
 from typing import Tuple, Optional, List
 
 from habitat import Config
@@ -36,6 +37,8 @@ class EvalEnvWrapper(Env):
              debug behavior on specific episodes
         """
         super().__init__(config=config.TASK_CONFIG)
+        os.environ["MAGNUM_LOG"] = "quiet"
+        os.environ["HABITAT_SIM_LOG"] = "quiet"
 
         self.ground_truth_semantics = config.GROUND_TRUTH_SEMANTICS
         self.device = (torch.device("cpu") if config.NO_GPU else
