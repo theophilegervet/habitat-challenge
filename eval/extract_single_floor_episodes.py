@@ -1,5 +1,6 @@
 from matplotlib import pyplot as plt
 from pathlib import Path
+from collections import Counter
 import os
 import json
 import sys
@@ -46,6 +47,7 @@ if __name__ == "__main__":
     num_same_floor_episodes = len(env._dataset.episodes)
 
     first_floor_episodes = []
+    first_floor_episodes_per_scene = Counter()
     for episode in env._dataset.episodes:
         scene_dir = "/".join(episode.scene_id.split("/")[:-1])
         map_dir = scene_dir + "/floor_semantic_maps_annotations_top_down"
@@ -54,9 +56,11 @@ if __name__ == "__main__":
             scene_info = json.load(f)
         if abs(episode.start_position[1] * 100. - scene_info["floor_heights_cm"][0]) < 50:
             first_floor_episodes.append(episode)
+            first_floor_episodes_per_scene[scene_id] += 1
 
     print("Total episodes:", num_total_episodes)
     print("Same floor episodes:", num_same_floor_episodes)
     print("First floor episodes:", len(first_floor_episodes))
+    print("First floor episodes per scene:", dict(first_floor_episodes_per_scene))
     print(f"Different floor episodes {(num_total_episodes - num_same_floor_episodes) / num_total_episodes * 100:.2f}%")
     print(f"Not first floor episodes {(num_total_episodes - len(first_floor_episodes)) / num_total_episodes * 100:.2f}%")
