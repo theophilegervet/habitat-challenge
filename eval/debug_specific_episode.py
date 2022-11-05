@@ -40,7 +40,7 @@ def reset_to_episode(env: Env,
 
 
 if __name__ == "__main__":
-    config, config_str = get_config("submission/configs/challenge_config.yaml")
+    config, config_str = get_config("submission/configs/eval_hm3d_config.yaml")
     config.defrost()
     config.EXP_NAME = "debug_specific_episode"
     config.TASK_CONFIG.DATASET.SPLIT = "val"
